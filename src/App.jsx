@@ -173,7 +173,7 @@ const CHAPTERS = [
 
 const ALL_TASKS = CHAPTERS.flatMap(c => c.months.flatMap(m => m.tasks));
 const TOTAL_TASKS = ALL_TASKS.length;
-const EMPTY_DATA = { completed: {}, journal: [], parentNotes: [], values: [] };
+const EMPTY_DATA = { completed: {}, journal: [], parentNotes: [], values: [], valueSnapshots: [] };
 
 function useStorage() {
   const [data, setData] = useState(null);
@@ -806,16 +806,25 @@ function ValuesView({ data, save }) {
     save({ ...data, values: newSelected });
   }
 
+  function handleGameFinish(topValues, heroIds) {
+    const snapshot = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString("he-IL"),
+      heroes: heroIds,
+      suggestedValues: topValues,
+      chosenValues: [],
+    };
+    const snapshots = [...(data.valueSnapshots || []), snapshot];
+    save({ ...data, valueSnapshots: snapshots });
+    setGamePhase("values");
+  }
+
   const filtered = search.trim()
     ? ALL_VALUES.filter(v => v.name.includes(search.trim()))
     : ALL_VALUES;
 
   if (gamePhase === "game") {
-    return (
-      <div>
-        <HeroGame onFinish={() => setGamePhase("values")} />
-      </div>
-    );
+    return <HeroGame onFinish={handleGameFinish} />;
   }
 
   return (
@@ -1273,7 +1282,7 @@ function HeroGame({ onFinish }) {
           }}>
             🔄 שחק שוב
           </button>
-          <button onClick={onFinish} style={{
+          <button onClick={() => onFinish(topValues, selected)} style={{
             flex: 2, padding: "12px", borderRadius: 12,
             background: "linear-gradient(135deg, #7c3aed, #a855f7)",
             border: "none", color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer"
@@ -1345,18 +1354,235 @@ function HeroAvatar({ hero, size = 64 }) {
   );
 }
 
+const SNAPSHOT_COLORS = ["#7c3aed", "#0ea5e9", "#f59e0b", "#10b981", "#ec4899", "#f97316"];
+
+function ValuesMapView({ data, save }) {
+  const snapshots = data.valueSnapshots || [];
+  const [selected, setSelected] = useState(
+    snapshots.length > 0 ? [snapshots[snapshots.length - 1].id] : []
+  );
+
+  // Collect all unique values ever suggested
+  const allSuggested = [...new Set(snapshots.flatMap(s => s.suggestedValues || []))];
+  // Also include chosen values
+  const allChosen = [...new Set(snapshots.flatMap(s => s.chosenValues || []))];
+  const allValues = [...new Set([...allSuggested, ...allChosen, ...(data.values || [])])];
+
+  function toggleSnapshot(id) {
+    if (selected.includes(id)) {
+      if (selected.length > 1) setSelected(selected.filter(s => s !== id));
+    } else {
+      setSelected([...selected, id]);
+    }
+  }
+
+  function deleteSnapshot(id) {
+    const newSnaps = (data.valueSnapshots || []).filter(s => s.id !== id);
+    save({ ...data, valueSnapshots: newSnaps });
+    setSelected(prev => prev.filter(s => s !== id));
+  }
+
+  // Build value frequency map per snapshot
+  function getValueScore(snapshotId, value) {
+    const snap = snapshots.find(s => s.id === snapshotId);
+    if (!snap) return 0;
+    const suggested = snap.suggestedValues || [];
+    const chosen = snap.chosenValues || [];
+    const idx = suggested.indexOf(value);
+    if (chosen.includes(value)) return 3;
+    if (idx === 0 || idx === 1 || idx === 2) return 2;
+    if (idx >= 0) return 1;
+    return 0;
+  }
+
+  const visibleSnapshots = snapshots.filter(s => selected.includes(s.id));
+
+  if (snapshots.length === 0) {
+    return (
+      <div style={{ textAlign: "center", padding: "60px 20px" }}>
+        <div style={{ fontSize: 48, marginBottom: 16 }}>🗺️</div>
+        <p style={{ color: "#fff", fontSize: 18, fontWeight: 600, margin: "0 0 8px" }}>מפת הערכים ריקה עדיין</p>
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0 }}>
+          שחק את משחק הדמויות כדי ליצור את הצילום הראשון שלך
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div style={{ marginBottom: 20 }}>
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, margin: "0 0 12px" }}>
+          בחר צילומים להשוואה:
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {snapshots.map((snap, i) => {
+            const isSel = selected.includes(snap.id);
+            const color = SNAPSHOT_COLORS[i % SNAPSHOT_COLORS.length];
+            const heroes = (snap.heroes || []).map(id => HEROES.find(h => h.id === id)?.name.split(" ")[0]).filter(Boolean);
+            return (
+              <div key={snap.id} style={{ position: "relative" }}>
+                <button onClick={() => toggleSnapshot(snap.id)} style={{
+                  padding: "8px 14px", borderRadius: 10, fontSize: 12, cursor: "pointer",
+                  background: isSel ? `${color}25` : "rgba(255,255,255,0.04)",
+                  border: isSel ? `1.5px solid ${color}` : "1px solid rgba(255,255,255,0.1)",
+                  color: isSel ? "#fff" : "rgba(255,255,255,0.5)",
+                  display: "flex", alignItems: "center", gap: 8
+                }}>
+                  <span style={{ width: 10, height: 10, borderRadius: "50%", background: color, display: "inline-block", flexShrink: 0 }} />
+                  <span>{snap.date}</span>
+                  {heroes.length > 0 && <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 10 }}>({heroes.join(", ")})</span>}
+                </button>
+                <button onClick={() => deleteSnapshot(snap.id)} style={{
+                  position: "absolute", top: -6, left: -6, width: 18, height: 18,
+                  borderRadius: "50%", background: "rgba(239,68,68,0.8)", border: "none",
+                  color: "#fff", fontSize: 10, cursor: "pointer", display: "flex",
+                  alignItems: "center", justifyContent: "center", lineHeight: 1, zIndex: 10
+                }}>×</button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Current chosen values from the active profile */}
+      {data.values?.length > 0 && (
+        <div style={{
+          padding: "12px 16px", borderRadius: 12, marginBottom: 20,
+          background: "rgba(234,179,8,0.07)", border: "1px solid rgba(234,179,8,0.2)"
+        }}>
+          <p style={{ color: "#fbbf24", fontWeight: 600, fontSize: 13, margin: "0 0 8px" }}>⭐ הערכים שבחרת כרגע</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {data.values.map(v => (
+              <span key={v} style={{
+                padding: "4px 12px", borderRadius: 20, fontSize: 13,
+                background: "rgba(234,179,8,0.15)", color: "#fef08a",
+                border: "1px solid rgba(234,179,8,0.3)"
+              }}>{v}</span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Value map grid */}
+      {visibleSnapshots.length > 0 && (
+        <div>
+          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: "0 0 12px" }}>
+            ⬛ לא הופיע &nbsp; 🟦 הוצע &nbsp; ⭐ הוצע בחוזקה &nbsp; 💛 נבחר
+          </p>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", direction: "rtl" }}>
+              <thead>
+                <tr>
+                  <th style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, padding: "6px 8px", textAlign: "right", minWidth: 90 }}>ערך</th>
+                  {visibleSnapshots.map((snap, i) => {
+                    const color = SNAPSHOT_COLORS[snapshots.indexOf(snap) % SNAPSHOT_COLORS.length];
+                    return (
+                      <th key={snap.id} style={{
+                        color, fontSize: 11, fontWeight: 600, padding: "6px 8px",
+                        textAlign: "center", minWidth: 70
+                      }}>
+                        {snap.date}
+                      </th>
+                    );
+                  })}
+                </tr>
+              </thead>
+              <tbody>
+                {allValues.map((value, rowIdx) => {
+                  const scores = visibleSnapshots.map(s => getValueScore(s.id, value));
+                  const hasAny = scores.some(s => s > 0) || data.values?.includes(value);
+                  if (!hasAny) return null;
+                  return (
+                    <tr key={value} style={{ background: rowIdx % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent" }}>
+                      <td style={{
+                        color: data.values?.includes(value) ? "#fbbf24" : "rgba(255,255,255,0.8)",
+                        fontSize: 13, padding: "8px", fontWeight: data.values?.includes(value) ? 600 : 400
+                      }}>
+                        {data.values?.includes(value) ? "⭐ " : ""}{value}
+                      </td>
+                      {visibleSnapshots.map((snap, i) => {
+                        const score = getValueScore(snap.id, value);
+                        const color = SNAPSHOT_COLORS[snapshots.indexOf(snap) % SNAPSHOT_COLORS.length];
+                        const cell = score === 0 ? { bg: "transparent", text: "—", color: "rgba(255,255,255,0.15)" }
+                          : score === 1 ? { bg: `${color}18`, text: "הוצע", color }
+                          : score === 2 ? { bg: `${color}30`, text: "⭐ חזק", color }
+                          : { bg: "rgba(234,179,8,0.2)", text: "💛 נבחר", color: "#fbbf24" };
+                        return (
+                          <td key={snap.id} style={{ textAlign: "center", padding: "6px 4px" }}>
+                            <span style={{
+                              display: "inline-block", padding: "3px 8px", borderRadius: 6, fontSize: 11,
+                              background: cell.bg, color: cell.color,
+                              border: score > 0 ? `1px solid ${cell.color}40` : "none"
+                            }}>{cell.text}</span>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Timeline visual */}
+      {snapshots.length > 1 && (
+        <div style={{ marginTop: 28, padding: 20, borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, margin: "0 0 16px", fontWeight: 600 }}>ציר זמן — שינויים בערכים</p>
+          {allValues.filter(v => {
+            const scores = snapshots.map(s => getValueScore(s.id, v));
+            return scores.some(s => s > 0);
+          }).slice(0, 12).map(value => {
+            const scores = snapshots.map((s, i) => ({
+              date: s.date, score: getValueScore(s.id, value),
+              color: SNAPSHOT_COLORS[i % SNAPSHOT_COLORS.length]
+            }));
+            const maxScore = Math.max(...scores.map(s => s.score));
+            if (maxScore === 0) return null;
+            return (
+              <div key={value} style={{ marginBottom: 12 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                  <span style={{ color: data.values?.includes(value) ? "#fbbf24" : "rgba(255,255,255,0.7)", fontSize: 13 }}>
+                    {data.values?.includes(value) ? "⭐ " : ""}{value}
+                  </span>
+                </div>
+                <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+                  {scores.map((s, i) => (
+                    <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+                      <div style={{
+                        width: 32, height: s.score === 0 ? 6 : s.score === 1 ? 14 : s.score === 2 ? 22 : 30,
+                        borderRadius: 4, background: s.score === 0 ? "rgba(255,255,255,0.06)" : s.color,
+                        opacity: s.score === 0 ? 1 : 0.6 + s.score * 0.13,
+                        transition: "height 0.4s ease"
+                      }} />
+                      <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 9 }}>{s.date.split("/").slice(0, 2).join("/")}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const NAV_IDO = [
   { id: "tasks", label: "משימות", icon: "✓" },
   { id: "progress", label: "התקדמות", icon: "📊" },
   { id: "journal", label: "יומן", icon: "📝" },
   { id: "values", label: "ערכים", icon: "⭐" },
-  { id: "manifesto", label: "המסע", icon: "🧭" },
+  { id: "map", label: "מפה", icon: "🗺️" },
 ];
 
 const NAV_PARENT = [
   { id: "progress", label: "התקדמות", icon: "📊" },
   { id: "tasks", label: "משימות", icon: "✓" },
   { id: "journal", label: "הערות", icon: "📝" },
+  { id: "map", label: "מפה", icon: "🗺️" },
   { id: "manifesto", label: "המסע", icon: "🧭" },
 ];
 
@@ -1417,6 +1643,7 @@ export default function App() {
         {tab === "progress" && <ProgressView data={data} />}
         {tab === "journal" && <JournalView data={data} save={save} isParent={isParent} />}
         {tab === "values" && !isParent && <ValuesView data={data} save={save} />}
+        {tab === "map" && <ValuesMapView data={data} save={save} />}
         {tab === "manifesto" && <ManifestoView />}
       </div>
 
