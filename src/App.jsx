@@ -592,73 +592,333 @@ function ProgressView({ data }) {
   );
 }
 
-function ValuesView({ data, save }) {
-  const [values, setValues] = useState(data.values || []);
-  const [input, setInput] = useState("");
+const ALL_VALUES = [
+  { name: "אדיבות", desc: "להתנהג בנועם ובכבוד כלפי כל אדם, גם כשקשה." },
+  { name: "אהבה", desc: "לחבב, לדאוג ולהעניק מעצמך לאנשים שחשובים לך." },
+  { name: "אהבת המולדת", desc: "קשר עמוק וגאווה בארץ ובעם שאתה שייך אליהם." },
+  { name: "אהדה", desc: "לחוש עם אחרים ברגעי שמחה וכאב כאחד." },
+  { name: "אומץ", desc: "לפעול גם כשמפחד, לא להימנע מאתגרים בגלל פחד." },
+  { name: "אופטימיות", desc: "להאמין שהעתיד יכול להיות טוב, גם כשקשה בהווה." },
+  { name: "אושר", desc: "לחפש ולטפח שמחה פנימית אמיתית בחיים." },
+  { name: "אותנטיות", desc: "להיות מי שאתה באמת, לא מה שאחרים מצפים ממך." },
+  { name: "אחדות", desc: "לפעול יחד, לחבר בין אנשים ולא לפרק." },
+  { name: "אחריות", desc: "לעמוד מאחורי המילים והמעשים שלך, גם כשטועים." },
+  { name: "איזון", desc: "לחיות בהרמוניה בין תחומים שונים — עבודה, מנוחה, יחסים." },
+  { name: "איכות הסביבה", desc: "לדאוג לטבע ולכדור הארץ כחלק מהאחריות שלך." },
+  { name: "אינטואיציה", desc: "לסמוך על הקול הפנימי שלך, לא רק על הגיון קר." },
+  { name: "אינטימיות", desc: "ליצור קשרים עמוקים ואמיתיים עם אנשים קרובים." },
+  { name: "אכפתיות", desc: "לא לעבור ליד בשוויון נפש — לאנשים, לסביבה, לחברה." },
+  { name: "אמון", desc: "לבנות מערכות יחסים שמבוססות על ביטחון הדדי." },
+  { name: "אמונה", desc: "להאמין במשהו גדול יותר ממך — בעצמך, בחיים, באנשים." },
+  { name: "אמנות", desc: "להעריך ביצירה אנושית — ביטוי, יופי, רגש דרך יצירה." },
+  { name: "אמפתיה", desc: "להרגיש את מה שאחרים מרגישים, לעמוד בנעליהם." },
+  { name: "אמת", desc: "לדבר ולחיות ביושר, גם כשהאמת לא נוחה." },
+  { name: "אנושיות", desc: "לראות את הצד האנושי בכל אדם, לא רק את החיצוני." },
+  { name: "אסרטיביות", desc: "לבטא את עצמך בביטחון מבלי לפגוע באחרים." },
+  { name: "אסתטיקה", desc: "להעריך יופי, עיצוב והרמוניה חזותית בחיים." },
+  { name: "אצילות", desc: "להתנהג בגדולה, לתת כבוד גם למי שאינו מצדיק אותו." },
+  { name: "אריכות ימים", desc: "לשמור על בריאות ולחיות חיים ארוכים ומלאים." },
+  { name: "בהירות", desc: "לחשוב ולתקשר בצורה ברורה וחדה, ללא עמימות." },
+  { name: "בחירה", desc: "להכיר שיש לך כוח לבחור את דרכך בכל רגע." },
+  { name: "בטחון", desc: "להרגיש יציב ובטוח בתוך עצמך, ללא תלות בחיצוני." },
+  { name: "ביטוי עצמי", desc: "לתת ביטוי חופשי לאישיות, לרגשות וליצירתיות שלך." },
+  { name: "בין אדם לחברו", desc: "להשקיע במערכות יחסים כמנוע מרכזי בחיים." },
+  { name: "בריאות", desc: "לדאוג לגוף ולנפש כבסיס לחיים מלאים." },
+  { name: "גאווה", desc: "להרגיש סיפוק ועוצמה על מי שאתה ומה שהשגת." },
+  { name: "גבורה", desc: "להתמודד עם קשיים בעוצמה ובאומץ." },
+  { name: "גיוון", desc: "לראות בשונות בין אנשים עושר ולא איום." },
+  { name: "גמישות", desc: "להסתגל לשינויים מבלי לאבד את עצמך." },
+  { name: "דוגמא אישית", desc: "להנהיג דרך מעשים ולא רק דברים." },
+  { name: "דו-קיום", desc: "לחיות בשלום לצד אנשים שונים ממך." },
+  { name: "דיוק", desc: "לעשות דברים בקפידה, לפרטים יש חשיבות." },
+  { name: "הארת פנים", desc: "להאיר את הסביבה בחיוך, בחום ובנוכחות חיובית." },
+  { name: "הבחנה", desc: "היכולת להבחין בין מה שחשוב לבין מה שלא." },
+  { name: "הבנה", desc: "לשאוף להבין לעומק — אנשים, רעיונות, מצבים." },
+  { name: "הגיון", desc: "לפעול מתוך חשיבה רציונלית ומבוססת." },
+  { name: "הגינות", desc: "לפעול בצדק ובשוויון גם כשאין חובה לכך." },
+  { name: "הגנה", desc: "לעמוד לצד מי שצריך הגנה — חלשים, אהובים, ערכים." },
+  { name: "הגשמה", desc: "לממש חלומות ומטרות, לא רק לחלום עליהם." },
+  { name: "הדדיות", desc: "לבנות מערכות יחסים של נתינה וקבלה הדדית." },
+  { name: "הובלה", desc: "לקחת אחריות ולהניע אחרים לכיוון משותף." },
+  { name: "הומור", desc: "לראות את הצד המצחיק של החיים ולהקל בו את הקשיים." },
+  { name: "הוקרת תודה", desc: "להכיר בטוב שמסביבך ולהביע תודה על כך." },
+  { name: "הזדהות", desc: "לחוש שייכות ומחויבות לקבוצה, לרעיון, לאדם." },
+  { name: "הישגיות", desc: "לשאוף לתוצאות ולא להסתפק בפחות ממה שאתה יכול." },
+  { name: "החלטיות", desc: "לקבל החלטות בביטחון ולהתחייב אליהן." },
+  { name: "הנאה", desc: "לאפשר לעצמך ליהנות מהחיים בלי אשמה." },
+  { name: "הסתגלות", desc: "להשתנות עם הנסיבות מבלי לאבד ערכים מרכזיים." },
+  { name: "הסתפקות במועט", desc: "למצוא שמחה במה שיש, לא להיות כל הזמן בחסר." },
+  { name: "הערכה", desc: "להכיר בערך של אנשים, דברים וחוויות בחייך." },
+  { name: "הצלחה", desc: "לשאוף ולהשיג מטרות שהגדרת לעצמך." },
+  { name: "הקשבה", desc: "להיות נוכח באמת כשמישהו מדבר, לא רק לשמוע." },
+  { name: "הרמוניה", desc: "לחיות בשלום עם עצמך ועם הסביבה." },
+  { name: "הרפתקנות", desc: "לפתוח את עצמך לחוויות חדשות ולא ידועות." },
+  { name: "השפעה", desc: "להשאיר חותם חיובי על אנשים ועל העולם." },
+  { name: "התלהבות", desc: "להביא אנרגיה ותשוקה לכל מה שאתה עושה." },
+  { name: "התמדה", desc: "להמשיך גם כשקשה, לא לוותר בדרך." },
+  { name: "התנדבות", desc: "לתת מזמנך ומאנרגייתך לאחרים ללא תמורה." },
+  { name: "התמסרות", desc: "להשקיע את כל עצמך במה שבחרת." },
+  { name: "התפתחות", desc: "לשאוף כל הזמן ללמוד, לגדול ולהשתפר." },
+  { name: "ודאות", desc: "לחפש יציבות וביטחון בתוך עולם משתנה." },
+  { name: "ויתור", desc: "לדעת מתי לשחרר — דברים, כעסים, ציפיות." },
+  { name: "זכרון", desc: "לשמר את העבר ולכבד את מה שהיה." },
+  { name: "זמן פנוי", desc: "לשמר מרחב לנשימה, מנוחה ומה שאוהבים." },
+  { name: "חברות", desc: "לטפח קשרים של אמון, שמחה ונאמנות לאורך זמן." },
+  { name: "חדשנות", desc: "לחשוב מחוץ לקופסה ולהמציא דרכים חדשות." },
+  { name: "חופש", desc: "לפעול מתוך רצון אישי ולא מכפייה." },
+  { name: "חופש בחירה", desc: "להאמין בזכות של כל אדם לבחור את דרכו." },
+  { name: "חיים", desc: "לחגוג את עצם הקיום ולהעניק לו משמעות." },
+  { name: "חינוך", desc: "להאמין בכוח של הידע והלמידה לשנות חיים." },
+  { name: "חכמה", desc: "לפעול מתוך בגרות, ניסיון והבנה עמוקה." },
+  { name: "חכמת חיים", desc: "לדעת מה באמת חשוב — לא רק מה נראה חשוב." },
+  { name: "חמלה", desc: "לפגוש כאב של אחרים בלב פתוח ורצון לעזור." },
+  { name: "חריצות", desc: "לעבוד קשה ובמסירות למה שאתה עושה." },
+  { name: "חשיבה", desc: "לתת לשכל מקום — לנתח, לפקפק, לחקור." },
+  { name: "טבע", desc: "לחוש קשר לעולם הטבעי ולשמור עליו." },
+  { name: "ידע", desc: "לאסוף מידע והבנה כדי לפעול טוב יותר בעולם." },
+  { name: "יוזמה", desc: "לא לחכות שדברים יקרו — ליזום ולפעול." },
+  { name: "יופי", desc: "להכיר ביופי בחיים — בטבע, באנשים, ביצירה." },
+  { name: "יושר", desc: "להיות ישר בדברים ובמעשים, גם כשזה לא נוח." },
+  { name: "יושר פנימי", desc: "להתאים בין מה שאתה מאמין לבין איך שאתה חי." },
+  { name: "יושרה", desc: "לשמור על עקרונות אתיים גם תחת לחץ." },
+  { name: "ייחודיות", desc: "להכיר ולחגוג את מה שהופך אותך לשונה מכולם." },
+  { name: "יסודיות", desc: "לעשות דברים לעומק ולא רק על פני השטח." },
+  { name: "יעילות", desc: "להשיג תוצאות מקסימליות עם המשאבים שיש." },
+  { name: "יציבות", desc: "להיות עקבי ואמין גם כשהסביבה לא." },
+  { name: "יצירתיות", desc: "לחשוב בדרכים חדשות ולהביא רעיונות מקוריים." },
+  { name: "ישירות", desc: "לדבר בגלוי ובפשטות, בלי לעגל פינות." },
+  { name: "כבוד", desc: "לתת כבוד לכל אדם — ולא לוותר על כבוד עצמך." },
+  { name: "כבוד המשפחה", desc: "לשמור על הקשר המשפחתי ולהעריך אותו." },
+  { name: "כיבוד האדם", desc: "לראות כל אדם כבעל ערך מולד ובלתי מותנה." },
+  { name: "כוח", desc: "לפתח עוצמה פנימית וגופנית להתמודד עם החיים." },
+  { name: "כיף", desc: "לתת מקום לשמחה, לשחק ולקלות בחיים." },
+  { name: "כנות", desc: "לאמר את האמת שלך, גם כשזה דורש אומץ." },
+  { name: "כריזמה", desc: "להשפיע על אחרים דרך נוכחות ואישיות חזקה." },
+  { name: "למידה", desc: "לראות כל ניסיון — גם כישלון — כהזדמנות לגדול." },
+  { name: "לקיחת סיכונים", desc: "להיות מוכן לנסות גם כשהתוצאה לא ידועה." },
+  { name: "מחויבות", desc: "לעמוד מאחורי המילה שלך ולסיים מה שהתחלת." },
+  { name: "מחילה", desc: "לשחרר טינה ולאפשר לעצמך ולאחרים להתחיל מחדש." },
+  { name: "מיקוד במטרה", desc: "להשקיע אנרגיה במה שבאמת חשוב ולא לפזר." },
+  { name: "מנהיגות", desc: "לדעת לעמוד בראש ולהוביל אחרים בדרך טובה." },
+  { name: "מסורת", desc: "לשמר דפוסים וערכים שהועברו מדורות קודמים." },
+  { name: "מסירות נפש", desc: "לתת את כולך לדבר שמאמין בו, גם במחיר אישי." },
+  { name: "מעורבות", desc: "להיות פעיל בקהילה ובחברה ולא רק צופה." },
+  { name: "מעשיות", desc: "לחשוב על פתרונות ריאליים ולא רק על רעיונות." },
+  { name: "מצוינות", desc: "לעשות את הדברים ברמה הגבוהה ביותר שאתה יכול." },
+  { name: "מקוריות", desc: "להביא קול ייחודי משלך לכל מה שאתה עושה." },
+  { name: "מקצועיות", desc: "לגשת לכל תחום בכובד ראש ובמיומנות." },
+  { name: "משמעת עצמית", desc: "לשלוט בדחפים ולעשות מה שצריך גם בלי חשק." },
+  { name: "משפחה", desc: "להעמיד את הקשר המשפחתי כעדיפות מרכזית בחיים." },
+  { name: "מתינות", desc: "לא להגזים — לשמור על שיווי משקל בהכל." },
+  { name: "נאמנות", desc: "לעמוד לצד מי שבחרת, גם בזמנים קשים." },
+  { name: "נדיבות", desc: "לתת בחופשיות — זמן, כסף, אנרגיה, אהבה." },
+  { name: "נוחות", desc: "לדאוג שהסביבה שלך ושל אחרים תהיה נינוחה." },
+  { name: "נחישות", desc: "לא לוותר על מה שחשוב לך, גם תחת לחץ." },
+  { name: "נימוס", desc: "להתנהג בדרך ארץ ובכבוד בכל מצב." },
+  { name: "נכונות", desc: "להיות מוכן לעזור, לשנות, ללמוד ולהתגמש." },
+  { name: "נקיון", desc: "לשמור על סדר וניקיון — בחלל, בנפש, במחשבה." },
+  { name: "נתינה", desc: "למצוא שמחה בנתינה לאחרים, לא רק בקבלה." },
+  { name: "סבלנות", desc: "להמתין בשלווה, לא לדחוף ולא להתפוצץ." },
+  { name: "סדר", desc: "לאהוב מבנה, ארגון ובהירות בחיים." },
+  { name: "סדר חברתי", desc: "להאמין בחשיבות של חוקים ומוסדות לחברה בריאה." },
+  { name: "סובלנות", desc: "לקבל שאנשים שונים ממך לא בהכרח טועים." },
+  { name: "סליחה", desc: "לשחרר כעס ולאפשר לעצמך להמשיך קדימה." },
+  { name: "סלחנות", desc: "להיות נדיב בסליחה כלפי אחרים וכלפי עצמך." },
+  { name: "ספונטניות", desc: "לאפשר לעצמך לפעול מהבטן, לא רק מהתכנון." },
+  { name: "סיפוק", desc: "למצוא תחושת שלמות ממה שכבר הגעת אליו." },
+  { name: "סקרנות", desc: "לשאול שאלות, לחקור, לא לקבל דברים כמובן מאליו." },
+  { name: "עבודת צוות", desc: "לפעול יחד עם אחרים לקראת מטרה משותפת." },
+  { name: "עדינות", desc: "להתנהל בעדינות ורגישות כלפי אחרים." },
+  { name: "עונג", desc: "לתת מקום לחוויות שגורמות לך עונג אמיתי." },
+  { name: "עוצמה", desc: "לפעול מתוך כוח פנימי ולא מחולשה או פחד." },
+  { name: "עושר", desc: "לשאוף לשפע — חומרי, רגשי, חברתי." },
+  { name: "עזרה לזולת", desc: "לראות בעזרה לאחרים חלק מרכזי מהזהות שלך." },
+  { name: "עליזות", desc: "לגשת לחיים עם קלות ואנרגיה חיובית." },
+  { name: "ענווה", desc: "להכיר בגבולותיך ולקבל ביקורת בפתיחות." },
+  { name: "עניין", desc: "לשמור על מעורבות ועניין פעיל בחיים ובאנשים." },
+  { name: "עצמאות", desc: "לפתח יכולת לפעול ולהחליט בעצמך." },
+  { name: "עקביות", desc: "להיות אותו אדם בין אם רואים אותך ובין אם לאו." },
+  { name: "עשיית הבדל", desc: "לפעול כך שהעולם יהיה טיפה יותר טוב בגללך." },
+  { name: "פטריוטיות", desc: "לאהוב ולשרת את המדינה והעם שאתה שייך אליהם." },
+  { name: "פרפקציוניזם", desc: "לשאוף למושלמות ולא להסתפק בבינוניות." },
+  { name: "פשטות", desc: "לוותר על מיותר ולחיות בצורה ברורה ופשוטה." },
+  { name: "פתיחות", desc: "להיות פתוח לרעיונות, לאנשים ולחוויות חדשות." },
+  { name: "צדק", desc: "לפעול למען שוויון הזדמנויות ויחס הוגן לכולם." },
+  { name: "צמיחה", desc: "לראות את עצמך כמתפתח כל הזמן ולא כקבוע." },
+  { name: "צניעות", desc: "לא לפרסם את עצמך יתר על המידה, לתת לעשייה לדבר." },
+  { name: "קבלה", desc: "לקבל את המציאות כמו שהיא — אנשים, מצבים, עצמך." },
+  { name: "קבלה עצמית", desc: "לאהוב את עצמך על כל מה שאתה — כולל הפגמים." },
+  { name: "קדושת החיים", desc: "להאמין שלכל חיים יש ערך מוחלט שאין לפגוע בו." },
+  { name: "קידמה", desc: "לפעול למען שיפור מתמיד של החברה והעולם." },
+  { name: "קלילות", desc: "לא לקחת הכל ברצינות יתרה — לנשום קצת." },
+  { name: "רוגע", desc: "לשמור על שקט פנימי גם בסיטואציות לחוצות." },
+  { name: "רוחניות", desc: "לחפש משמעות ועומק מעבר לפן החומרי של החיים." },
+  { name: "רומנטיקה", desc: "להעריך קשרים אינטימיים ולטפח אותם ביצירתיות." },
+  { name: "ריגוש", desc: "לחפש חוויות שמלהיבות ומגרות אותך." },
+  { name: "ריכוז", desc: "להתמקד במה שלפניך ולא לפזר את הקשב." },
+  { name: "רכות", desc: "לנהוג בעדינות ובחום גם כשאפשר להיות קשיח." },
+  { name: "רצינות", desc: "לגשת לדברים בכובד ראש ולא לזלזל בשום דבר." },
+  { name: "רעות", desc: "לבנות חברויות אמיתיות שמחזיקות לאורך זמן." },
+  { name: "שאפתנות", desc: "לרצות להשיג דברים גדולים ולעמוד מאחורי זה." },
+  { name: "שוויון", desc: "להאמין שכל אדם ראוי ליחס שווה ולהזדמנות שווה." },
+  { name: "שונות", desc: "לחגוג ייחודיות ולא לנסות להיות כמו כולם." },
+  { name: "שותפות", desc: "לבנות דרכים משותפות עם אחרים, לא לפעול לבד." },
+  { name: "שחרור", desc: "לשחרר מה שמכביד ולפנות מקום לחדש." },
+  { name: "שייכות", desc: "להרגיש חלק ממשהו — קבוצה, קהילה, משפחה." },
+  { name: "שיפור מתמיד", desc: "לא להסתפק במה שיש — תמיד לשאוף ליותר." },
+  { name: "שיתוף", desc: "לחלוק עם אחרים — ידע, חוויות, רגשות." },
+  { name: "שיתוף פעולה", desc: "לפעול יחד ולמנף את הכוח המשותף." },
+  { name: "שלווה", desc: "לחיות ברוגע פנימי עמוק, מעבר לרעש של החיים." },
+  { name: "שלום", desc: "לפעול למען שלום — בבית, בקהילה, בעולם." },
+  { name: "שליטה", desc: "להרגיש שאתה זה שמוביל את חייך, לא ההיפך." },
+  { name: "שלמות", desc: "לחפש תחושת שלמות — בין ערכים לבין מעשים." },
+  { name: "שמחה", desc: "לפעול למען שמחה — שלך ושל הסביבה." },
+  { name: "שמחת חיים", desc: "לחגוג את החיים עצמם, גם ברגעים קטנים." },
+  { name: "שמירה על הטבע", desc: "לפעול כשומר על הסביבה הטבעית לדורות הבאים." },
+  { name: "שפע", desc: "לראות בעולם מקום של אפשרויות ולא מחסור." },
+  { name: "שקט", desc: "לחפש שקט — פיזי ומנטלי — כמשאב חיוני." },
+  { name: "שקיפות", desc: "לפעול בפתיחות כך שאחרים יוכלו לסמוך עליך." },
+  { name: "תושייה", desc: "למצוא פתרונות יצירתיים גם כשהמשאבים מוגבלים." },
+  { name: "תמימות", desc: "לשמר תמימות ואמונה בטוב גם אחרי אכזבות." },
+  { name: "תעוזה", desc: "לעשות את מה שמפחיד, כשיש לזה סיבה טובה." },
+  { name: "תקווה", desc: "להאמין שדברים יכולים להשתפר, גם כשקשה." },
+  { name: "תקשורת", desc: "לבטא ולהקשיב בצורה שמחברת ולא מרחיקה." },
+  { name: "תרבות", desc: "להעריך ולשמר יצירה, שפה ומורשת אנושית." },
+  { name: "תרומה", desc: "להשאיר את המקום שלך יותר טוב ממה שמצאת." },
+  { name: "תרומה חברתית", desc: "לפעול לטובת הכלל ולא רק לטובת עצמך." },
+];
 
-  function addValue() {
-    if (!input.trim() || values.length >= 5) return;
-    const newVals = [...values, input.trim()];
-    setValues(newVals);
-    save({ ...data, values: newVals });
-    setInput("");
+function ValuesView({ data, save }) {
+  const [selected, setSelected] = useState(data.values || []);
+  const [expandedValue, setExpandedValue] = useState(null);
+  const [search, setSearch] = useState("");
+  const [gamePhase, setGamePhase] = useState(data.values?.length > 0 ? "values" : "game");
+
+  function toggleValue(name) {
+    let newSelected;
+    if (selected.includes(name)) {
+      newSelected = selected.filter(v => v !== name);
+    } else {
+      if (selected.length >= 5) return;
+      newSelected = [...selected, name];
+    }
+    setSelected(newSelected);
+    save({ ...data, values: newSelected });
   }
 
-  function removeValue(i) {
-    const newVals = values.filter((_, idx) => idx !== i);
-    setValues(newVals);
-    save({ ...data, values: newVals });
+  const filtered = search.trim()
+    ? ALL_VALUES.filter(v => v.name.includes(search.trim()))
+    : ALL_VALUES;
+
+  if (gamePhase === "game") {
+    return (
+      <div>
+        <HeroGame onFinish={() => setGamePhase("values")} />
+      </div>
+    );
   }
 
   return (
     <div>
-      <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 14, lineHeight: 1.7, marginBottom: 24 }}>
-        בחר עד 5 ערכים שמנחים אותך השנה. אלו הדברים הכי חשובים לך — המצפן האישי שלך.
-      </p>
-      <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-        <input value={input} onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && addValue()}
-          placeholder={values.length < 5 ? "ערך חדש..." : "בחרת 5 ערכים!"}
-          disabled={values.length >= 5}
-          style={{
-            flex: 1, padding: "11px 16px", borderRadius: 12,
-            background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
-            color: "#fff", fontSize: 15, outline: "none", direction: "rtl"
-          }} />
-        <button onClick={addValue} disabled={values.length >= 5} style={{
-          padding: "11px 20px", borderRadius: 12,
-          background: "rgba(124,58,237,0.7)", border: "none", color: "#fff",
-          cursor: values.length < 5 ? "pointer" : "not-allowed", fontSize: 15
-        }}>+</button>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+        <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 14, lineHeight: 1.7, margin: 0 }}>
+          בחר עד 5 ערכים — לחץ על ערך לתיאור.
+        </p>
+        <button onClick={() => setGamePhase("game")} style={{
+          padding: "7px 14px", borderRadius: 10, fontSize: 12, cursor: "pointer", flexShrink: 0,
+          background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.3)",
+          color: "#c4b5fd"
+        }}>🏆 חזור למשחק</button>
       </div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-        {values.map((v, i) => (
-          <div key={i} style={{
-            display: "flex", alignItems: "center", gap: 10, padding: "10px 18px",
-            borderRadius: 30, background: "rgba(124,58,237,0.2)", border: "1px solid rgba(124,58,237,0.4)"
-          }}>
-            <span style={{ color: "#e9d5ff", fontSize: 15, fontWeight: 500 }}>{v}</span>
-            <button onClick={() => removeValue(i)} style={{
-              background: "none", border: "none", color: "rgba(255,255,255,0.4)",
-              cursor: "pointer", fontSize: 18, lineHeight: 1, padding: 0
-            }}>×</button>
-          </div>
-        ))}
-        {values.length === 0 && (
-          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>לא בחרת ערכים עדיין.</p>
-        )}
-      </div>
-      {values.length === 5 && (
+
+      {selected.length > 0 && (
         <div style={{
-          marginTop: 24, padding: 20, borderRadius: 14,
-          background: "rgba(234,179,8,0.08)", border: "1px solid rgba(234,179,8,0.2)"
+          padding: 16, borderRadius: 14, marginBottom: 20,
+          background: selected.length === 5 ? "rgba(234,179,8,0.08)" : "rgba(124,58,237,0.08)",
+          border: selected.length === 5 ? "1px solid rgba(234,179,8,0.25)" : "1px solid rgba(124,58,237,0.2)"
         }}>
-          <p style={{ color: "#fbbf24", fontWeight: 600, margin: 0 }}>✨ המצפן שלך לשנה הזו</p>
-          <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 14, margin: "8px 0 0" }}>
-            {values.join(" • ")}
+          <p style={{ color: selected.length === 5 ? "#fbbf24" : "#c4b5fd", fontWeight: 600, margin: "0 0 10px", fontSize: 13 }}>
+            {selected.length === 5 ? "✨ המצפן שלך לשנה הזו" : `✓ בחרת ${selected.length}/5 ערכים`}
           </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {selected.map(v => (
+              <div key={v} style={{
+                display: "flex", alignItems: "center", gap: 8, padding: "6px 14px",
+                borderRadius: 30, background: "rgba(124,58,237,0.2)", border: "1px solid rgba(124,58,237,0.4)"
+              }}>
+                <span style={{ color: "#e9d5ff", fontSize: 14, fontWeight: 500 }}>{v}</span>
+                <button onClick={() => toggleValue(v)} style={{
+                  background: "none", border: "none", color: "rgba(255,255,255,0.4)",
+                  cursor: "pointer", fontSize: 16, lineHeight: 1, padding: 0
+                }}>×</button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
+
+      <input
+        value={search} onChange={e => setSearch(e.target.value)}
+        placeholder="חפש ערך..."
+        style={{
+          width: "100%", padding: "10px 16px", borderRadius: 12, boxSizing: "border-box",
+          background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
+          color: "#fff", fontSize: 14, outline: "none", direction: "rtl", marginBottom: 16
+        }}
+      />
+
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        {filtered.map(v => {
+          const isSelected = selected.includes(v.name);
+          const isExpanded = expandedValue === v.name;
+          const isDisabled = !isSelected && selected.length >= 5;
+
+          return (
+            <div key={v.name} style={{ position: "relative" }}>
+              <button
+                onClick={() => setExpandedValue(isExpanded ? null : v.name)}
+                style={{
+                  padding: "8px 14px", borderRadius: 10, fontSize: 14, cursor: isDisabled ? "not-allowed" : "pointer",
+                  background: isSelected ? "rgba(124,58,237,0.3)" : isExpanded ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.05)",
+                  border: isSelected ? "1px solid rgba(124,58,237,0.6)" : "1px solid rgba(255,255,255,0.1)",
+                  color: isSelected ? "#e9d5ff" : isDisabled ? "rgba(255,255,255,0.25)" : "#fff",
+                  transition: "all 0.15s"
+                }}
+              >
+                {isSelected && <span style={{ marginLeft: 6 }}>✓</span>}
+                {v.name}
+              </button>
+
+              {isExpanded && (
+                <div style={{
+                  position: "absolute", top: "calc(100% + 8px)", right: 0, zIndex: 50,
+                  width: 240, padding: "14px 16px", borderRadius: 12,
+                  background: "#1a1a2e", border: "1px solid rgba(124,58,237,0.4)",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.6)"
+                }}>
+                  <p style={{ color: "#c4b5fd", fontWeight: 600, margin: "0 0 6px", fontSize: 14 }}>{v.name}</p>
+                  <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, margin: "0 0 12px", lineHeight: 1.6 }}>{v.desc}</p>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button onClick={() => { toggleValue(v.name); setExpandedValue(null); }} style={{
+                      flex: 1, padding: "8px", borderRadius: 8, fontSize: 13, cursor: isDisabled && !isSelected ? "not-allowed" : "pointer",
+                      background: isSelected ? "rgba(239,68,68,0.15)" : "rgba(124,58,237,0.4)",
+                      border: isSelected ? "1px solid rgba(239,68,68,0.3)" : "1px solid rgba(124,58,237,0.5)",
+                      color: isSelected ? "#fca5a5" : "#fff"
+                    }}>
+                      {isSelected ? "הסר" : isDisabled ? "כבר 5 ✓" : "בחר ➕"}
+                    </button>
+                    <button onClick={() => setExpandedValue(null)} style={{
+                      padding: "8px 12px", borderRadius: 8, fontSize: 13,
+                      background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+                      color: "rgba(255,255,255,0.5)", cursor: "pointer"
+                    }}>סגור</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -714,6 +974,312 @@ function ManifestoView() {
           אנחנו מתחייבות להיות לצידך במסע הזה. לא להוביל במקומך, לא לפתור עבורך, לא להחליט — אלא לצעוד לצידך, לשאול, להקשיב, לאתגר כשצריך ולתמוך תמיד.
         </p>
       </div>
+    </div>
+  );
+}
+
+const HEROES = [
+  {
+    id: "mandela",
+    name: "נלסון מנדלה",
+    title: "מנהיג, לוחם חופש, נשיא דרום אפריקה",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Nelson_Mandela_1994.jpg/400px-Nelson_Mandela_1994.jpg",
+    bio: "בילה 27 שנה בכלא בגלל מאבקו נגד אפרטהייד, ויצא ממנו ללא שנאה. הפך לנשיא דרום אפריקה החופשית ולסמל של סליחה, כוח ושינוי.",
+    values: ["צדק", "סליחה", "נחישות", "שוויון", "אומץ", "מנהיגות", "הובלה"],
+  },
+  {
+    id: "spiderman",
+    name: "האיש העכביש",
+    title: "גיבור-על, פיטר פארקר",
+    img: "https://upload.wikimedia.org/wikipedia/en/thumb/2/21/Web_of_Spider-Man_Vol_1_129-1.png/400px-Web_of_Spider-Man_Vol_1_129-1.png",
+    bio: "נער רגיל שקיבל כוחות-על ולמד בדרך הקשה: עם כוח גדול באה אחריות גדולה. מגן על השכונה שלו גם כשאיש לא יודע מי הוא.",
+    values: ["אחריות", "עזרה לזולת", "אנושיות", "גבורה", "אומץ", "הגנה"],
+  },
+  {
+    id: "messi",
+    name: "ליאונל מסי",
+    title: "שחקן הכדורגל הטוב בהיסטוריה",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg/400px-Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg",
+    bio: "ילד קטן שנאמר לו שגופו לא מתאים לכדורגל. לא ויתר, לא התגאה, תמיד עבד קשה יותר מכולם. הוכיח שהתמדה ואהבה לדבר הם הכלי האמיתי.",
+    values: ["התמדה", "ענווה", "מצוינות", "שאפתנות", "מחויבות", "משפחה", "יצירתיות"],
+  },
+  {
+    id: "anne",
+    name: "אנה פרנק",
+    title: "נערה יהודייה, כותבת יומן, סמל תקווה",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Anne_Frank_school_portrait%2C_1940.jpg/400px-Anne_Frank_school_portrait%2C_1940.jpg",
+    bio: "נסתרה שנתיים עם משפחתה במחבוא מהנאצים. כתבה יומן שנהפך לאחד הספרים הנקראים ביותר בעולם — תיעוד של תקווה, אנושיות ואמונה בטוב גם בחושך.",
+    values: ["תקווה", "אמת", "אנושיות", "אותנטיות", "אמונה", "ביטוי עצמי", "כתיבה"],
+  },
+  {
+    id: "jobs",
+    name: "סטיב ג'ובס",
+    title: "מייסד אפל, חלוץ עיצוב וטכנולוגיה",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Steve_Jobs_Headshot_2010-CROP_%28cropped_2%29.jpg/400px-Steve_Jobs_Headshot_2010-CROP_%28cropped_2%29.jpg",
+    bio: "ילד מאומץ שנשר מהאוניברסיטה ובנה את החברה הכי שווה בעולם. האמין שעיצוב ופשטות יכולים לשנות את האנושות. \"Think Different\" לא היה רק סלוגן — זו הייתה הדרך שלו לחיות.",
+    values: ["חדשנות", "אסתטיקה", "פרפקציוניזם", "חזון", "יצירתיות", "פשטות", "מקוריות"],
+  },
+  {
+    id: "teresa",
+    name: "אמא תרזה",
+    title: "נזירה, זוכת פרס נובל לשלום",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Mother_Teresa_1.jpg/400px-Mother_Teresa_1.jpg",
+    bio: "בחרה לוותר על חייה הנוחים ולחיות בין העניים ביותר בקלקוטה, הודו. טיפלה באנשים שאיש לא רצה לגעת בהם. אמרה: \"אם תשפוט אנשים, לא יהיה לך זמן לאהוב אותם.\"",
+    values: ["חמלה", "נדיבות", "נתינה", "אהבה", "ענווה", "התמסרות", "עזרה לזולת"],
+  },
+  {
+    id: "einstein",
+    name: "אלברט איינשטיין",
+    title: "פיזיקאי, מדען, פילוסוף",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Albert_Einstein_Head.jpg/400px-Albert_Einstein_Head.jpg",
+    bio: "נכשל בבחינות קבלה, עבד כפקיד פטנטים, וגילה את תורת היחסות בזמנו החופשי. האמין שסקרנות היא המתנה הכי גדולה של האדם, ושדמיון חשוב מידע.",
+    values: ["סקרנות", "חשיבה", "יצירתיות", "ידע", "חופש", "ביטוי עצמי", "הגיון"],
+  },
+  {
+    id: "malala",
+    name: "מלאלה יוספזאי",
+    title: "פעילת זכויות, צעירה זוכת פרס נובל",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Malala_Yousafzai_in_2015.jpg/400px-Malala_Yousafzai_in_2015.jpg",
+    bio: "בת 15 שנורתה בראשה על ידי הטליבאן כי הלכה לבית ספר. שרדה והפכה לקול הכי חזק בעולם עבור זכות חינוך לכל ילדה. אמרה: \"ספר אחד, עט אחד — יכולים לשנות את העולם.\"",
+    values: ["אומץ", "חינוך", "צדק", "עשיית הבדל", "השפעה", "נחישות", "שוויון"],
+  },
+  {
+    id: "ronaldo",
+    name: "כריסטיאנו רונאלדו",
+    title: "שחקן כדורגל, מכונת אימון",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Cristiano_Ronaldo_2018.jpg/400px-Cristiano_Ronaldo_2018.jpg",
+    bio: "גדל בעוני בפורטוגל, חלה בלב בגיל 15. אחרי ניתוח חזר לאמן כפול. ידוע בכך שהוא הראשון שמגיע לאימון והאחרון שעוזב. הוכיח שאין תחליף למשמעת ועבודה.",
+    values: ["משמעת עצמית", "חריצות", "התמדה", "הישגיות", "שאפתנות", "מצוינות", "כוח"],
+  },
+  {
+    id: "obama",
+    name: "ברק אובמה",
+    title: "נשיא ארה\"ב ה-44, הראשון שחור",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/President_Barack_Obama.jpg/400px-President_Barack_Obama.jpg",
+    bio: "גדל ללא אב, בין שתי תרבויות, ועלה להיות הנשיא הראשון ממוצא אפריקאי של ארה\"ב. האמין שמילים, דיאלוג ואמון בין אנשים יכולים לשנות מדינות שלמות.",
+    values: ["תקווה", "אחדות", "מנהיגות", "תקשורת", "שוויון", "הובלה", "שייכות"],
+  },
+  {
+    id: "diana",
+    name: "נסיכת דיאנה",
+    title: "נסיכת וולס, \"נסיכת הלבבות\"",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Diana%2C_Princess_of_Wales_1997_%282%29.jpg/400px-Diana%2C_Princess_of_Wales_1997_%282%29.jpg",
+    bio: "ויתרה על הפרוטוקול המלכותי ויצאה לחבק חולי איידס, לבקר ילדים בבתי חולים, ולהילחם בנגד מוקשים. אמרה: \"מקום היחיד שבו הלב שלי ממש מרגיש חופשי הוא כשאני נותנת לאחרים.\"",
+    values: ["אמפתיה", "חמלה", "אנושיות", "נדיבות", "אהדה", "הוקרת תודה", "אהבה"],
+  },
+  {
+    id: "hawking",
+    name: "סטיבן הוקינג",
+    title: "פיזיקאי, קוסמולוג, סמל התגברות",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Stephen_Hawking.StarChild.jpg/400px-Stephen_Hawking.StarChild.jpg",
+    bio: "אובחן עם מחלה ניוונית בגיל 21 ונאמר לו שיחיה 2 שנים. חי עד גיל 76 וגילה את סודות היקום מכיסא גלגלים. אמר: \"כל עוד יש חיים, יש תקווה.\"",
+    values: ["התמדה", "סקרנות", "אופטימיות", "יצירתיות", "ידע", "הומור", "עוצמה"],
+  },
+];
+
+function HeroGame({ onFinish }) {
+  const [selected, setSelected] = useState([]);
+  const [expanded, setExpanded] = useState(null);
+  const [phase, setPhase] = useState("pick"); // pick | result
+
+  function toggleHero(id) {
+    if (selected.includes(id)) {
+      setSelected(selected.filter(s => s !== id));
+    } else if (selected.length < 3) {
+      setSelected([...selected, id]);
+    }
+  }
+
+  function computeResult() {
+    const counts = {};
+    selected.forEach(id => {
+      const hero = HEROES.find(h => h.id === id);
+      hero.values.forEach(v => { counts[v] = (counts[v] || 0) + 1; });
+    });
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([v]) => v);
+  }
+
+  if (phase === "result") {
+    const topValues = computeResult();
+    const pickedHeroes = HEROES.filter(h => selected.includes(h.id));
+    return (
+      <div>
+        <div style={{ textAlign: "center", marginBottom: 28 }}>
+          <div style={{ fontSize: 48, marginBottom: 8 }}>🔍</div>
+          <h2 style={{ color: "#fff", fontSize: 20, fontWeight: 700, margin: "0 0 8px" }}>הצוות שלך מגלה משהו</h2>
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0 }}>
+            בחרת ב{pickedHeroes.map(h => h.name).join(", ")}
+          </p>
+        </div>
+
+        <div style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 28 }}>
+          {pickedHeroes.map(h => (
+            <div key={h.id} style={{ textAlign: "center" }}>
+              <img src={h.img} alt={h.name}
+                style={{ width: 64, height: 64, borderRadius: "50%", objectFit: "cover", objectPosition: "top",
+                  border: "2px solid #7c3aed" }} />
+              <p style={{ color: "#c4b5fd", fontSize: 11, margin: "6px 0 0" }}>{h.name.split(" ")[0]}</p>
+            </div>
+          ))}
+        </div>
+
+        <div style={{
+          padding: 20, borderRadius: 16, marginBottom: 20,
+          background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.3)"
+        }}>
+          <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 15, margin: "0 0 14px" }}>
+            הערכים שמאפיינים את הצוות שלך:
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {topValues.map((v, i) => (
+              <div key={v} style={{
+                padding: "8px 16px", borderRadius: 30, fontSize: 14, fontWeight: 500,
+                background: i < 3 ? "rgba(124,58,237,0.35)" : "rgba(255,255,255,0.07)",
+                border: i < 3 ? "1px solid rgba(124,58,237,0.6)" : "1px solid rgba(255,255,255,0.1)",
+                color: i < 3 ? "#e9d5ff" : "rgba(255,255,255,0.6)"
+              }}>
+                {i < 3 && <span style={{ marginLeft: 6 }}>⭐</span>}
+                {v}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{
+          padding: 18, borderRadius: 14, marginBottom: 24,
+          background: "rgba(16,185,129,0.07)", border: "1px solid rgba(16,185,129,0.2)"
+        }}>
+          <p style={{ color: "#6ee7b7", fontSize: 13, margin: 0, lineHeight: 1.7 }}>
+            💡 הערכים המודגשים הם הכי חזקים אצלך על פי הבחירות שלך. השתמש בהם כנקודת מוצא כשתבחר את 5 הערכים שלך.
+          </p>
+        </div>
+
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={() => { setSelected([]); setPhase("pick"); }} style={{
+            flex: 1, padding: "12px", borderRadius: 12,
+            background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
+            color: "rgba(255,255,255,0.7)", fontSize: 15, cursor: "pointer"
+          }}>
+            🔄 שחק שוב
+          </button>
+          <button onClick={onFinish} style={{
+            flex: 2, padding: "12px", borderRadius: 12,
+            background: "linear-gradient(135deg, #7c3aed, #a855f7)",
+            border: "none", color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer"
+          }}>
+            בחר את 5 הערכים שלי ←
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div style={{ textAlign: "center", marginBottom: 24 }}>
+        <div style={{ fontSize: 40, marginBottom: 8 }}>🏆</div>
+        <h2 style={{ color: "#fff", fontSize: 20, fontWeight: 700, margin: "0 0 6px" }}>בנה את הצוות שלך</h2>
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: "0 0 4px" }}>
+          בחר 3 דמויות שהיית רוצה שיהיו לצידך במסע הזה
+        </p>
+        <p style={{ color: selected.length === 3 ? "#a855f7" : "rgba(255,255,255,0.35)", fontSize: 13, fontWeight: 600 }}>
+          {selected.length}/3 נבחרו
+        </p>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
+        {HEROES.map(hero => {
+          const isSel = selected.includes(hero.id);
+          const isExp = expanded === hero.id;
+          const isDisabled = !isSel && selected.length >= 3;
+
+          return (
+            <div key={hero.id} style={{
+              borderRadius: 16, overflow: "visible", position: "relative",
+              border: isSel ? "2px solid #7c3aed" : "1px solid rgba(255,255,255,0.08)",
+              background: isSel ? "rgba(124,58,237,0.12)" : "rgba(255,255,255,0.03)",
+              opacity: isDisabled ? 0.4 : 1, transition: "all 0.2s"
+            }}>
+              <button onClick={() => setExpanded(isExp ? null : hero.id)} style={{
+                width: "100%", background: "none", border: "none", cursor: isDisabled ? "not-allowed" : "pointer",
+                padding: 14, textAlign: "right", display: "flex", flexDirection: "column", alignItems: "center", gap: 8
+              }}>
+                <div style={{ position: "relative" }}>
+                  <img src={hero.img} alt={hero.name}
+                    style={{
+                      width: 80, height: 80, borderRadius: "50%", objectFit: "cover", objectPosition: "top",
+                      border: isSel ? "3px solid #7c3aed" : "2px solid rgba(255,255,255,0.1)"
+                    }} />
+                  {isSel && (
+                    <div style={{
+                      position: "absolute", bottom: 0, right: 0,
+                      width: 24, height: 24, borderRadius: "50%",
+                      background: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 13, color: "#fff", border: "2px solid #0a0a1a"
+                    }}>✓</div>
+                  )}
+                </div>
+                <div style={{ textAlign: "center" }}>
+                  <p style={{ color: "#fff", fontWeight: 600, fontSize: 13, margin: "0 0 2px" }}>{hero.name}</p>
+                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, margin: 0, lineHeight: 1.4 }}>{hero.title}</p>
+                </div>
+              </button>
+
+              {isExp && (
+                <div style={{
+                  position: "absolute", top: "calc(100% + 8px)",
+                  right: 0, left: 0, zIndex: 200,
+                  padding: "16px", borderRadius: 14,
+                  background: "#13132a", border: "1px solid rgba(124,58,237,0.5)",
+                  boxShadow: "0 12px 40px rgba(0,0,0,0.7)"
+                }}>
+                  <p style={{ color: "#c4b5fd", fontWeight: 700, fontSize: 14, margin: "0 0 6px" }}>{hero.name}</p>
+                  <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, margin: "0 0 12px", lineHeight: 1.6 }}>{hero.bio}</p>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 12 }}>
+                    {hero.values.slice(0, 4).map(v => (
+                      <span key={v} style={{
+                        padding: "3px 10px", borderRadius: 20, fontSize: 11,
+                        background: "rgba(124,58,237,0.2)", color: "#c4b5fd",
+                        border: "1px solid rgba(124,58,237,0.3)"
+                      }}>{v}</span>
+                    ))}
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {!isDisabled && (
+                      <button onClick={() => { toggleHero(hero.id); setExpanded(null); }} style={{
+                        flex: 1, padding: "8px", borderRadius: 8, fontSize: 12, cursor: "pointer",
+                        background: isSel ? "rgba(239,68,68,0.2)" : "rgba(124,58,237,0.5)",
+                        border: isSel ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(124,58,237,0.6)",
+                        color: isSel ? "#fca5a5" : "#fff", fontWeight: 600
+                      }}>
+                        {isSel ? "הסר מהצוות" : "הוסף לצוות ➕"}
+                      </button>
+                    )}
+                    <button onClick={() => setExpanded(null)} style={{
+                      padding: "8px 12px", borderRadius: 8, fontSize: 12,
+                      background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+                      color: "rgba(255,255,255,0.5)", cursor: "pointer"
+                    }}>סגור</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {selected.length === 3 && (
+        <button onClick={() => setPhase("result")} style={{
+          width: "100%", padding: "14px", borderRadius: 14,
+          background: "linear-gradient(135deg, #7c3aed, #a855f7)",
+          border: "none", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer"
+        }}>
+          גלה מה הצוות שלך אומר עליך ←
+        </button>
+      )}
     </div>
   );
 }
