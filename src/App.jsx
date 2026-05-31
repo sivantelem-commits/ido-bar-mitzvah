@@ -983,23 +983,15 @@ const HEROES = [
     id: "mandela",
     name: "נלסון מנדלה",
     title: "מנהיג, לוחם חופש, נשיא דרום אפריקה",
-    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Nelson_Mandela_1994.jpg/400px-Nelson_Mandela_1994.jpg",
+    wiki: "Nelson_Mandela",
     bio: "בילה 27 שנה בכלא בגלל מאבקו נגד אפרטהייד, ויצא ממנו ללא שנאה. הפך לנשיא דרום אפריקה החופשית ולסמל של סליחה, כוח ושינוי.",
     values: ["צדק", "סליחה", "נחישות", "שוויון", "אומץ", "מנהיגות", "הובלה"],
-  },
-  {
-    id: "spiderman",
-    name: "האיש העכביש",
-    title: "גיבור-על, פיטר פארקר",
-    img: "https://upload.wikimedia.org/wikipedia/en/thumb/2/21/Web_of_Spider-Man_Vol_1_129-1.png/400px-Web_of_Spider-Man_Vol_1_129-1.png",
-    bio: "נער רגיל שקיבל כוחות-על ולמד בדרך הקשה: עם כוח גדול באה אחריות גדולה. מגן על השכונה שלו גם כשאיש לא יודע מי הוא.",
-    values: ["אחריות", "עזרה לזולת", "אנושיות", "גבורה", "אומץ", "הגנה"],
   },
   {
     id: "messi",
     name: "ליאונל מסי",
     title: "שחקן הכדורגל הטוב בהיסטוריה",
-    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg/400px-Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg",
+    wiki: "Lionel_Messi",
     bio: "ילד קטן שנאמר לו שגופו לא מתאים לכדורגל. לא ויתר, לא התגאה, תמיד עבד קשה יותר מכולם. הוכיח שהתמדה ואהבה לדבר הם הכלי האמיתי.",
     values: ["התמדה", "ענווה", "מצוינות", "שאפתנות", "מחויבות", "משפחה", "יצירתיות"],
   },
@@ -1007,80 +999,201 @@ const HEROES = [
     id: "anne",
     name: "אנה פרנק",
     title: "נערה יהודייה, כותבת יומן, סמל תקווה",
-    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Anne_Frank_school_portrait%2C_1940.jpg/400px-Anne_Frank_school_portrait%2C_1940.jpg",
+    wiki: "Anne_Frank",
     bio: "נסתרה שנתיים עם משפחתה במחבוא מהנאצים. כתבה יומן שנהפך לאחד הספרים הנקראים ביותר בעולם — תיעוד של תקווה, אנושיות ואמונה בטוב גם בחושך.",
-    values: ["תקווה", "אמת", "אנושיות", "אותנטיות", "אמונה", "ביטוי עצמי", "כתיבה"],
+    values: ["תקווה", "אמת", "אנושיות", "אותנטיות", "אמונה", "ביטוי עצמי"],
   },
   {
     id: "jobs",
     name: "סטיב ג'ובס",
     title: "מייסד אפל, חלוץ עיצוב וטכנולוגיה",
-    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Steve_Jobs_Headshot_2010-CROP_%28cropped_2%29.jpg/400px-Steve_Jobs_Headshot_2010-CROP_%28cropped_2%29.jpg",
-    bio: "ילד מאומץ שנשר מהאוניברסיטה ובנה את החברה הכי שווה בעולם. האמין שעיצוב ופשטות יכולים לשנות את האנושות. \"Think Different\" לא היה רק סלוגן — זו הייתה הדרך שלו לחיות.",
-    values: ["חדשנות", "אסתטיקה", "פרפקציוניזם", "חזון", "יצירתיות", "פשטות", "מקוריות"],
+    wiki: "Steve_Jobs",
+    bio: "ילד מאומץ שנשר מהאוניברסיטה ובנה את החברה הכי שווה בעולם. האמין שעיצוב ופשטות יכולים לשנות את האנושות.",
+    values: ["חדשנות", "אסתטיקה", "פרפקציוניזם", "יצירתיות", "פשטות", "מקוריות"],
   },
   {
     id: "teresa",
     name: "אמא תרזה",
     title: "נזירה, זוכת פרס נובל לשלום",
-    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Mother_Teresa_1.jpg/400px-Mother_Teresa_1.jpg",
-    bio: "בחרה לוותר על חייה הנוחים ולחיות בין העניים ביותר בקלקוטה, הודו. טיפלה באנשים שאיש לא רצה לגעת בהם. אמרה: \"אם תשפוט אנשים, לא יהיה לך זמן לאהוב אותם.\"",
+    wiki: "Mother_Teresa",
+    bio: "בחרה לוותר על חייה הנוחים ולחיות בין העניים ביותר בקלקוטה. טיפלה באנשים שאיש לא רצה לגעת בהם. אמרה: \"אם תשפוט אנשים, לא יהיה לך זמן לאהוב אותם.\"",
     values: ["חמלה", "נדיבות", "נתינה", "אהבה", "ענווה", "התמסרות", "עזרה לזולת"],
   },
   {
     id: "einstein",
     name: "אלברט איינשטיין",
     title: "פיזיקאי, מדען, פילוסוף",
-    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Albert_Einstein_Head.jpg/400px-Albert_Einstein_Head.jpg",
-    bio: "נכשל בבחינות קבלה, עבד כפקיד פטנטים, וגילה את תורת היחסות בזמנו החופשי. האמין שסקרנות היא המתנה הכי גדולה של האדם, ושדמיון חשוב מידע.",
+    wiki: "Albert_Einstein",
+    bio: "נכשל בבחינות קבלה, עבד כפקיד פטנטים, וגילה את תורת היחסות בזמנו החופשי. האמין שסקרנות היא המתנה הכי גדולה של האדם.",
     values: ["סקרנות", "חשיבה", "יצירתיות", "ידע", "חופש", "ביטוי עצמי", "הגיון"],
   },
   {
     id: "malala",
     name: "מלאלה יוספזאי",
     title: "פעילת זכויות, צעירה זוכת פרס נובל",
-    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Malala_Yousafzai_in_2015.jpg/400px-Malala_Yousafzai_in_2015.jpg",
-    bio: "בת 15 שנורתה בראשה על ידי הטליבאן כי הלכה לבית ספר. שרדה והפכה לקול הכי חזק בעולם עבור זכות חינוך לכל ילדה. אמרה: \"ספר אחד, עט אחד — יכולים לשנות את העולם.\"",
+    wiki: "Malala_Yousafzai",
+    bio: "בת 15 שנורתה בראשה על ידי הטליבאן כי הלכה לבית ספר. שרדה והפכה לקול הכי חזק בעולם עבור זכות חינוך לכל ילדה.",
     values: ["אומץ", "חינוך", "צדק", "עשיית הבדל", "השפעה", "נחישות", "שוויון"],
   },
   {
     id: "ronaldo",
     name: "כריסטיאנו רונאלדו",
     title: "שחקן כדורגל, מכונת אימון",
-    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Cristiano_Ronaldo_2018.jpg/400px-Cristiano_Ronaldo_2018.jpg",
-    bio: "גדל בעוני בפורטוגל, חלה בלב בגיל 15. אחרי ניתוח חזר לאמן כפול. ידוע בכך שהוא הראשון שמגיע לאימון והאחרון שעוזב. הוכיח שאין תחליף למשמעת ועבודה.",
+    wiki: "Cristiano_Ronaldo",
+    bio: "גדל בעוני בפורטוגל, חלה בלב בגיל 15. אחרי ניתוח חזר לאמן כפול. הראשון שמגיע לאימון והאחרון שעוזב. הוכיח שאין תחליף למשמעת.",
     values: ["משמעת עצמית", "חריצות", "התמדה", "הישגיות", "שאפתנות", "מצוינות", "כוח"],
   },
   {
     id: "obama",
     name: "ברק אובמה",
     title: "נשיא ארה\"ב ה-44, הראשון שחור",
-    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/President_Barack_Obama.jpg/400px-President_Barack_Obama.jpg",
-    bio: "גדל ללא אב, בין שתי תרבויות, ועלה להיות הנשיא הראשון ממוצא אפריקאי של ארה\"ב. האמין שמילים, דיאלוג ואמון בין אנשים יכולים לשנות מדינות שלמות.",
+    wiki: "Barack_Obama",
+    bio: "גדל ללא אב, בין שתי תרבויות, ועלה להיות הנשיא הראשון ממוצא אפריקאי של ארה\"ב. האמין שמילים ודיאלוג יכולים לשנות מדינות.",
     values: ["תקווה", "אחדות", "מנהיגות", "תקשורת", "שוויון", "הובלה", "שייכות"],
   },
   {
     id: "diana",
     name: "נסיכת דיאנה",
     title: "נסיכת וולס, \"נסיכת הלבבות\"",
-    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Diana%2C_Princess_of_Wales_1997_%282%29.jpg/400px-Diana%2C_Princess_of_Wales_1997_%282%29.jpg",
-    bio: "ויתרה על הפרוטוקול המלכותי ויצאה לחבק חולי איידס, לבקר ילדים בבתי חולים, ולהילחם בנגד מוקשים. אמרה: \"מקום היחיד שבו הלב שלי ממש מרגיש חופשי הוא כשאני נותנת לאחרים.\"",
-    values: ["אמפתיה", "חמלה", "אנושיות", "נדיבות", "אהדה", "הוקרת תודה", "אהבה"],
+    wiki: "Diana,_Princess_of_Wales",
+    bio: "ויתרה על הפרוטוקול המלכותי ויצאה לחבק חולי איידס ולבקר ילדים בבתי חולים. אמרה: \"הלב שלי מרגיש חופשי כשאני נותנת לאחרים.\"",
+    values: ["אמפתיה", "חמלה", "אנושיות", "נדיבות", "אהדה", "אהבה"],
   },
   {
     id: "hawking",
     name: "סטיבן הוקינג",
     title: "פיזיקאי, קוסמולוג, סמל התגברות",
-    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Stephen_Hawking.StarChild.jpg/400px-Stephen_Hawking.StarChild.jpg",
+    wiki: "Stephen_Hawking",
     bio: "אובחן עם מחלה ניוונית בגיל 21 ונאמר לו שיחיה 2 שנים. חי עד גיל 76 וגילה את סודות היקום מכיסא גלגלים. אמר: \"כל עוד יש חיים, יש תקווה.\"",
     values: ["התמדה", "סקרנות", "אופטימיות", "יצירתיות", "ידע", "הומור", "עוצמה"],
   },
+  {
+    id: "mandela_winnie",
+    name: "מלאלה — שנית",
+    title: "ראה למעלה",
+    wiki: "Marie_Curie",
+    bio: "האישה הראשונה שזכתה בפרס נובל — ובתחומים שניים שונים. עבדה בתנאים קשים ללא הכרה, הוכיחה שמגדר אינו מגבלה.",
+    values: ["נחישות", "ידע", "יצירתיות", "שוויון", "חריצות", "מצוינות", "פריצת דרך"],
+  },
 ];
+
+// Fix the last hero
+HEROES[11] = {
+  id: "curie",
+  name: "מארי קירי",
+  title: "מדענית, פורצת דרך, זוכת נובל פעמיים",
+  wiki: "Marie_Curie",
+  bio: "האישה הראשונה שזכתה בפרס נובל — ובשני תחומים שונים. עבדה בתנאים קשים ללא הכרה, הוכיחה שמגדר אינו מגבלה לגדולה.",
+  values: ["נחישות", "ידע", "יצירתיות", "שוויון", "חריצות", "מצוינות"],
+};
+
+function HeroCard({ hero, isSelected, isDisabled, onExpand, isExpanded, onToggle, onClose }) {
+  const [imgUrl, setImgUrl] = useState(null);
+
+  useEffect(() => {
+    fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${hero.wiki}`)
+      .then(r => r.json())
+      .then(d => { if (d.thumbnail?.source) setImgUrl(d.thumbnail.source); })
+      .catch(() => {});
+  }, [hero.wiki]);
+
+  return (
+    <div style={{
+      borderRadius: 16, overflow: "visible", position: "relative",
+      border: isSelected ? "2px solid #7c3aed" : "1px solid rgba(255,255,255,0.08)",
+      background: isSelected ? "rgba(124,58,237,0.12)" : "rgba(255,255,255,0.03)",
+      opacity: isDisabled ? 0.4 : 1, transition: "all 0.2s"
+    }}>
+      <button onClick={() => onExpand(isExpanded ? null : hero.id)} style={{
+        width: "100%", background: "none", border: "none",
+        cursor: isDisabled ? "not-allowed" : "pointer",
+        padding: 14, textAlign: "center",
+        display: "flex", flexDirection: "column", alignItems: "center", gap: 8
+      }}>
+        <div style={{ position: "relative" }}>
+          {imgUrl ? (
+            <img src={imgUrl} alt={hero.name} style={{
+              width: 80, height: 80, borderRadius: "50%", objectFit: "cover", objectPosition: "top",
+              border: isSelected ? "3px solid #7c3aed" : "2px solid rgba(255,255,255,0.1)"
+            }} />
+          ) : (
+            <div style={{
+              width: 80, height: 80, borderRadius: "50%",
+              background: "rgba(124,58,237,0.2)", border: "2px solid rgba(124,58,237,0.3)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 28
+            }}>
+              {hero.name[0]}
+            </div>
+          )}
+          {isSelected && (
+            <div style={{
+              position: "absolute", bottom: 0, right: 0,
+              width: 24, height: 24, borderRadius: "50%",
+              background: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 13, color: "#fff", border: "2px solid #0a0a1a"
+            }}>✓</div>
+          )}
+        </div>
+        <div style={{ textAlign: "center" }}>
+          <p style={{ color: "#fff", fontWeight: 600, fontSize: 13, margin: "0 0 2px" }}>{hero.name}</p>
+          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, margin: 0, lineHeight: 1.4 }}>{hero.title}</p>
+        </div>
+      </button>
+
+      {isExpanded && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 8px)",
+          right: 0, left: 0, zIndex: 200,
+          padding: "16px", borderRadius: 14,
+          background: "#13132a", border: "1px solid rgba(124,58,237,0.5)",
+          boxShadow: "0 12px 40px rgba(0,0,0,0.8)"
+        }}>
+          {imgUrl && (
+            <img src={imgUrl} alt={hero.name} style={{
+              width: 56, height: 56, borderRadius: "50%", objectFit: "cover", objectPosition: "top",
+              float: "right", marginRight: 0, marginLeft: 12, marginBottom: 4,
+              border: "2px solid rgba(124,58,237,0.4)"
+            }} />
+          )}
+          <p style={{ color: "#c4b5fd", fontWeight: 700, fontSize: 14, margin: "0 0 6px" }}>{hero.name}</p>
+          <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, margin: "0 0 10px", lineHeight: 1.6, clear: "both" }}>{hero.bio}</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 12 }}>
+            {hero.values.slice(0, 4).map(v => (
+              <span key={v} style={{
+                padding: "3px 10px", borderRadius: 20, fontSize: 11,
+                background: "rgba(124,58,237,0.2)", color: "#c4b5fd",
+                border: "1px solid rgba(124,58,237,0.3)"
+              }}>{v}</span>
+            ))}
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            {!isDisabled && (
+              <button onClick={() => { onToggle(hero.id); onClose(); }} style={{
+                flex: 1, padding: "8px", borderRadius: 8, fontSize: 12, cursor: "pointer",
+                background: isSelected ? "rgba(239,68,68,0.2)" : "rgba(124,58,237,0.5)",
+                border: isSelected ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(124,58,237,0.6)",
+                color: isSelected ? "#fca5a5" : "#fff", fontWeight: 600
+              }}>
+                {isSelected ? "הסר מהצוות" : "הוסף לצוות ➕"}
+              </button>
+            )}
+            <button onClick={onClose} style={{
+              padding: "8px 12px", borderRadius: 8, fontSize: 12,
+              background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+              color: "rgba(255,255,255,0.5)", cursor: "pointer"
+            }}>סגור</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function HeroGame({ onFinish }) {
   const [selected, setSelected] = useState([]);
   const [expanded, setExpanded] = useState(null);
-  const [phase, setPhase] = useState("pick"); // pick | result
+  const [phase, setPhase] = useState("pick");
 
   function toggleHero(id) {
     if (selected.includes(id)) {
@@ -1117,12 +1230,7 @@ function HeroGame({ onFinish }) {
 
         <div style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 28 }}>
           {pickedHeroes.map(h => (
-            <div key={h.id} style={{ textAlign: "center" }}>
-              <img src={h.img} alt={h.name}
-                style={{ width: 64, height: 64, borderRadius: "50%", objectFit: "cover", objectPosition: "top",
-                  border: "2px solid #7c3aed" }} />
-              <p style={{ color: "#c4b5fd", fontSize: 11, margin: "6px 0 0" }}>{h.name.split(" ")[0]}</p>
-            </div>
+            <HeroAvatar key={h.id} hero={h} size={64} />
           ))}
         </div>
 
@@ -1153,7 +1261,7 @@ function HeroGame({ onFinish }) {
           background: "rgba(16,185,129,0.07)", border: "1px solid rgba(16,185,129,0.2)"
         }}>
           <p style={{ color: "#6ee7b7", fontSize: 13, margin: 0, lineHeight: 1.7 }}>
-            💡 הערכים המודגשים הם הכי חזקים אצלך על פי הבחירות שלך. השתמש בהם כנקודת מוצא כשתבחר את 5 הערכים שלך.
+            💡 הערכים המודגשים בכוכב הם הכי חזקים אצלך לפי הבחירות שלך. השתמש בהם כנקודת מוצא כשתבחר את 5 הערכים שלך.
           </p>
         </div>
 
@@ -1191,84 +1299,18 @@ function HeroGame({ onFinish }) {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
-        {HEROES.map(hero => {
-          const isSel = selected.includes(hero.id);
-          const isExp = expanded === hero.id;
-          const isDisabled = !isSel && selected.length >= 3;
-
-          return (
-            <div key={hero.id} style={{
-              borderRadius: 16, overflow: "visible", position: "relative",
-              border: isSel ? "2px solid #7c3aed" : "1px solid rgba(255,255,255,0.08)",
-              background: isSel ? "rgba(124,58,237,0.12)" : "rgba(255,255,255,0.03)",
-              opacity: isDisabled ? 0.4 : 1, transition: "all 0.2s"
-            }}>
-              <button onClick={() => setExpanded(isExp ? null : hero.id)} style={{
-                width: "100%", background: "none", border: "none", cursor: isDisabled ? "not-allowed" : "pointer",
-                padding: 14, textAlign: "right", display: "flex", flexDirection: "column", alignItems: "center", gap: 8
-              }}>
-                <div style={{ position: "relative" }}>
-                  <img src={hero.img} alt={hero.name}
-                    style={{
-                      width: 80, height: 80, borderRadius: "50%", objectFit: "cover", objectPosition: "top",
-                      border: isSel ? "3px solid #7c3aed" : "2px solid rgba(255,255,255,0.1)"
-                    }} />
-                  {isSel && (
-                    <div style={{
-                      position: "absolute", bottom: 0, right: 0,
-                      width: 24, height: 24, borderRadius: "50%",
-                      background: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 13, color: "#fff", border: "2px solid #0a0a1a"
-                    }}>✓</div>
-                  )}
-                </div>
-                <div style={{ textAlign: "center" }}>
-                  <p style={{ color: "#fff", fontWeight: 600, fontSize: 13, margin: "0 0 2px" }}>{hero.name}</p>
-                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, margin: 0, lineHeight: 1.4 }}>{hero.title}</p>
-                </div>
-              </button>
-
-              {isExp && (
-                <div style={{
-                  position: "absolute", top: "calc(100% + 8px)",
-                  right: 0, left: 0, zIndex: 200,
-                  padding: "16px", borderRadius: 14,
-                  background: "#13132a", border: "1px solid rgba(124,58,237,0.5)",
-                  boxShadow: "0 12px 40px rgba(0,0,0,0.7)"
-                }}>
-                  <p style={{ color: "#c4b5fd", fontWeight: 700, fontSize: 14, margin: "0 0 6px" }}>{hero.name}</p>
-                  <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, margin: "0 0 12px", lineHeight: 1.6 }}>{hero.bio}</p>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 12 }}>
-                    {hero.values.slice(0, 4).map(v => (
-                      <span key={v} style={{
-                        padding: "3px 10px", borderRadius: 20, fontSize: 11,
-                        background: "rgba(124,58,237,0.2)", color: "#c4b5fd",
-                        border: "1px solid rgba(124,58,237,0.3)"
-                      }}>{v}</span>
-                    ))}
-                  </div>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    {!isDisabled && (
-                      <button onClick={() => { toggleHero(hero.id); setExpanded(null); }} style={{
-                        flex: 1, padding: "8px", borderRadius: 8, fontSize: 12, cursor: "pointer",
-                        background: isSel ? "rgba(239,68,68,0.2)" : "rgba(124,58,237,0.5)",
-                        border: isSel ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(124,58,237,0.6)",
-                        color: isSel ? "#fca5a5" : "#fff", fontWeight: 600
-                      }}>
-                        {isSel ? "הסר מהצוות" : "הוסף לצוות ➕"}
-                      </button>
-                    )}
-                    <button onClick={() => setExpanded(null)} style={{
-                      padding: "8px 12px", borderRadius: 8, fontSize: 12,
-                      background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-                      color: "rgba(255,255,255,0.5)", cursor: "pointer"
-                    }}>סגור</button>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
+        {HEROES.map(hero => (
+          <HeroCard
+            key={hero.id}
+            hero={hero}
+            isSelected={selected.includes(hero.id)}
+            isDisabled={!selected.includes(hero.id) && selected.length >= 3}
+            isExpanded={expanded === hero.id}
+            onExpand={setExpanded}
+            onToggle={toggleHero}
+            onClose={() => setExpanded(null)}
+          />
+        ))}
       </div>
 
       {selected.length === 3 && (
@@ -1280,6 +1322,25 @@ function HeroGame({ onFinish }) {
           גלה מה הצוות שלך אומר עליך ←
         </button>
       )}
+    </div>
+  );
+}
+
+function HeroAvatar({ hero, size = 64 }) {
+  const [imgUrl, setImgUrl] = useState(null);
+  useEffect(() => {
+    fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${hero.wiki}`)
+      .then(r => r.json())
+      .then(d => { if (d.thumbnail?.source) setImgUrl(d.thumbnail.source); })
+      .catch(() => {});
+  }, [hero.wiki]);
+  return (
+    <div style={{ textAlign: "center" }}>
+      {imgUrl
+        ? <img src={imgUrl} alt={hero.name} style={{ width: size, height: size, borderRadius: "50%", objectFit: "cover", objectPosition: "top", border: "2px solid #7c3aed" }} />
+        : <div style={{ width: size, height: size, borderRadius: "50%", background: "rgba(124,58,237,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, border: "2px solid #7c3aed" }}>{hero.name[0]}</div>
+      }
+      <p style={{ color: "#c4b5fd", fontSize: 11, margin: "6px 0 0" }}>{hero.name.split(" ")[0]}</p>
     </div>
   );
 }
