@@ -1082,23 +1082,24 @@ export const MONTH_QUIZZES = {
 export function MonthlyQuiz({ monthId, state, onChange }) {
   const quiz = MONTH_QUIZZES[monthId];
   const s = state || { step: "intro", dilemmaIdx: 0, dilemmaAnswers: {}, quizAnswers: {}, done: false };
-
-  if (!quiz) return <p style={{ color: "rgba(255,255,255,0.5)", textAlign: "center", padding: 40 }}>המשחקון בדרך...</p>;
+  const dilemmaAnswers = s.dilemmaAnswers || {};
+  const quizAnswers = s.quizAnswers || {};
+  const dilemmaIdx = s.dilemmaIdx || 0;
 
   function setStep(step) { onChange({ ...s, step }); }
   function answerDilemma(id, value) {
-    onChange({ ...s, dilemmaAnswers: { ...s.dilemmaAnswers, [id]: value } });
+    onChange({ ...s, dilemmaAnswers: { ...dilemmaAnswers, [id]: value } });
   }
   function answerQuiz(idx, val) {
-    onChange({ ...s, quizAnswers: { ...s.quizAnswers, [idx]: val } });
+    onChange({ ...s, quizAnswers: { ...quizAnswers, [idx]: val } });
   }
   function nextDilemma() {
-    if (s.dilemmaIdx < quiz.dilemmas.length - 1) onChange({ ...s, dilemmaIdx: s.dilemmaIdx + 1 });
+    if (dilemmaIdx < quiz.dilemmas.length - 1) onChange({ ...s, dilemmaIdx: dilemmaIdx + 1 });
     else setStep("quiz");
   }
 
-  const quizScore = quiz.quiz.filter((q, i) => s.quizAnswers[i] === q.correct).length;
-  const allQuizAnswered = quiz.quiz.every((_, i) => s.quizAnswers[i] !== undefined);
+  const quizScore = quiz.quiz.filter((q, i) => quizAnswers[i] === q.correct).length;
+  const allQuizAnswered = quiz.quiz.every((_, i) => quizAnswers[i] !== undefined);
 
   // INTRO
   if (s.step === "intro") return (
@@ -1134,12 +1135,12 @@ export function MonthlyQuiz({ monthId, state, onChange }) {
 
   // DILEMMA
   if (s.step === "dilemma") {
-    const d = quiz.dilemmas[s.dilemmaIdx || 0];
-    const answered = s.dilemmaAnswers[d.id];
+    const d = quiz.dilemmas[dilemmaIdx];
+    const answered = dilemmaAnswers[d.id];
     return (
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>דילמה {(s.dilemmaIdx || 0) + 1} מתוך {quiz.dilemmas.length}</span>
+          <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>דילמה {dilemmaIdx + 1} מתוך {quiz.dilemmas.length}</span>
           <span style={{ color: "#c4b5fd", fontSize: 13, fontWeight: 600 }}>🎭 מה היית עושה?</span>
         </div>
         <Card style={{ marginBottom: 16, border: "1px solid rgba(124,58,237,0.25)", background: "rgba(124,58,237,0.06)" }}>
@@ -1171,7 +1172,7 @@ export function MonthlyQuiz({ monthId, state, onChange }) {
             background: "linear-gradient(135deg, #7c3aed, #a855f7)",
             border: "none", color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer"
           }}>
-            {s.dilemmaIdx < quiz.dilemmas.length - 1 ? "דילמה הבאה →" : "עכשיו לקוויז →"}
+            {dilemmaIdx < quiz.dilemmas.length - 1 ? "דילמה הבאה →" : "עכשיו לקוויז →"}
           </button>
         )}
       </div>
@@ -1183,7 +1184,7 @@ export function MonthlyQuiz({ monthId, state, onChange }) {
     <div>
       <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 15, margin: "0 0 16px", textAlign: "center" }}>🧠 קוויז — {quiz.dilemmas.length === 2 ? "3" : "3"} שאלות</p>
       {quiz.quiz.map((q, i) => {
-        const ans = s.quizAnswers[i];
+        const ans = quizAnswers[i];
         const correct = ans === q.correct;
         return (
           <Card key={i} style={{ marginBottom: 14 }}>
