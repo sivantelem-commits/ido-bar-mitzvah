@@ -711,7 +711,8 @@ function T9_NeedsWants({ state, onChange }) {
 }
 
 function T10_Cooking({ state, onChange }) {
-  const s = state || { menu: { starter: "", main: "", side: "", salad: "", dessert: "" }, difficulty: 5, reflection: [] };
+  const s = state || {};
+  const menu = s.menu || { starter: "", main: "", side: "", salad: "", dessert: "" };
   return (
     <div>
       <Intro emoji="🍳" title="בישול ארוחה מלאה"
@@ -727,13 +728,13 @@ function T10_Cooking({ state, onChange }) {
         ].map(({ key, label }) => (
           <div key={key} style={{ marginBottom: 10 }}>
             <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, margin: "0 0 4px" }}>{label}</p>
-            <TextInput value={s.menu[key]} onChange={v => onChange({ ...s, menu: { ...s.menu, [key]: v } })}
+            <TextInput value={menu[key] || ""} onChange={v => onChange({ ...s, menu: { ...menu, [key]: v } })}
               placeholder="שם המנה..." />
           </div>
         ))}
       </Card>
       <Card style={{ marginTop: 12 }}>
-        <Scale value={s.difficulty} onChange={v => onChange({ ...s, difficulty: v })}
+        <Scale value={s.difficulty || 5} onChange={v => onChange({ ...s, difficulty: v })}
           label="כמה היה קשה מ-1 עד 10?" />
       </Card>
       <ReflectionSection
