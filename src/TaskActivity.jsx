@@ -1081,20 +1081,23 @@ export const MONTH_QUIZZES = {
 
 export function MonthlyQuiz({ monthId, state, onChange }) {
   const quiz = MONTH_QUIZZES[monthId];
-  const s = state || { step: "intro", dilemmaIdx: 0, dilemmaAnswers: {}, quizAnswers: {}, done: false };
+  const s = state || {};
+  const step = s.step || "intro";
   const dilemmaAnswers = s.dilemmaAnswers || {};
   const quizAnswers = s.quizAnswers || {};
   const dilemmaIdx = s.dilemmaIdx || 0;
 
-  function setStep(step) { onChange({ ...s, step }); }
+  if (!quiz) return <p style={{ color: "rgba(255,255,255,0.5)", textAlign: "center", padding: 40 }}>המשחקון בדרך...</p>;
+
+  function setStep(newStep) { onChange({ ...s, step: newStep }); }
   function answerDilemma(id, value) {
-    onChange({ ...s, dilemmaAnswers: { ...dilemmaAnswers, [id]: value } });
+    onChange({ ...s, step, dilemmaAnswers: { ...dilemmaAnswers, [id]: value } });
   }
   function answerQuiz(idx, val) {
-    onChange({ ...s, quizAnswers: { ...quizAnswers, [idx]: val } });
+    onChange({ ...s, step, quizAnswers: { ...quizAnswers, [idx]: val } });
   }
   function nextDilemma() {
-    if (dilemmaIdx < quiz.dilemmas.length - 1) onChange({ ...s, dilemmaIdx: dilemmaIdx + 1 });
+    if (dilemmaIdx < quiz.dilemmas.length - 1) onChange({ ...s, step, dilemmaIdx: dilemmaIdx + 1 });
     else setStep("quiz");
   }
 
@@ -1102,7 +1105,7 @@ export function MonthlyQuiz({ monthId, state, onChange }) {
   const allQuizAnswered = quiz.quiz.every((_, i) => quizAnswers[i] !== undefined);
 
   // INTRO
-  if (s.step === "intro") return (
+  if (step === "intro") return (
     <div>
       <Intro emoji={quiz.emoji} title={quiz.title}
         desc="כל חודש מסתיים במשחקון קצר — דילמה אחת ושאלות הבנה. בלי ציונים שפוסלים — רק לחשוב ולהרגיש." />
@@ -1134,7 +1137,7 @@ export function MonthlyQuiz({ monthId, state, onChange }) {
   );
 
   // DILEMMA
-  if (s.step === "dilemma") {
+  if (step === "dilemma") {
     const d = quiz.dilemmas[dilemmaIdx];
     const answered = dilemmaAnswers[d.id];
     return (
@@ -1180,7 +1183,7 @@ export function MonthlyQuiz({ monthId, state, onChange }) {
   }
 
   // QUIZ
-  if (s.step === "quiz") return (
+  if (step === "quiz") return (
     <div>
       <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 15, margin: "0 0 16px", textAlign: "center" }}>🧠 קוויז — {quiz.dilemmas.length === 2 ? "3" : "3"} שאלות</p>
       {quiz.quiz.map((q, i) => {
@@ -1227,7 +1230,7 @@ export function MonthlyQuiz({ monthId, state, onChange }) {
   );
 
   // RESULT
-  if (s.step === "result") {
+  if (step === "result") {
     const pct = Math.round((quizScore / quiz.quiz.length) * 100);
     const msgs = [
       { min: 0, emoji: "💪", text: "לא נורא — הדברים האלה לוקחים זמן. הכי חשוב שניסית וחשבת." },
