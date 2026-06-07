@@ -1661,16 +1661,9 @@ const NAV_PARENT = [
 ];
 
 export default function App() {
-  const [session, setSession] = useState(null);
+  const [session] = useState({ key: "ido", name: "עידו", role: "kid" });
   const [tab, setTab] = useState("tasks");
   const [data, save] = useStorage();
-
-  if (!session) {
-    return <LoginScreen onLogin={(k, u) => {
-      setSession({ key: k, ...u });
-      setTab(u.role === "parent" ? "progress" : "tasks");
-    }} />;
-  }
 
   if (!data) {
     return (
@@ -1703,13 +1696,7 @@ export default function App() {
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, margin: 0 }}>{overallPct}% מהמסע הושלם</p>
           </div>
         </div>
-        <button onClick={() => setSession(null)} style={{
-          background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
-          color: "rgba(255,255,255,0.6)", padding: "7px 14px", borderRadius: 10,
-          cursor: "pointer", fontSize: 13
-        }}>
-          {isParent ? "👩‍👩‍👦" : "👦"} {session.name} ↩
-        </button>
+        <button onClick={() => {}} style={{ display: "none" }} />
       </div>
 
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 16px 100px" }}>
