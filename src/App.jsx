@@ -1648,8 +1648,8 @@ const NAV_IDO = [
   { id: "tasks", label: "משימות", icon: "✓" },
   { id: "progress", label: "התקדמות", icon: "📊" },
   { id: "journal", label: "יומן", icon: "📝" },
-  { id: "values", label: "ערכים", icon: "⭐" },
   { id: "map", label: "מפה", icon: "🗺️" },
+  { id: "manifesto", label: "המסע", icon: "🧭" },
 ];
 
 const NAV_PARENT = [
