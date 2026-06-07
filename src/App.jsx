@@ -17,11 +17,11 @@ const CHAPTERS = [
     id: 1,
     emoji: "🌿",
     title: "שורשים וזהות",
-    period: "מאי–אוגוסט 2026",
+    period: "נובמבר 2025 – פברואר 2026",
     question: "מי אני? מאיפה באתי? מה חשוב לי?",
     months: [
       {
-        id: "m1", month: "מאי", title: "טקס פתיחה ומפת זהות",
+        id: "m1", month: "נובמבר 2025", title: "טקס פתיחה ומפת זהות",
         tasks: [
           { id: "t1", text: "טקס פתיחה משפחתי" },
           { id: "t2", text: "מפת ערכים אישית" },
@@ -29,7 +29,7 @@ const CHAPTERS = [
         ]
       },
       {
-        id: "m2", month: "יוני", title: "אחריות בבית",
+        id: "m2", month: "דצמבר 2025", title: "אחריות בבית",
         tasks: [
           { id: "t4", text: "בחירת תחום אחריות קבוע" },
           { id: "t5", text: "סטנדרט ביצוע ברור" },
@@ -37,7 +37,7 @@ const CHAPTERS = [
         ]
       },
       {
-        id: "m3", month: "יולי", title: "כסף וניהול עצמי",
+        id: "m3", month: "ינואר 2026", title: "כסף וניהול עצמי",
         tasks: [
           { id: "t7", text: "דמי ניהול חודשיים" },
           { id: "t8", text: "טבלת הוצאות" },
@@ -45,7 +45,7 @@ const CHAPTERS = [
         ]
       },
       {
-        id: "m4", month: "אוגוסט", title: "עצמאות יומיומית",
+        id: "m4", month: "פברואר 2026", title: "עצמאות יומיומית",
         tasks: [
           { id: "t10", text: "בישול ארוחה מלאה" },
           { id: "t11", text: "כביסה וניהול זמן" },
@@ -59,25 +59,25 @@ const CHAPTERS = [
     id: 2,
     emoji: "🧭",
     title: "אחריות ועצמאות בעולם",
-    period: "ספטמבר–דצמבר 2026",
+    period: "מרץ–יוני 2026",
     question: "איך אני מתנהל לבד? איך אני פועל מחוץ לבית?",
     months: [
       {
-        id: "m5", month: "ספטמבר", title: "רגשות וחוסן",
+        id: "m5", month: "מרץ 2026", title: "רגשות וחוסן",
         tasks: [
           { id: "t13", text: "יומן רגשי שבועי" },
           { id: "t14", text: "שיחה אמיצה על פחד/כעס" },
         ]
       },
       {
-        id: "m6", month: "אוקטובר", title: "קהילה ותרומה",
+        id: "m6", month: "אפריל 2026", title: "קהילה ותרומה",
         tasks: [
           { id: "t15", text: "בחירת פרויקט התנדבותי" },
           { id: "t16", text: "התחייבות קבועה" },
         ]
       },
       {
-        id: "m7", month: "נובמבר", title: "אתגר פיזי",
+        id: "m7", month: "מאי 2026", title: "אתגר פיזי",
         tasks: [
           { id: "t17", text: "בחירת יעד (ריצה / מסלול / רכיבה)" },
           { id: "t18", text: "תכנית אימון" },
@@ -85,7 +85,7 @@ const CHAPTERS = [
         ]
       },
       {
-        id: "m8", month: "דצמבר", title: 'נסיעה עצמאית בתחב"צ 🚍',
+        id: "m8", month: "יוני 2026", title: 'נסיעה עצמאית בתחב"צ 🚍',
         tasks: [
           { id: "t20", text: "תכנון מסלול לבד" },
           { id: "t21", text: "נסיעה עצמאית ליעד מוסכם" },
@@ -100,25 +100,25 @@ const CHAPTERS = [
     id: 3,
     emoji: "🔥",
     title: "מסע והתנסות אמיתית",
-    period: "ינואר–אפריל 2027",
+    period: "יולי–אוקטובר 2026",
     question: "חיבור בין גוף, טבע ובגרות.",
     months: [
       {
-        id: "m9", month: "ינואר", title: "מיומנות טכנית",
+        id: "m9", month: "יולי 2026", title: "מיומנות טכנית",
         tasks: [
           { id: "t24", text: "תיקון בבית" },
           { id: "t25", text: "שימוש בכלים בסיסיים" },
         ]
       },
       {
-        id: "m10", month: "פברואר", title: "יום עצמאות מלא",
+        id: "m10", month: "אוגוסט 2026", title: "יום עצמאות מלא",
         tasks: [
           { id: "t26", text: "יציאה ליום שתכנן לגמרי לבד" },
           { id: "t27", text: "אחריות לזמנים ולכסף" },
         ]
       },
       {
-        id: "m11", month: "מרץ", title: "מחנאות 🏕",
+        id: "m11", month: "ספטמבר 2026", title: "מחנאות 🏕",
         tasks: [
           { id: "t28", text: "לימוד הדלקת גזיה / מדורה" },
           { id: "t29", text: "הקמת אוהל" },
@@ -127,7 +127,7 @@ const CHAPTERS = [
         ]
       },
       {
-        id: "m12", month: "אפריל", title: "תיק עתיד",
+        id: "m12", month: "אוקטובר 2026", title: "תיק עתיד",
         tasks: [
           { id: "t32", text: "מיפוי חוזקות" },
           { id: "t33", text: "חלומות" },
@@ -141,11 +141,11 @@ const CHAPTERS = [
     id: 4,
     emoji: "🚀",
     title: "חזון והובלה אישית",
-    period: "מאי–נובמבר 2027",
+    period: "נובמבר 2026 — קו הסיום",
     question: "לאן אני לוקח את עצמי מכאן?",
     months: [
       {
-        id: "m13", month: "מאי–אוגוסט", title: "פרויקט אישי משמעותי",
+        id: "m13", month: "נובמבר 2026 — שבוע א׳", title: "פרויקט אישי משמעותי",
         tasks: [
           { id: "t35", text: "הגדרת פרויקט אישי" },
           { id: "t36", text: "יעד ברור + מדדי הצלחה" },
@@ -153,7 +153,7 @@ const CHAPTERS = [
         ]
       },
       {
-        id: "m14", month: "ספטמבר–אוקטובר", title: "עיבוד המסע",
+        id: "m14", month: "נובמבר 2026 — שבוע ב׳", title: "עיבוד המסע",
         tasks: [
           { id: "t38", text: "כתיבת נאום אישי" },
           { id: "t39", text: "בחירת 5 תובנות מהשנה" },
@@ -161,7 +161,7 @@ const CHAPTERS = [
         ]
       },
       {
-        id: "m15", month: "נובמבר 2027", title: "טקס סיום",
+        id: "m15", month: "יום הבר מצווה", title: "טקס סיום",
         tasks: [
           { id: "t41", text: "הצגת המסע" },
           { id: "t42", text: "חתימה על אמנת בגרות מחודשת" },
@@ -334,10 +334,17 @@ function TasksView({ data, save, isParent }) {
         <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "#0a0a1a", display: "flex", flexDirection: "column", overflow: "hidden" }}>
           <div style={{ background: "#0f0f23", borderBottom: "1px solid rgba(255,255,255,0.08)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
             <button onClick={() => setActiveQuiz(null)} style={{ background: "rgba(255,255,255,0.08)", border: "none", color: "#fff", width: 34, height: 34, borderRadius: "50%", cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>←</button>
-            <p style={{ color: "#fbbf24", fontWeight: 700, fontSize: 15, margin: 0 }}>🎮 משחקון סיכום חודש</p>
+            <p style={{ color: "#fbbf24", fontWeight: 700, fontSize: 15, margin: 0, flex: 1 }}>🎮 משחקון סיכום חודש</p>
             {!!data.completed?.[`quiz_${activeQuiz.monthId}`] && (
-              <span style={{ marginRight: "auto", padding: "4px 12px", borderRadius: 20, fontSize: 12, background: "rgba(16,185,129,0.2)", color: "#6ee7b7", border: "1px solid rgba(16,185,129,0.3)" }}>✓ הושלם</span>
+              <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, background: "rgba(16,185,129,0.2)", color: "#6ee7b7", border: "1px solid rgba(16,185,129,0.3)" }}>✓ הושלם</span>
             )}
+            <button onClick={() => {
+              const newTaskData = { ...(data.taskData || {}) };
+              delete newTaskData[`quiz_${activeQuiz.monthId}`];
+              const newCompleted = { ...(data.completed || {}) };
+              delete newCompleted[`quiz_${activeQuiz.monthId}`];
+              save({ ...data, taskData: newTaskData, completed: newCompleted });
+            }} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 12, cursor: "pointer", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", color: "#fca5a5" }}>🔄 אפס</button>
           </div>
           <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px 100px" }}>
             <MonthlyQuiz
