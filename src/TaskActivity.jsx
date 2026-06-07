@@ -922,7 +922,7 @@ function Ch1Climax({ state, onChange, onApprove, isParent }) {
 
 export const MONTH_QUIZZES = {
   m1: {
-    title: "סיכום חודש מאי — זהות וערכים",
+    title: "סיכום חודש נובמבר — זהות וערכים",
     emoji: "🌿",
     dilemmas: [
       {
@@ -961,7 +961,7 @@ export const MONTH_QUIZZES = {
     ]
   },
   m2: {
-    title: "סיכום חודש יוני — אחריות בבית",
+    title: "סיכום חודש דצמבר — אחריות בבית",
     emoji: "🏠",
     dilemmas: [
       {
@@ -1000,7 +1000,7 @@ export const MONTH_QUIZZES = {
     ]
   },
   m3: {
-    title: "סיכום חודש יולי — כסף וניהול עצמי",
+    title: "סיכום חודש ינואר — כסף וניהול עצמי",
     emoji: "💰",
     dilemmas: [
       {
@@ -1039,7 +1039,7 @@ export const MONTH_QUIZZES = {
     ]
   },
   m4: {
-    title: "סיכום חודש אוגוסט — עצמאות יומיומית",
+    title: "סיכום חודש פברואר — עצמאות יומיומית",
     emoji: "🔥",
     dilemmas: [
       {
