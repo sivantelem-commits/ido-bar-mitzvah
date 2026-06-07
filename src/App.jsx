@@ -182,11 +182,12 @@ function useStorage() {
   useEffect(() => {
     async function load() {
       try {
-        const { data: row } = await supabase
+        const { data: row, error } = await supabase
           .from("bar_mitzvah")
           .select("value")
           .eq("key", "ido-data")
-          .single();
+          .maybeSingle();
+        // maybeSingle() returns null (not error) when no row exists
         setData(row?.value ?? EMPTY_DATA);
       } catch {
         setData(EMPTY_DATA);
