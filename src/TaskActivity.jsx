@@ -657,7 +657,7 @@ export function TaskModal({ task, chapter, data, save, isParent, onClose }) {
 
   return (
     <div style={{
-      position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.85)",
+      position: "fixed", inset: 0, zIndex: 1000, background: "#0a0a1a",
       display: "flex", flexDirection: "column", overflow: "hidden"
     }}>
       {/* Header */}
@@ -723,7 +723,7 @@ export function ClimaxModal({ chapterId, data, save, isParent, onClose, onApprov
 
   return (
     <div style={{
-      position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.85)",
+      position: "fixed", inset: 0, zIndex: 1000, background: "#0a0a1a",
       display: "flex", flexDirection: "column", overflow: "hidden"
     }}>
       <div style={{
