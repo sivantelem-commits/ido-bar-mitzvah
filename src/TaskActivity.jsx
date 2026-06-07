@@ -918,6 +918,346 @@ function Ch1Climax({ state, onChange, onApprove, isParent }) {
 
 // ─── Activity registry ────────────────────────────────────────────────────────
 
+// ─── Monthly Quiz Games ───────────────────────────────────────────────────────
+
+const MONTH_QUIZZES = {
+  m1: {
+    title: "סיכום חודש מאי — זהות וערכים",
+    emoji: "🌿",
+    dilemmas: [
+      {
+        id: "d1",
+        scenario: "חבר טוב שלך מתלבש בצורה שנראית לך מוזרה. הוא שואל מה דעתך.",
+        options: [
+          { text: "אומר לו שזה נראה נהדר, גם אם זה לא נכון", value: "social" },
+          { text: "אומר לו בעדינות מה אני חושב באמת", value: "honest" },
+          { text: "משנה נושא ולא עונה", value: "avoid" },
+        ],
+        feedback: {
+          social: "בחרת לשמור על הרגשות שלו — אבל חברות אמיתית מבוססת על אמת. חשוב לדעת לומר אמת בעדינות.",
+          honest: "מעולה! אמת שנאמרת בעדינות היא סימן לחברות אמיתית ולערך האותנטיות.",
+          avoid: "הימנעות לפעמים נוחה, אבל לא מחזקת חברויות. אמת בעדינות עדיפה על שתיקה.",
+        }
+      },
+      {
+        id: "d2",
+        scenario: "אתה צריך לבחור בין לבלות עם חברים לבין לעזור לאמא עם קניות שהבטחת לעשות.",
+        options: [
+          { text: "הולך עם החברים — זה פחות חשוב", value: "friends" },
+          { text: "עומד בהבטחה ועוזר לאמא", value: "promise" },
+          { text: "מתנצל ומסביר שישלם בזמן אחר", value: "negotiate" },
+        ],
+        feedback: {
+          friends: "קשה לוותר על חברים, אבל הבטחות שנשברות פוגעות באמון. אחריות מתחילה בדברים קטנים.",
+          promise: "כל הכבוד! עמידה בהבטחות היא אחד הדברים שמגדירים אדם אמין.",
+          negotiate: "תקשורת ישירה ופתרון חלופי — זו דרך בוגרת להתמודד עם קונפליקט.",
+        }
+      },
+    ],
+    quiz: [
+      { q: "מה ההבדל בין ערך לבין תחביב?", options: ["ערך הוא דבר שמשנה לי עמוק — מנחה אותי בהחלטות. תחביב הוא דבר שאני אוהב לעשות.", "אין הבדל, שניהם חשובים לי.", "תחביב יותר חשוב כי עושה אותי שמח."], correct: 0 },
+      { q: "למה כתבנו 'מפת זהות' בתחילת השנה?", options: ["כי זה היה שיעורי בית", "כדי לדעת מאיפה מתחילים את המסע — מה חזק בנו ומה נרצה לפתח", "כי ההורים ביקשו"], correct: 1 },
+      { q: "מה זה אומר שמישהו הוא אותנטי?", options: ["שהוא תמיד מסכים עם כולם", "שהוא מתנהג לפי מי שהוא באמת, לא לפי מה שאחרים רוצים", "שהוא לא אכפת לו מאחרים"], correct: 1 },
+    ]
+  },
+  m2: {
+    title: "סיכום חודש יוני — אחריות בבית",
+    emoji: "🏠",
+    dilemmas: [
+      {
+        id: "d1",
+        scenario: "שכחת לעשות את תחום האחריות שלך השבוע. ההורים שאלו אם עשית.",
+        options: [
+          { text: "אומר שכן, ומקווה שלא ישימו לב", value: "lie" },
+          { text: "מודה ומבקש סליחה, ומציע לפצות", value: "honest" },
+          { text: "מאשים גורם חיצוני — היה לי יום קשה", value: "blame" },
+        ],
+        feedback: {
+          lie: "שקר קטן מייצר חוסר אמון גדול. אחריות כוללת גם לקחת בעלות על טעויות.",
+          honest: "מדהים! הודאה בטעות ופיצוי — זו בגרות אמיתית. זה מה שבונה אמון.",
+          blame: "קל לתרץ, אבל אחריות אמיתית לא עוברת בין ידיים. הצעד הבא — להודות ולתקן.",
+        }
+      },
+      {
+        id: "d2",
+        scenario: "ביצעת את תחום האחריות שלך, אבל לא ממש טוב — חצי-חצי. ההורים לא שמו לב.",
+        options: [
+          { text: "לא אומר כלום, עשיתי את שלי", value: "ignore" },
+          { text: "חוזר ועושה את זה כמו שצריך, בלי שיבקשו", value: "redo" },
+          { text: "שואל אם הסטנדרט שקבענו היה ריאלי", value: "discuss" },
+        ],
+        feedback: {
+          ignore: "הסטנדרט קיים בשבילך — לא בשביל ההורים. מצפון פנימי חזק מהשגחה חיצונית.",
+          redo: "וואו — זו אחריות אמיתית! לחזור ולתקן בלי שביקשו ממך זה בגרות של אמת.",
+          discuss: "שיחה על ציפיות ריאליות — מעולה! תקשורת פתוחה היא חלק מהאחריות.",
+        }
+      },
+    ],
+    quiz: [
+      { q: "למה חשוב לקבוע סטנדרט ברור לתחום האחריות?", options: ["כדי שההורים יהיו שקטים", "כדי שיהיה ברור לך מה 'טוב' נראה — ולא תצטרך שיגידו לך", "כי זה הכלל"], correct: 1 },
+      { q: "מה זה אומר לקחת אחריות?", options: ["לעשות מה שמבקשים ממך", "לעמוד מאחורי מה שהתחייבת — גם כשטועים, גם בלי תזכורת", "להאשים את עצמך כשמשהו לא עובד"], correct: 1 },
+      { q: "מה עדיף — לקבל משוב ביקורתי או לא לקבל משוב בכלל?", options: ["לא לקבל משוב — פחות לחץ", "לקבל משוב ביקורתי — כי זה עוזר לגדול", "תלוי מה אומרים"], correct: 1 },
+    ]
+  },
+  m3: {
+    title: "סיכום חודש יולי — כסף וניהול עצמי",
+    emoji: "💰",
+    dilemmas: [
+      {
+        id: "d1",
+        scenario: "יש לך 100 ₪ בתקציב. חבר מציע לך הזדמנות מדהימה לצאת לאירוע שעולה בדיוק 100 ₪. אבל זה כל הכסף שלך לחודש.",
+        options: [
+          { text: "יוצא — זו חוויה שלא חוזרת!", value: "yolo" },
+          { text: "לא יוצא — החלטתי לחסוך חלק", value: "save" },
+          { text: "מדבר עם ההורים על הלוואה קטנה", value: "loan" },
+        ],
+        feedback: {
+          yolo: "חוויות שוות כסף — אבל לאזל לגמרי לא נותן גב לאורכי החודש. איזון הוא מיומנות.",
+          save: "משמעת פיננסית בגיל הזה היא מיומנות נדירה. כל הכבוד על השמירה על הגבול שקבעת.",
+          loan: "להבין שצריך עזרה ולבקש אותה בכנות — זה בוגר. רק חשוב להחזיר.",
+        }
+      },
+      {
+        id: "d2",
+        scenario: "בתוך החודש גילית שהוצאת יותר ממה שתכננת. נשארו לך 20 ₪ ל-2 שבועות.",
+        options: [
+          { text: "מבקש כסף נוסף מההורים", value: "ask" },
+          { text: "מסתדר עם מה שיש — לומד מהטעות", value: "manage" },
+          { text: "מתעלם ומשתמש בכרטיס אשראי", value: "credit" },
+        ],
+        feedback: {
+          ask: "לבקש עזרה זה בסדר — אבל לנסות קודם לבד מלמד יותר. מה היית יכול לעשות אחרת?",
+          manage: "אמיץ! 20 ₪ ל-2 שבועות זה אתגר — אבל כלכלת אילוץ מלמדת יותר מכל ספר.",
+          credit: "להוציא כסף שאין לך — זו הבעיה הפיננסית הכי נפוצה אצל מבוגרים. עכשיו הזמן ללמוד אחרת.",
+        }
+      },
+    ],
+    quiz: [
+      { q: "מה ההבדל בין צורך לרצון?", options: ["אין הבדל — כל מה שרוצים צריך", "צורך הוא משהו שחייבים לחיות — רצון הוא משהו שרוצים אבל אפשר בלעדיו", "רצון יותר חשוב כי הוא גורם לי אושר"], correct: 1 },
+      { q: "למה כדאי לנהל טבלת הוצאות?", options: ["כי ההורים מבקשים", "כי היא מגלה לאן הכסף הולך ועוזרת להחליט טוב יותר", "כי זה כיף לכתוב מספרים"], correct: 1 },
+      { q: "מה זה חיסכון?", options: ["כסף שנגמר", "כסף שמפרישים עכשיו כדי שיהיה לך אפשרות בעתיד", "כסף שאסור להשתמש בו אף פעם"], correct: 1 },
+    ]
+  },
+  m4: {
+    title: "סיכום חודש אוגוסט — עצמאות יומיומית",
+    emoji: "🔥",
+    dilemmas: [
+      {
+        id: "d1",
+        scenario: "בישלת ארוחה שיצאה בינונית. ההורים אמרו שהיה טעים אבל ראית שהם לא סיימו.",
+        options: [
+          { text: "מתבאס ומחליט שבישול זה לא בשבילי", value: "quit" },
+          { text: "שואל מה היה אפשר לשפר ומנסה שוב", value: "improve" },
+          { text: "מאמין שהיה טוב וממשיך הלאה", value: "accept" },
+        ],
+        feedback: {
+          quit: "כישלון ראשון הוא חלק מהלמידה — לא הסוף שלה. כל שף התחיל עם ארוחות בינוניות.",
+          improve: "זו בדיוק הגישה שמפתחת מיומנות! לשאול, ללמוד, לנסות שוב — זו גדילה אמיתית.",
+          accept: "לקבל מחמאה זה בסדר — אבל לשאול למשוב אמיתי הוא מה שמשפר.",
+        }
+      },
+      {
+        id: "d2",
+        scenario: "תכננת יום משפחתי שלא הלך לפי התכנית. חצי מהדברים לא קרו.",
+        options: [
+          { text: "מרגיש כישלון — לא מספיק טוב כמארגן", value: "fail" },
+          { text: "מבין שתכנון ומציאות תמיד שונים — זה בסדר", value: "learn" },
+          { text: "מאשים את ההורים שלא שיתפו פעולה", value: "blame" },
+        ],
+        feedback: {
+          fail: "תכנון שלא יוצא מושלם הוא נורמלי — גם למנהיגים מנוסים. השאלה היא מה עושים עם זה.",
+          learn: "בדיוק! גמישות היא מיומנות מנהיגות. תכנית טובה יודעת להסתגל.",
+          blame: "קל להאשים — קשה לקחת בעלות. מה אתה היית יכול לעשות אחרת?",
+        }
+      },
+    ],
+    quiz: [
+      { q: "מה המשמעות של עצמאות יומיומית?", options: ["לעשות הכל לבד בלי עזרה", "לדעת לטפל בצרכים בסיסיים של עצמך — בישול, כביסה, ארגון", "לא לצטרך את ההורים בכלל"], correct: 1 },
+      { q: "למה חשוב ללמוד לבשל?", options: ["כי זה מגניב", "כי זו מיומנות בסיסית לחיים — בריאות, עצמאות וחיסכון כספי", "כי כולם עושים את זה"], correct: 1 },
+      { q: "מה ניהול זמן טוב עוזר לך לעשות?", options: ["לגמור הכל מהר", "לפנות מקום למה שחשוב לך — ולא להיות תמיד בלחץ", "להרשים אחרים"], correct: 1 },
+    ]
+  },
+};
+
+function MonthlyQuiz({ monthId, state, onChange }) {
+  const quiz = MONTH_QUIZZES[monthId];
+  const s = state || { step: "intro", dilemmaIdx: 0, dilemmaAnswers: {}, quizAnswers: {}, done: false };
+
+  if (!quiz) return <p style={{ color: "rgba(255,255,255,0.5)", textAlign: "center", padding: 40 }}>המשחקון בדרך...</p>;
+
+  function setStep(step) { onChange({ ...s, step }); }
+  function answerDilemma(id, value) {
+    onChange({ ...s, dilemmaAnswers: { ...s.dilemmaAnswers, [id]: value } });
+  }
+  function answerQuiz(idx, val) {
+    onChange({ ...s, quizAnswers: { ...s.quizAnswers, [idx]: val } });
+  }
+  function nextDilemma() {
+    if (s.dilemmaIdx < quiz.dilemmas.length - 1) onChange({ ...s, dilemmaIdx: s.dilemmaIdx + 1 });
+    else setStep("quiz");
+  }
+
+  const quizScore = quiz.quiz.filter((q, i) => s.quizAnswers[i] === q.correct).length;
+  const allQuizAnswered = quiz.quiz.every((_, i) => s.quizAnswers[i] !== undefined);
+
+  // INTRO
+  if (s.step === "intro") return (
+    <div>
+      <Intro emoji={quiz.emoji} title={quiz.title}
+        desc="כל חודש מסתיים במשחקון קצר — דילמה אחת ושאלות הבנה. בלי ציונים שפוסלים — רק לחשוב ולהרגיש." />
+      <Card>
+        <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 14, lineHeight: 1.7, margin: "0 0 16px" }}>
+          המשחקון כולל שני חלקים:
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {[
+            { icon: "🎭", title: "דילמות", desc: "מצבים מהחיים — מה היית עושה?" },
+            { icon: "🧠", title: "קוויז", desc: "כמה שאלות על מה שלמדת החודש" },
+          ].map(item => (
+            <div key={item.icon} style={{ display: "flex", gap: 12, padding: "12px 14px", borderRadius: 12, background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.15)" }}>
+              <span style={{ fontSize: 24 }}>{item.icon}</span>
+              <div>
+                <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 14, margin: "0 0 2px" }}>{item.title}</p>
+                <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, margin: 0 }}>{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+      <button onClick={() => setStep("dilemma")} style={{
+        marginTop: 16, width: "100%", padding: "14px", borderRadius: 14,
+        background: "linear-gradient(135deg, #7c3aed, #a855f7)",
+        border: "none", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer"
+      }}>יאללה, מתחילים! ←</button>
+    </div>
+  );
+
+  // DILEMMA
+  if (s.step === "dilemma") {
+    const d = quiz.dilemmas[s.dilemmaIdx || 0];
+    const answered = s.dilemmaAnswers[d.id];
+    return (
+      <div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+          <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>דילמה {(s.dilemmaIdx || 0) + 1} מתוך {quiz.dilemmas.length}</span>
+          <span style={{ color: "#c4b5fd", fontSize: 13, fontWeight: 600 }}>🎭 מה היית עושה?</span>
+        </div>
+        <Card style={{ marginBottom: 16, border: "1px solid rgba(124,58,237,0.25)", background: "rgba(124,58,237,0.06)" }}>
+          <p style={{ color: "#fff", fontSize: 15, lineHeight: 1.7, margin: 0 }}>{d.scenario}</p>
+        </Card>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
+          {d.options.map(opt => {
+            const isSel = answered === opt.value;
+            return (
+              <button key={opt.value} onClick={() => !answered && answerDilemma(d.id, opt.value)} style={{
+                padding: "14px 16px", borderRadius: 12, textAlign: "right",
+                background: isSel ? "rgba(124,58,237,0.25)" : "rgba(255,255,255,0.04)",
+                border: isSel ? "1.5px solid #7c3aed" : "1px solid rgba(255,255,255,0.1)",
+                color: isSel ? "#e9d5ff" : "#fff", fontSize: 14, cursor: answered ? "default" : "pointer",
+                lineHeight: 1.5
+              }}>{opt.text}</button>
+            );
+          })}
+        </div>
+        {answered && (
+          <Card style={{ marginBottom: 16, border: "1px solid rgba(16,185,129,0.25)", background: "rgba(16,185,129,0.06)" }}>
+            <p style={{ color: "#6ee7b7", fontWeight: 600, fontSize: 13, margin: "0 0 6px" }}>💬 מה חושבים על זה?</p>
+            <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 14, margin: 0, lineHeight: 1.6 }}>{d.feedback[answered]}</p>
+          </Card>
+        )}
+        {answered && (
+          <button onClick={nextDilemma} style={{
+            width: "100%", padding: "13px", borderRadius: 12,
+            background: "linear-gradient(135deg, #7c3aed, #a855f7)",
+            border: "none", color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer"
+          }}>
+            {s.dilemmaIdx < quiz.dilemmas.length - 1 ? "דילמה הבאה →" : "עכשיו לקוויז →"}
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // QUIZ
+  if (s.step === "quiz") return (
+    <div>
+      <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 15, margin: "0 0 16px", textAlign: "center" }}>🧠 קוויז — {quiz.dilemmas.length === 2 ? "3" : "3"} שאלות</p>
+      {quiz.quiz.map((q, i) => {
+        const ans = s.quizAnswers[i];
+        const correct = ans === q.correct;
+        return (
+          <Card key={i} style={{ marginBottom: 14 }}>
+            <p style={{ color: "#fff", fontSize: 14, fontWeight: 600, margin: "0 0 12px" }}>
+              {i + 1}. {q.q}
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {q.options.map((opt, oi) => {
+                const isSel = ans === oi;
+                const isCorrect = oi === q.correct;
+                let bg = "rgba(255,255,255,0.04)";
+                let border = "1px solid rgba(255,255,255,0.1)";
+                let color = "#fff";
+                if (ans !== undefined) {
+                  if (isCorrect) { bg = "rgba(16,185,129,0.15)"; border = "1px solid rgba(16,185,129,0.4)"; color = "#6ee7b7"; }
+                  else if (isSel) { bg = "rgba(239,68,68,0.12)"; border = "1px solid rgba(239,68,68,0.3)"; color = "#fca5a5"; }
+                }
+                return (
+                  <button key={oi} onClick={() => ans === undefined && answerQuiz(i, oi)} style={{
+                    padding: "10px 14px", borderRadius: 10, textAlign: "right",
+                    background: bg, border, color, fontSize: 13,
+                    cursor: ans !== undefined ? "default" : "pointer", lineHeight: 1.5
+                  }}>
+                    {ans !== undefined && isCorrect && "✓ "}{opt}
+                  </button>
+                );
+              })}
+            </div>
+          </Card>
+        );
+      })}
+      {allQuizAnswered && (
+        <button onClick={() => setStep("result")} style={{
+          width: "100%", padding: "13px", borderRadius: 12,
+          background: "linear-gradient(135deg, #7c3aed, #a855f7)",
+          border: "none", color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer", marginTop: 8
+        }}>ראה תוצאות →</button>
+      )}
+    </div>
+  );
+
+  // RESULT
+  if (s.step === "result") {
+    const pct = Math.round((quizScore / quiz.quiz.length) * 100);
+    const msgs = [
+      { min: 0, emoji: "💪", text: "לא נורא — הדברים האלה לוקחים זמן. הכי חשוב שניסית וחשבת." },
+      { min: 40, emoji: "👍", text: "יפה! אתה בדרך הנכונה. המשך לשאול שאלות." },
+      { min: 70, emoji: "🌟", text: "מרשים! הראית שהפנמת את מה שלמדת החודש." },
+      { min: 100, emoji: "🏆", text: "מושלם! שולט בחומר לגמרי — החודש הזה היה שלך." },
+    ];
+    const msg = [...msgs].reverse().find(m => pct >= m.min);
+    return (
+      <div>
+        <div style={{ textAlign: "center", padding: "32px 0 24px" }}>
+          <div style={{ fontSize: 56, marginBottom: 12 }}>{msg.emoji}</div>
+          <p style={{ color: "#fff", fontSize: 22, fontWeight: 700, margin: "0 0 8px" }}>{pct}% בקוויז</p>
+          <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 14, margin: 0 }}>{quizScore}/{quiz.quiz.length} תשובות נכונות</p>
+        </div>
+        <Card style={{ border: "1px solid rgba(124,58,237,0.3)", background: "rgba(124,58,237,0.08)", marginBottom: 20 }}>
+          <p style={{ color: "#c4b5fd", fontSize: 15, lineHeight: 1.7, margin: 0 }}>{msg.text}</p>
+        </Card>
+        <Card style={{ border: "1px solid rgba(16,185,129,0.2)", background: "rgba(16,185,129,0.05)" }}>
+          <Label>💭 משהו שלמדת על עצמך החודש הזה?</Label>
+          <TextInput multiline value={s.takeaway || ""} onChange={v => onChange({ ...s, takeaway: v })}
+            placeholder="החודש הזה גיליתי ש..." />
+        </Card>
+      </div>
+    );
+  }
+  return null;
+}
+
+export const MONTH_QUIZ_IDS = Object.keys(MONTH_QUIZZES);
+
 export const TASK_ACTIVITIES = {
   t1: T1_OpeningCeremony,
   t2: T2_ValueMap,
