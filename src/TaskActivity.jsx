@@ -161,22 +161,319 @@ function T2_ValueMap({ state, onChange }) {
   );
 }
 
-function T3_ChooseValues({ state, onChange }) {
+// ─── Heroes data (for T3) ─────────────────────────────────────────────────────
+const HEROES_T3 = [
+  { id: "mandela", name: "נלסון מנדלה", wiki: "Nelson_Mandela", title: "מנהיג, לוחם חופש", bio: "בילה 27 שנה בכלא ויצא ללא שנאה. סמל של סליחה, כוח ושינוי.", values: ["צדק","סליחה","נחישות","שוויון","אומץ","מנהיגות"] },
+  { id: "messi", name: "ליאונל מסי", wiki: "Lionel_Messi", title: "שחקן הכדורגל הטוב בהיסטוריה", bio: "ילד שנאמר לו שגופו לא מתאים. לא ויתר, לא התגאה, תמיד עבד קשה.", values: ["התמדה","ענווה","מצוינות","שאפתנות","מחויבות","משפחה"] },
+  { id: "anne", name: "אנה פרנק", wiki: "Anne_Frank", title: "סמל תקווה ואנושיות", bio: "נסתרה שנתיים מהנאצים וכתבה יומן של תקווה ואמונה בטוב גם בחושך.", values: ["תקווה","אמת","אנושיות","אותנטיות","אמונה","ביטוי עצמי"] },
+  { id: "jobs", name: "סטיב ג'ובס", wiki: "Steve_Jobs", title: "מייסד אפל", bio: "נשר מהאוניברסיטה ובנה את החברה הכי שווה בעולם. האמין שעיצוב ופשטות משנים הכל.", values: ["חדשנות","אסתטיקה","פרפקציוניזם","יצירתיות","פשטות","מקוריות"] },
+  { id: "teresa", name: "אמא תרזה", wiki: "Mother_Teresa", title: "נזירה, זוכת פרס נובל", bio: "ויתרה על חייה הנוחים לטפל בעניים ביותר. 'אם תשפוט — לא יהיה לך זמן לאהוב.'", values: ["חמלה","נדיבות","נתינה","אהבה","ענווה","עזרה לזולת"] },
+  { id: "einstein", name: "אלברט איינשטיין", wiki: "Albert_Einstein", title: "פיזיקאי ומדען", bio: "נכשל בבחינות, עבד כפקיד, וגילה את תורת היחסות. האמין שסקרנות היא המתנה הכי גדולה.", values: ["סקרנות","חשיבה","יצירתיות","ידע","חופש","הגיון"] },
+  { id: "malala", name: "מלאלה יוספזאי", wiki: "Malala_Yousafzai", title: "פעילת זכויות, זוכת נובל", bio: "נורתה בגיל 15 כי הלכה לבית ספר. שרדה והפכה לקול הכי חזק למען חינוך.", values: ["אומץ","חינוך","צדק","עשיית הבדל","השפעה","נחישות"] },
+  { id: "ronaldo", name: "כריסטיאנו רונאלדו", wiki: "Cristiano_Ronaldo", title: "שחקן כדורגל", bio: "גדל בעוני, חלה בלב בגיל 15. הראשון להגיע לאימון והאחרון לעזוב. משמעת מעל הכל.", values: ["משמעת עצמית","חריצות","התמדה","הישגיות","שאפתנות","מצוינות"] },
+  { id: "obama", name: "ברק אובמה", wiki: "Barack_Obama", title: "נשיא ארה\"ב ה-44", bio: "גדל ללא אב, בין שתי תרבויות. הנשיא הראשון ממוצא אפריקאי. האמין בכוח המילים.", values: ["תקווה","אחדות","מנהיגות","תקשורת","שוויון","שייכות"] },
+  { id: "diana", name: "נסיכת דיאנה", wiki: "Diana,_Princess_of_Wales", title: "נסיכת הלבבות", bio: "ויתרה על הפרוטוקול לחבק חולים ולהילחם בנגד מוקשים. 'הלב חופשי כשנותנים לאחרים.'", values: ["אמפתיה","חמלה","אנושיות","נדיבות","אהדה","אהבה"] },
+  { id: "hawking", name: "סטיבן הוקינג", wiki: "Stephen_Hawking", title: "קוסמולוג וסמל התגברות", bio: "אובחן עם מחלה קשה בגיל 21, חי עד 76 וגילה סודות היקום. 'כל עוד יש חיים — יש תקווה.'", values: ["התמדה","סקרנות","אופטימיות","יצירתיות","ידע","הומור"] },
+  { id: "curie", name: "מארי קירי", wiki: "Marie_Curie", title: "מדענית, זוכת נובל פעמיים", bio: "האישה הראשונה שזכתה בפרס נובל — ובשני תחומים שונים. הוכיחה שמגדר אינו מגבלה.", values: ["נחישות","ידע","יצירתיות","שוויון","חריצות","מצוינות"] },
+];
+
+const ALL_VALUES_T3 = [
+  { name: "אדיבות", desc: "להתנהג בנועם ובכבוד כלפי כל אדם." },
+  { name: "אהבה", desc: "לחבב, לדאוג ולהעניק מעצמך." },
+  { name: "אומץ", desc: "לפעול גם כשמפחד." },
+  { name: "אופטימיות", desc: "להאמין שהעתיד יכול להיות טוב." },
+  { name: "אותנטיות", desc: "להיות מי שאתה באמת." },
+  { name: "אחריות", desc: "לעמוד מאחורי המילים והמעשים שלך." },
+  { name: "אמון", desc: "לבנות מערכות יחסים על ביטחון הדדי." },
+  { name: "אמפתיה", desc: "להרגיש את מה שאחרים מרגישים." },
+  { name: "אמת", desc: "לדבר ולחיות ביושר." },
+  { name: "אנושיות", desc: "לראות את הצד האנושי בכל אדם." },
+  { name: "ביטוי עצמי", desc: "לתת ביטוי חופשי לאישיות שלך." },
+  { name: "בריאות", desc: "לדאוג לגוף ולנפש." },
+  { name: "גבורה", desc: "להתמודד עם קשיים בעוצמה." },
+  { name: "גמישות", desc: "להסתגל לשינויים מבלי לאבד את עצמך." },
+  { name: "הישגיות", desc: "לשאוף לתוצאות ולא להסתפק בפחות." },
+  { name: "התמדה", desc: "להמשיך גם כשקשה." },
+  { name: "התפתחות", desc: "לשאוף ללמוד, לגדול ולהשתפר." },
+  { name: "חברות", desc: "לטפח קשרים של אמון ושמחה." },
+  { name: "חדשנות", desc: "לחשוב מחוץ לקופסה." },
+  { name: "חופש", desc: "לפעול מתוך רצון אישי." },
+  { name: "חינוך", desc: "להאמין בכוח הידע והלמידה." },
+  { name: "חכמה", desc: "לפעול מתוך בגרות והבנה עמוקה." },
+  { name: "חמלה", desc: "לפגוש כאב של אחרים בלב פתוח." },
+  { name: "חריצות", desc: "לעבוד קשה ובמסירות." },
+  { name: "יושר", desc: "להיות ישר בדברים ובמעשים." },
+  { name: "יצירתיות", desc: "לחשוב בדרכים חדשות." },
+  { name: "כבוד", desc: "לתת כבוד לכל אדם ולעצמך." },
+  { name: "כנות", desc: "לאמר את האמת שלך." },
+  { name: "מנהיגות", desc: "לדעת לעמוד בראש ולהוביל." },
+  { name: "מסירות", desc: "לתת את כולך למה שבחרת." },
+  { name: "משמעת עצמית", desc: "לשלוט בדחפים ולעשות מה שצריך." },
+  { name: "משפחה", desc: "לשים את הקשר המשפחתי כעדיפות." },
+  { name: "מצוינות", desc: "לעשות דברים ברמה הגבוהה ביותר." },
+  { name: "נאמנות", desc: "לעמוד לצד מי שבחרת גם בזמנים קשים." },
+  { name: "נדיבות", desc: "לתת בחופשיות — זמן, אנרגיה, אהבה." },
+  { name: "נחישות", desc: "לא לוותר על מה שחשוב, גם תחת לחץ." },
+  { name: "סבלנות", desc: "להמתין בשלווה." },
+  { name: "סקרנות", desc: "לשאול שאלות, לחקור." },
+  { name: "עבודת צוות", desc: "לפעול יחד לקראת מטרה משותפת." },
+  { name: "עזרה לזולת", desc: "לראות בעזרה לאחרים חלק מהזהות שלך." },
+  { name: "עצמאות", desc: "לפתח יכולת לפעול ולהחליט בעצמך." },
+  { name: "עקביות", desc: "להיות אותו אדם תמיד." },
+  { name: "עשיית הבדל", desc: "לפעול כך שהעולם יהיה טיפה יותר טוב." },
+  { name: "צדק", desc: "לפעול למען שוויון ויחס הוגן." },
+  { name: "צמיחה", desc: "לראות את עצמך כמתפתח כל הזמן." },
+  { name: "קבלה עצמית", desc: "לאהוב את עצמך על כל מה שאתה." },
+  { name: "שאפתנות", desc: "לרצות להשיג דברים גדולים." },
+  { name: "שוויון", desc: "להאמין שכל אדם ראוי ליחס שווה." },
+  { name: "שייכות", desc: "להרגיש חלק ממשהו — קבוצה, קהילה, משפחה." },
+  { name: "שמחה", desc: "לפעול למען שמחה — שלך ושל הסביבה." },
+  { name: "תקווה", desc: "להאמין שדברים יכולים להשתפר." },
+  { name: "תרומה", desc: "להשאיר את המקום שלך יותר טוב." },
+];
+
+function HeroCardMini({ hero, isSelected, isDisabled, onToggle }) {
+  const [imgUrl, setImgUrl] = useState(null);
+  const [showBio, setShowBio] = useState(false);
+
+  useEffect(() => {
+    fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${hero.wiki}`)
+      .then(r => r.json()).then(d => { if (d.thumbnail?.source) setImgUrl(d.thumbnail.source); })
+      .catch(() => {});
+  }, [hero.wiki]);
+
+  return (
+    <div style={{
+      borderRadius: 14, border: isSelected ? "2px solid #7c3aed" : "1px solid rgba(255,255,255,0.08)",
+      background: isSelected ? "rgba(124,58,237,0.12)" : "rgba(255,255,255,0.03)",
+      opacity: isDisabled ? 0.35 : 1, transition: "all 0.2s", overflow: "visible", position: "relative"
+    }}>
+      <button onClick={() => !isDisabled && setShowBio(!showBio)} style={{
+        width: "100%", background: "none", border: "none", cursor: isDisabled ? "not-allowed" : "pointer",
+        padding: 12, display: "flex", flexDirection: "column", alignItems: "center", gap: 6
+      }}>
+        {imgUrl
+          ? <img src={imgUrl} alt={hero.name} style={{ width: 64, height: 64, borderRadius: "50%", objectFit: "cover", objectPosition: "top", border: isSelected ? "2px solid #7c3aed" : "2px solid rgba(255,255,255,0.1)" }} />
+          : <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(124,58,237,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{hero.name[0]}</div>
+        }
+        {isSelected && <div style={{ position: "absolute", top: 8, left: 8, width: 20, height: 20, borderRadius: "50%", background: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#fff" }}>✓</div>}
+        <p style={{ color: "#fff", fontWeight: 600, fontSize: 12, margin: 0, textAlign: "center" }}>{hero.name}</p>
+        <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, margin: 0, textAlign: "center" }}>{hero.title}</p>
+      </button>
+
+      {showBio && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 6px)", right: 0, left: 0, zIndex: 300,
+          padding: 14, borderRadius: 12, background: "#13132a",
+          border: "1px solid rgba(124,58,237,0.5)", boxShadow: "0 8px 32px rgba(0,0,0,0.8)"
+        }}>
+          <p style={{ color: "#c4b5fd", fontWeight: 700, fontSize: 13, margin: "0 0 4px" }}>{hero.name}</p>
+          <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, margin: "0 0 10px", lineHeight: 1.5 }}>{hero.bio}</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 10 }}>
+            {hero.values.slice(0, 3).map(v => (
+              <span key={v} style={{ padding: "2px 8px", borderRadius: 20, fontSize: 10, background: "rgba(124,58,237,0.2)", color: "#c4b5fd", border: "1px solid rgba(124,58,237,0.3)" }}>{v}</span>
+            ))}
+          </div>
+          <div style={{ display: "flex", gap: 6 }}>
+            {!isDisabled && (
+              <button onClick={() => { onToggle(hero.id); setShowBio(false); }} style={{
+                flex: 1, padding: "7px", borderRadius: 8, fontSize: 12, cursor: "pointer",
+                background: isSelected ? "rgba(239,68,68,0.2)" : "rgba(124,58,237,0.5)",
+                border: isSelected ? "1px solid rgba(239,68,68,0.4)" : "none",
+                color: isSelected ? "#fca5a5" : "#fff", fontWeight: 600
+              }}>{isSelected ? "הסר" : "הוסף ➕"}</button>
+            )}
+            <button onClick={() => setShowBio(false)} style={{ padding: "7px 10px", borderRadius: 8, fontSize: 12, background: "rgba(255,255,255,0.05)", border: "none", color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>✕</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function T3_ChooseValues({ state, onChange, data, save }) {
+  const s = state || { phase: "game", heroSelected: [], suggestedValues: [], chosenValues: [] };
+  const [search, setSearch] = useState("");
+
+  function toggleHero(id) {
+    const cur = s.heroSelected || [];
+    const next = cur.includes(id) ? cur.filter(x => x !== id) : cur.length < 3 ? [...cur, id] : cur;
+    onChange({ ...s, heroSelected: next });
+  }
+
+  function computeSuggested() {
+    const counts = {};
+    (s.heroSelected || []).forEach(id => {
+      const hero = HEROES_T3.find(h => h.id === id);
+      if (hero) hero.values.forEach(v => { counts[v] = (counts[v] || 0) + 1; });
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([v]) => v);
+  }
+
+  function goToResult() {
+    const suggested = computeSuggested();
+    // Save snapshot to global data
+    const snapshot = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString("he-IL"),
+      heroes: s.heroSelected,
+      suggestedValues: suggested,
+      chosenValues: [],
+    };
+    if (save && data) {
+      save({ ...data, valueSnapshots: [...(data.valueSnapshots || []), snapshot] });
+    }
+    onChange({ ...s, phase: "result", suggestedValues: suggested });
+  }
+
+  function toggleValue(name) {
+    const cur = s.chosenValues || [];
+    const next = cur.includes(name) ? cur.filter(v => v !== name) : cur.length < 5 ? [...cur, name] : cur;
+    onChange({ ...s, chosenValues: next });
+    // Also save to global values
+    if (save && data) save({ ...data, values: next });
+  }
+
+  const chosen = s.chosenValues || [];
+  const heroSelected = s.heroSelected || [];
+  const suggested = s.suggestedValues || [];
+
+  // PHASE: game
+  if (s.phase !== "result") {
+    return (
+      <div>
+        <Intro emoji="🏆" title="בנה את הצוות שלך"
+          desc="בחר 3 דמויות שהיית רוצה שיהיו לצידך במסע. הבחירות שלך יגלו את הערכים שמנחים אותך." />
+        <p style={{ color: heroSelected.length === 3 ? "#a855f7" : "rgba(255,255,255,0.4)", fontSize: 13, fontWeight: 600, textAlign: "center", margin: "0 0 16px" }}>
+          {heroSelected.length}/3 נבחרו
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 20 }}>
+          {HEROES_T3.map(hero => (
+            <HeroCardMini key={hero.id}
+              hero={hero}
+              isSelected={heroSelected.includes(hero.id)}
+              isDisabled={!heroSelected.includes(hero.id) && heroSelected.length >= 3}
+              onToggle={toggleHero} />
+          ))}
+        </div>
+        {heroSelected.length === 3 && (
+          <button onClick={goToResult} style={{
+            width: "100%", padding: "14px", borderRadius: 14,
+            background: "linear-gradient(135deg, #7c3aed, #a855f7)",
+            border: "none", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer"
+          }}>גלה מה הצוות שלך אומר עליך ←</button>
+        )}
+      </div>
+    );
+  }
+
+  // PHASE: result + value selection
+  const pickedHeroes = HEROES_T3.filter(h => heroSelected.includes(h.id));
+  const filtered = search.trim() ? ALL_VALUES_T3.filter(v => v.name.includes(search.trim())) : ALL_VALUES_T3;
+
   return (
     <div>
-      <Intro emoji="⭐" title="5 ערכים מובילים"
-        desc="עברת על רשימת הערכים ושיחקת את משחק הדמויות. עכשיו הגיע הזמן לסגור — 5 ערכים שיהיו המצפן שלך לשנה הזו." />
-      <Card>
-        <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 14, lineHeight: 1.7, margin: 0 }}>
-          כדי לבחור ערכים — לך לכרטיסיית <strong style={{ color: "#c4b5fd" }}>⭐ ערכים</strong> ובחר 5 ערכים.
-          כשתסיים לחזור לכאן ולסמן הושלם.
-        </p>
-        {state?.done && (
-          <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 10, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)" }}>
-            <span style={{ color: "#6ee7b7", fontSize: 13 }}>✓ בחרת את הערכים שלך!</span>
+      {/* Hero summary */}
+      <div style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 20 }}>
+        {pickedHeroes.map(h => (
+          <div key={h.id} style={{ textAlign: "center" }}>
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(124,58,237,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, margin: "0 auto 4px", border: "2px solid #7c3aed" }}>{h.name[0]}</div>
+            <p style={{ color: "#c4b5fd", fontSize: 11, margin: 0 }}>{h.name.split(" ")[0]}</p>
           </div>
-        )}
+        ))}
+      </div>
+
+      {/* Suggested */}
+      <Card style={{ marginBottom: 16, border: "1px solid rgba(124,58,237,0.3)", background: "rgba(124,58,237,0.07)" }}>
+        <Label>הערכים המובילים שעולים מהצוות שלך:</Label>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {suggested.map((v, i) => (
+            <span key={v} style={{
+              padding: "6px 14px", borderRadius: 30, fontSize: 13,
+              background: i < 3 ? "rgba(124,58,237,0.3)" : "rgba(255,255,255,0.06)",
+              border: i < 3 ? "1px solid rgba(124,58,237,0.5)" : "1px solid rgba(255,255,255,0.1)",
+              color: i < 3 ? "#e9d5ff" : "rgba(255,255,255,0.6)"
+            }}>
+              {i < 3 ? "⭐ " : ""}{v}
+            </span>
+          ))}
+        </div>
       </Card>
+
+      {/* Chosen */}
+      {chosen.length > 0 && (
+        <Card style={{ marginBottom: 16, background: chosen.length === 5 ? "rgba(234,179,8,0.07)" : "rgba(124,58,237,0.06)", border: chosen.length === 5 ? "1px solid rgba(234,179,8,0.3)" : "1px solid rgba(124,58,237,0.2)" }}>
+          <p style={{ color: chosen.length === 5 ? "#fbbf24" : "#c4b5fd", fontWeight: 600, fontSize: 14, margin: "0 0 10px" }}>
+            {chosen.length === 5 ? "✨ המצפן שלך לשנה הזו" : `בחרת ${chosen.length}/5 ערכים`}
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+            {chosen.map(v => (
+              <div key={v} style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 30, background: "rgba(124,58,237,0.2)", border: "1px solid rgba(124,58,237,0.4)" }}>
+                <span style={{ color: "#e9d5ff", fontSize: 13 }}>{v}</span>
+                <button onClick={() => toggleValue(v)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", cursor: "pointer", fontSize: 15, padding: 0, lineHeight: 1 }}>×</button>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Value picker */}
+      <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, margin: "0 0 10px" }}>
+        בחר עד 5 ערכים — לחץ על ערך לתיאור:
+      </p>
+      <input value={search} onChange={e => setSearch(e.target.value)} placeholder="חפש ערך..."
+        style={{ width: "100%", padding: "9px 14px", borderRadius: 10, boxSizing: "border-box", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontSize: 13, outline: "none", direction: "rtl", marginBottom: 12 }} />
+      <ValuePickerInline values={filtered} chosen={chosen} onToggle={toggleValue} />
+
+      <button onClick={() => onChange({ ...s, phase: "game", heroSelected: [] })} style={{
+        marginTop: 16, padding: "9px 18px", borderRadius: 10, fontSize: 13, cursor: "pointer",
+        background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)"
+      }}>🔄 שחק שוב</button>
+    </div>
+  );
+}
+
+function ValuePickerInline({ values, chosen, onToggle }) {
+  const [expanded, setExpanded] = useState(null);
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+      {values.map(v => {
+        const isSel = chosen.includes(v.name);
+        const isDisabled = !isSel && chosen.length >= 5;
+        const isExp = expanded === v.name;
+        return (
+          <div key={v.name} style={{ position: "relative" }}>
+            <button onClick={() => setExpanded(isExp ? null : v.name)} style={{
+              padding: "7px 13px", borderRadius: 9, fontSize: 13, cursor: isDisabled ? "not-allowed" : "pointer",
+              background: isSel ? "rgba(124,58,237,0.3)" : "rgba(255,255,255,0.05)",
+              border: isSel ? "1.5px solid #7c3aed" : "1px solid rgba(255,255,255,0.1)",
+              color: isSel ? "#e9d5ff" : isDisabled ? "rgba(255,255,255,0.2)" : "#fff",
+            }}>
+              {isSel && "✓ "}{v.name}
+            </button>
+            {isExp && (
+              <div style={{
+                position: "absolute", top: "calc(100% + 6px)", right: 0, zIndex: 200,
+                width: 220, padding: "12px 14px", borderRadius: 11,
+                background: "#1a1a2e", border: "1px solid rgba(124,58,237,0.4)",
+                boxShadow: "0 8px 28px rgba(0,0,0,0.7)"
+              }}>
+                <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 13, margin: "0 0 5px" }}>{v.name}</p>
+                <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, margin: "0 0 10px", lineHeight: 1.5 }}>{v.desc}</p>
+                <div style={{ display: "flex", gap: 6 }}>
+                  <button onClick={() => { onToggle(v.name); setExpanded(null); }} style={{
+                    flex: 1, padding: "7px", borderRadius: 7, fontSize: 12, cursor: isDisabled && !isSel ? "not-allowed" : "pointer",
+                    background: isSel ? "rgba(239,68,68,0.15)" : "rgba(124,58,237,0.4)",
+                    border: isSel ? "1px solid rgba(239,68,68,0.3)" : "none",
+                    color: isSel ? "#fca5a5" : "#fff"
+                  }}>{isSel ? "הסר" : isDisabled ? "כבר 5 ✓" : "בחר ➕"}</button>
+                  <button onClick={() => setExpanded(null)} style={{ padding: "7px 10px", borderRadius: 7, fontSize: 12, background: "rgba(255,255,255,0.05)", border: "none", color: "rgba(255,255,255,0.4)", cursor: "pointer" }}>✕</button>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -688,7 +985,7 @@ export function TaskModal({ task, chapter, data, save, isParent, onClose }) {
       {/* Body */}
       <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px 100px" }}>
         {ActivityComponent
-          ? <ActivityComponent state={activityData} onChange={saveActivity} isParent={isParent} />
+          ? <ActivityComponent state={activityData} onChange={saveActivity} isParent={isParent} data={data} save={save} />
           : <p style={{ color: "rgba(255,255,255,0.5)", textAlign: "center", padding: 40 }}>הפעילות בדרך...</p>
         }
       </div>
