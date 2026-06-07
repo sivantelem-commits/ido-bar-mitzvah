@@ -505,7 +505,7 @@ function TasksView({ data, save, isParent }) {
                         if (!hasQuiz) return null;
                         const allTasksDone = m.tasks.every(t => data.completed[t.id]);
                         const quizDone = !!data.completed?.[`quiz_${m.id}`];
-                        const quizUnlocked = mUnlocked && allTasksDone;
+                        const quizUnlocked = isParent || (mUnlocked && allTasksDone);
                         return (
                           <div onClick={() => quizUnlocked && setActiveQuiz({ monthId: m.id })} style={{
                             display: "flex", alignItems: "center", gap: 12, padding: "12px 14px",
