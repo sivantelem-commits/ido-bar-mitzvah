@@ -129,6 +129,8 @@ function T1_OpeningCeremony({ state, onChange }) {
 
 function T2_ValueMap({ state, onChange }) {
   const s = state || { strengths: [], challenges: [], proudOf: "", whoAmI: "" };
+  const strengths = s.strengths || [];
+  const challenges = s.challenges || [];
   const strengthOpts = ["מאזין טוב", "יצירתי", "חבר אמיתי", "מצחיק", "אחראי", "חושב עמוק", "ספורטאי", "סקרן", "עוזר לאחרים", "עקשן (בצורה טובה)"];
   const challengeOpts = ["ארגון", "לסיים מה שהתחלתי", "לבקש עזרה", "לשחרר כעס", "סבלנות", "לומר לא", "ריכוז", "ניהול זמן"];
   return (
@@ -137,12 +139,12 @@ function T2_ValueMap({ state, onChange }) {
         desc="לפני שיוצאים למסע — צריך לדעת מאיפה מתחילים. זו מפה שלך — חוזקות, אתגרים, ומה שמגדיר אותך." />
       <Card>
         <Label>מה הכי חזק בי — בחר עד 4</Label>
-        <ChipSelect options={strengthOpts} value={s.strengths} multi
+        <ChipSelect options={strengthOpts} value={strengths} multi
           onChange={v => v.length <= 4 && onChange({ ...s, strengths: v })} />
       </Card>
       <Card style={{ marginTop: 12 }}>
         <Label>מה אני רוצה לחזק השנה — בחר עד 3</Label>
-        <ChipSelect options={challengeOpts} value={s.challenges} multi
+        <ChipSelect options={challengeOpts} value={challenges} multi
           onChange={v => v.length <= 3 && onChange({ ...s, challenges: v })} />
       </Card>
       <Card style={{ marginTop: 12 }}>
