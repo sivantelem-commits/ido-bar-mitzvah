@@ -297,33 +297,16 @@ function TasksView({ data, save, isParent }) {
 
   // A month is unlocked when all tasks in all previous months (across all chapters) are done
   function isMonthUnlocked(chapterIdx, monthIdx) {
-    if (isParent) return true;
-    // collect all months before this one in order
-    for (let ci = 0; ci <= chapterIdx; ci++) {
-      const ch = CHAPTERS[ci];
-      const mEnd = ci === chapterIdx ? monthIdx : ch.months.length;
-      for (let mi = 0; mi < mEnd; mi++) {
-        const m = ch.months[mi];
-        const allDone = m.tasks.every(t => data.completed[t.id]);
-        if (!allDone) return false;
-      }
-    }
-    return true;
+    return true; // TODO: restore locking after review
   }
 
-  // Climax unlocked when all tasks in a chapter are done AND parent hasn't approved yet
+  // Climax unlocked when all tasks in a chapter are done
   function isClimaxUnlocked(ch) {
-    const allDone = ch.months.flatMap(m => m.tasks).every(t => data.completed[t.id]);
-    return allDone;
+    return true; // TODO: restore locking after review
   }
 
   function isChapterUnlocked(chIdx) {
-    if (isParent) return true;
-    if (chIdx === 0) return true;
-    // previous chapter climax must be parent-approved
-    const prevCh = CHAPTERS[chIdx - 1];
-    const climaxApproved = (data.climaxData || {})[prevCh.id]?.parentApproved;
-    return !!climaxApproved;
+    return true; // TODO: restore locking after review
   }
 
   return (
