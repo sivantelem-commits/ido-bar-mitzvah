@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { TaskModal, ClimaxModal } from "./TaskActivity.jsx";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -173,7 +174,7 @@ const CHAPTERS = [
 
 const ALL_TASKS = CHAPTERS.flatMap(c => c.months.flatMap(m => m.tasks));
 const TOTAL_TASKS = ALL_TASKS.length;
-const EMPTY_DATA = { completed: {}, journal: [], parentNotes: [], values: [], valueSnapshots: [] };
+const EMPTY_DATA = { completed: {}, journal: [], parentNotes: [], values: [], valueSnapshots: [], taskData: {}, climaxData: {} };
 
 function useStorage() {
   const [data, setData] = useState(null);
@@ -288,18 +289,64 @@ function LoginScreen({ onLogin }) {
 
 function TasksView({ data, save, isParent }) {
   const [openChapter, setOpenChapter] = useState(1);
-
-  function toggleTask(tid) {
-    if (isParent) return;
-    const newCompleted = { ...data.completed, [tid]: !data.completed[tid] };
-    save({ ...data, completed: newCompleted });
-  }
+  const [activeTask, setActiveTask] = useState(null);
+  const [activeClimax, setActiveClimax] = useState(null);
 
   const totalDone = ALL_TASKS.filter(t => data.completed[t.id]).length;
   const overallPct = Math.round((totalDone / TOTAL_TASKS) * 100);
 
+  // A month is unlocked when all tasks in all previous months (across all chapters) are done
+  function isMonthUnlocked(chapterIdx, monthIdx) {
+    if (isParent) return true;
+    // collect all months before this one in order
+    for (let ci = 0; ci <= chapterIdx; ci++) {
+      const ch = CHAPTERS[ci];
+      const mEnd = ci === chapterIdx ? monthIdx : ch.months.length;
+      for (let mi = 0; mi < mEnd; mi++) {
+        const m = ch.months[mi];
+        const allDone = m.tasks.every(t => data.completed[t.id]);
+        if (!allDone) return false;
+      }
+    }
+    return true;
+  }
+
+  // Climax unlocked when all tasks in a chapter are done AND parent hasn't approved yet
+  function isClimaxUnlocked(ch) {
+    const allDone = ch.months.flatMap(m => m.tasks).every(t => data.completed[t.id]);
+    return allDone;
+  }
+
+  function isChapterUnlocked(chIdx) {
+    if (isParent) return true;
+    if (chIdx === 0) return true;
+    // previous chapter climax must be parent-approved
+    const prevCh = CHAPTERS[chIdx - 1];
+    const climaxApproved = (data.climaxData || {})[prevCh.id]?.parentApproved;
+    return !!climaxApproved;
+  }
+
   return (
     <div>
+      {/* Active task modal */}
+      {activeTask && (
+        <TaskModal
+          task={activeTask.task}
+          chapter={activeTask.chapter}
+          data={data} save={save}
+          isParent={isParent}
+          onClose={() => setActiveTask(null)} />
+      )}
+      {activeClimax && (
+        <ClimaxModal
+          chapterId={activeClimax}
+          data={data} save={save}
+          isParent={isParent}
+          onClose={() => setActiveClimax(null)}
+          onApprove={() => setActiveClimax(null)} />
+      )}
+
+      {/* Overall progress */}
       <div style={{
         background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.3)",
         borderRadius: 20, padding: 24, marginBottom: 24, display: "flex", alignItems: "center", gap: 24
@@ -324,59 +371,58 @@ function TasksView({ data, save, isParent }) {
         </div>
       </div>
 
+      {/* Chapters */}
       {CHAPTERS.map((ch, chIdx) => {
         const chTasks = ch.months.flatMap(m => m.tasks);
         const chDone = chTasks.filter(t => data.completed[t.id]).length;
         const chPct = Math.round((chDone / chTasks.length) * 100);
         const isOpen = openChapter === ch.id;
-
-        const prevCh = chIdx > 0 ? CHAPTERS[chIdx - 1] : null;
-        const prevTasks = prevCh ? prevCh.months.flatMap(m => m.tasks) : [];
-        const prevDone = prevTasks.filter(t => data.completed[t.id]).length;
-        const isLocked = !isParent && chIdx > 0 && prevDone < prevTasks.length;
+        const chUnlocked = isChapterUnlocked(chIdx);
+        const climaxUnlocked = isClimaxUnlocked(ch);
+        const climaxApproved = (data.climaxData || {})[ch.id]?.parentApproved;
 
         return (
           <div key={ch.id} style={{
             marginBottom: 16,
-            border: isLocked ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(255,255,255,0.1)",
+            border: !chUnlocked ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(255,255,255,0.1)",
             borderRadius: 16, overflow: "hidden",
-            background: isLocked ? "rgba(255,255,255,0.01)" : isOpen ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.02)",
-            opacity: isLocked ? 0.5 : 1, transition: "opacity 0.3s"
+            background: !chUnlocked ? "rgba(255,255,255,0.01)" : isOpen ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.02)",
+            opacity: !chUnlocked ? 0.5 : 1, transition: "opacity 0.3s"
           }}>
-            <button onClick={() => !isLocked && setOpenChapter(isOpen ? null : ch.id)} style={{
+            {/* Chapter header */}
+            <button onClick={() => chUnlocked && setOpenChapter(isOpen ? null : ch.id)} style={{
               width: "100%", padding: "16px 20px", background: "none", border: "none",
               display: "flex", alignItems: "center", gap: 16,
-              cursor: isLocked ? "not-allowed" : "pointer", textAlign: "right"
+              cursor: chUnlocked ? "pointer" : "not-allowed", textAlign: "right"
             }}>
-              <span style={{ fontSize: 28 }}>{isLocked ? "🔒" : ch.emoji}</span>
+              <span style={{ fontSize: 28 }}>{!chUnlocked ? "🔒" : ch.emoji}</span>
               <div style={{ flex: 1 }}>
-                <p style={{ color: isLocked ? "rgba(255,255,255,0.4)" : "#fff", fontWeight: 600, margin: "0 0 2px", fontSize: 16 }}>
+                <p style={{ color: !chUnlocked ? "rgba(255,255,255,0.4)" : "#fff", fontWeight: 600, margin: "0 0 2px", fontSize: 16 }}>
                   {ch.title}
                 </p>
                 <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, margin: 0 }}>
-                  {isLocked ? `נפתח לאחר השלמת "${prevCh.title}"` : ch.period}
+                  {!chUnlocked
+                    ? `נפתח לאחר אישור הורים על אירוע השיא של "${CHAPTERS[chIdx-1]?.title}"`
+                    : ch.period}
                 </p>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ textAlign: "left" }}>
-                  {isLocked
-                    ? <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 14 }}>נעול</span>
-                    : <>
-                        <span style={{ color: "#a855f7", fontWeight: 700, fontSize: 16 }}>{chPct}%</span>
-                        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, margin: 0 }}>{chDone}/{chTasks.length}</p>
-                      </>
-                  }
-                </div>
-                {!isLocked && (
-                  <span style={{
-                    color: "rgba(255,255,255,0.4)", fontSize: 18,
-                    transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s"
-                  }}>▾</span>
+                {chUnlocked && (
+                  <>
+                    <div style={{ textAlign: "left" }}>
+                      <span style={{ color: "#a855f7", fontWeight: 700, fontSize: 16 }}>{chPct}%</span>
+                      <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, margin: 0 }}>{chDone}/{chTasks.length}</p>
+                    </div>
+                    <span style={{
+                      color: "rgba(255,255,255,0.4)", fontSize: 18,
+                      transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s"
+                    }}>▾</span>
+                  </>
                 )}
               </div>
             </button>
 
-            {isOpen && !isLocked && (
+            {isOpen && chUnlocked && (
               <div style={{ padding: "0 20px 20px" }}>
                 <p style={{
                   color: "rgba(255,255,255,0.5)", fontSize: 13, margin: "0 0 16px",
@@ -384,47 +430,92 @@ function TasksView({ data, save, isParent }) {
                 }}>
                   {ch.question}
                 </p>
-                {ch.months.map(m => (
-                  <div key={m.id} style={{ marginBottom: 20 }}>
-                    <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 14, margin: "0 0 8px" }}>
-                      {m.month} – {m.title}
-                    </p>
-                    {m.tasks.map(task => {
-                      const done = !!data.completed[task.id];
-                      return (
-                        <div key={task.id} onClick={() => toggleTask(task.id)} style={{
-                          display: "flex", alignItems: "center", gap: 12, padding: "10px 12px",
-                          borderRadius: 10, marginBottom: 6,
-                          cursor: isParent ? "default" : "pointer",
-                          background: done ? "rgba(124,58,237,0.12)" : "rgba(255,255,255,0.03)",
-                          border: done ? "1px solid rgba(124,58,237,0.25)" : "1px solid rgba(255,255,255,0.06)",
-                          transition: "all 0.2s"
-                        }}>
-                          <div style={{
-                            width: 22, height: 22, borderRadius: 6, flexShrink: 0,
-                            border: done ? "none" : "1.5px solid rgba(255,255,255,0.25)",
-                            background: done ? "#7c3aed" : "transparent",
-                            display: "flex", alignItems: "center", justifyContent: "center"
+
+                {/* Months */}
+                {ch.months.map((m, mIdx) => {
+                  const mUnlocked = isMonthUnlocked(chIdx, mIdx);
+                  const mDone = m.tasks.every(t => data.completed[t.id]);
+
+                  return (
+                    <div key={m.id} style={{
+                      marginBottom: 20,
+                      opacity: !mUnlocked ? 0.4 : 1, transition: "opacity 0.3s"
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                        <div style={{
+                          width: 10, height: 10, borderRadius: "50%", flexShrink: 0,
+                          background: mDone ? "#10b981" : mUnlocked ? "#7c3aed" : "rgba(255,255,255,0.2)"
+                        }} />
+                        <p style={{ color: mUnlocked ? "#c4b5fd" : "rgba(255,255,255,0.3)", fontWeight: 600, fontSize: 14, margin: 0 }}>
+                          {m.month} – {m.title}
+                        </p>
+                        {!mUnlocked && <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>🔒 נפתח אחרי החודש הקודם</span>}
+                        {mDone && <span style={{ color: "#6ee7b7", fontSize: 11 }}>✓ הושלם</span>}
+                      </div>
+
+                      {m.tasks.map(task => {
+                        const done = !!data.completed[task.id];
+                        const taskUnlocked = mUnlocked;
+                        return (
+                          <div key={task.id} onClick={() => taskUnlocked && setActiveTask({ task, chapter: ch })} style={{
+                            display: "flex", alignItems: "center", gap: 12, padding: "12px 14px",
+                            borderRadius: 12, marginBottom: 6,
+                            cursor: taskUnlocked ? "pointer" : "not-allowed",
+                            background: done ? "rgba(124,58,237,0.12)" : taskUnlocked ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.01)",
+                            border: done ? "1px solid rgba(124,58,237,0.25)" : "1px solid rgba(255,255,255,0.07)",
+                            transition: "all 0.2s"
                           }}>
-                            {done && <span style={{ color: "#fff", fontSize: 13 }}>✓</span>}
+                            <div style={{
+                              width: 22, height: 22, borderRadius: 6, flexShrink: 0,
+                              border: done ? "none" : "1.5px solid rgba(255,255,255,0.2)",
+                              background: done ? "#7c3aed" : "transparent",
+                              display: "flex", alignItems: "center", justifyContent: "center"
+                            }}>
+                              {done && <span style={{ color: "#fff", fontSize: 13 }}>✓</span>}
+                            </div>
+                            <span style={{
+                              color: done ? "rgba(255,255,255,0.5)" : "#fff", fontSize: 14, flex: 1,
+                              textDecoration: done ? "line-through" : "none"
+                            }}>{task.text}</span>
+                            {taskUnlocked && !done && (
+                              <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 18 }}>›</span>
+                            )}
                           </div>
-                          <span style={{
-                            color: done ? "rgba(255,255,255,0.5)" : "#fff", fontSize: 14,
-                            textDecoration: done ? "line-through" : "none", transition: "all 0.2s"
-                          }}>{task.text}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
-                <div style={{
-                  marginTop: 12, padding: "12px 16px", borderRadius: 12,
-                  background: "rgba(234,179,8,0.08)", border: "1px solid rgba(234,179,8,0.2)"
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+
+                {/* Climax */}
+                <div onClick={() => (climaxUnlocked || isParent) && setActiveClimax(ch.id)} style={{
+                  marginTop: 12, padding: "14px 16px", borderRadius: 14,
+                  background: climaxApproved
+                    ? "rgba(16,185,129,0.1)"
+                    : climaxUnlocked
+                    ? "rgba(234,179,8,0.1)"
+                    : "rgba(255,255,255,0.03)",
+                  border: climaxApproved
+                    ? "1px solid rgba(16,185,129,0.3)"
+                    : climaxUnlocked
+                    ? "1px solid rgba(234,179,8,0.3)"
+                    : "1px solid rgba(255,255,255,0.06)",
+                  cursor: (climaxUnlocked || isParent) ? "pointer" : "default",
+                  opacity: !climaxUnlocked && !isParent ? 0.4 : 1,
+                  display: "flex", alignItems: "center", gap: 12
                 }}>
-                  <span style={{ fontSize: 16 }}>🎯 </span>
-                  <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 13 }}>
-                    אירוע שיא: {ch.climax}
+                  <span style={{ fontSize: 20 }}>
+                    {climaxApproved ? "✅" : climaxUnlocked ? "🎯" : "🔒"}
                   </span>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ color: climaxApproved ? "#6ee7b7" : climaxUnlocked ? "#fbbf24" : "rgba(255,255,255,0.4)", fontSize: 14, fontWeight: 600, margin: "0 0 2px" }}>
+                      אירוע שיא
+                    </p>
+                    <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, margin: 0 }}>
+                      {climaxApproved ? "הושלם ואושר ✓" : climaxUnlocked ? ch.climax : "יפתח כשכל המשימות יושלמו"}
+                    </p>
+                  </div>
+                  {(climaxUnlocked || isParent) && <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 18 }}>›</span>}
                 </div>
               </div>
             )}
