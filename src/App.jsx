@@ -1726,7 +1726,10 @@ const NAV_PARENT = [
 ];
 
 export default function App() {
-  const [session] = useState({ key: "ido", name: "עידו", role: "kid" });
+  const [role, setRole] = useState("kid"); // "kid" | "parent"
+  const session = role === "kid"
+    ? { key: "ido", name: "עידו", role: "kid" }
+    : { key: "parents", name: "ההורים", role: "parent" };
   const [tab, setTab] = useState("tasks");
   const [data, save] = useStorage();
 
@@ -1761,7 +1764,13 @@ export default function App() {
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, margin: 0 }}>{overallPct}% מהמסע הושלם</p>
           </div>
         </div>
-        <button onClick={() => {}} style={{ display: "none" }} />
+        <button onClick={() => { setRole(r => r === "kid" ? "parent" : "kid"); setTab("tasks"); }} style={{
+          background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
+          color: "rgba(255,255,255,0.6)", padding: "7px 14px", borderRadius: 10,
+          cursor: "pointer", fontSize: 13
+        }}>
+          {role === "kid" ? "👩‍👩‍👦 הורים" : "👦 עידו"}
+        </button>
       </div>
 
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 16px 100px" }}>
