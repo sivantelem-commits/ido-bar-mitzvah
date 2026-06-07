@@ -920,7 +920,7 @@ function Ch1Climax({ state, onChange, onApprove, isParent }) {
 
 // ─── Monthly Quiz Games ───────────────────────────────────────────────────────
 
-const MONTH_QUIZZES = {
+export const MONTH_QUIZZES = {
   m1: {
     title: "סיכום חודש מאי — זהות וערכים",
     emoji: "🌿",
@@ -1079,7 +1079,7 @@ const MONTH_QUIZZES = {
   },
 };
 
-function MonthlyQuiz({ monthId, state, onChange }) {
+export function MonthlyQuiz({ monthId, state, onChange }) {
   const quiz = MONTH_QUIZZES[monthId];
   const s = state || { step: "intro", dilemmaIdx: 0, dilemmaAnswers: {}, quizAnswers: {}, done: false };
 
