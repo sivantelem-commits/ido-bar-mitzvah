@@ -1052,7 +1052,7 @@ function ManifestoView() {
         marginTop: 24, padding: 20, borderRadius: 14,
         background: "rgba(16,185,129,0.07)", border: "1px solid rgba(16,185,129,0.2)"
       }}>
-        <p style={{ color: "#6ee7b7", fontWeight: 600, margin: "0 0 6px" }}>הבטחה מאמא ומורן</p>
+        <p style={{ color: "#6ee7b7", fontWeight: 600, margin: "0 0 6px" }}>הבטחה מאיתנו</p>
         <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 14, margin: 0, lineHeight: 1.7 }}>
           אנחנו מתחייבות להיות לצידך במסע הזה. לא להוביל במקומך, לא לפתור עבורך, לא להחליט — אלא לצעוד לצידך, לשאול, להקשיב, לאתגר כשצריך ולתמוך תמיד.
         </p>
