@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { TaskModal, ClimaxModal } from "./TaskActivity.jsx";
+import { TaskModal, ClimaxModal, MonthlyQuiz, MONTH_QUIZZES } from "./TaskActivity.jsx";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -291,6 +291,7 @@ function TasksView({ data, save, isParent }) {
   const [openChapter, setOpenChapter] = useState(1);
   const [activeTask, setActiveTask] = useState(null);
   const [activeClimax, setActiveClimax] = useState(null);
+  const [activeQuiz, setActiveQuiz] = useState(null); // { monthId }
 
   const totalDone = ALL_TASKS.filter(t => data.completed[t.id]).length;
   const overallPct = Math.round((totalDone / TOTAL_TASKS) * 100);
@@ -327,6 +328,37 @@ function TasksView({ data, save, isParent }) {
           isParent={isParent}
           onClose={() => setActiveClimax(null)}
           onApprove={() => setActiveClimax(null)} />
+      )}
+      {activeQuiz && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "#0a0a1a", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <div style={{ background: "#0f0f23", borderBottom: "1px solid rgba(255,255,255,0.08)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
+            <button onClick={() => setActiveQuiz(null)} style={{ background: "rgba(255,255,255,0.08)", border: "none", color: "#fff", width: 34, height: 34, borderRadius: "50%", cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>←</button>
+            <p style={{ color: "#fbbf24", fontWeight: 700, fontSize: 15, margin: 0 }}>🎮 משחקון סיכום חודש</p>
+            {!!data.completed?.[`quiz_${activeQuiz.monthId}`] && (
+              <span style={{ marginRight: "auto", padding: "4px 12px", borderRadius: 20, fontSize: 12, background: "rgba(16,185,129,0.2)", color: "#6ee7b7", border: "1px solid rgba(16,185,129,0.3)" }}>✓ הושלם</span>
+            )}
+          </div>
+          <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px 100px" }}>
+            <MonthlyQuiz
+              monthId={activeQuiz.monthId}
+              state={(data.taskData || {})[`quiz_${activeQuiz.monthId}`] || {}}
+              onChange={newState => {
+                const newTaskData = { ...(data.taskData || {}), [`quiz_${activeQuiz.monthId}`]: newState };
+                save({ ...data, taskData: newTaskData });
+              }} />
+          </div>
+          {!isParent && !data.completed?.[`quiz_${activeQuiz.monthId}`] && (
+            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "16px", background: "rgba(10,10,26,0.95)", backdropFilter: "blur(10px)", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+              <button onClick={() => {
+                const newCompleted = { ...(data.completed || {}), [`quiz_${activeQuiz.monthId}`]: true };
+                save({ ...data, completed: newCompleted });
+                setActiveQuiz(null);
+              }} style={{ width: "100%", padding: "14px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
+                ✓ סיימתי את המשחקון
+              </button>
+            </div>
+          )}
+        </div>
       )}
 
       {/* Overall progress */}
@@ -466,6 +498,39 @@ function TasksView({ data, save, isParent }) {
                           </div>
                         );
                       })}
+
+                      {/* Monthly quiz — appears after all tasks done */}
+                      {(() => {
+                        const hasQuiz = MONTH_QUIZZES[m.id];
+                        if (!hasQuiz) return null;
+                        const allTasksDone = m.tasks.every(t => data.completed[t.id]);
+                        const quizDone = !!data.completed?.[`quiz_${m.id}`];
+                        const quizUnlocked = mUnlocked && allTasksDone;
+                        return (
+                          <div onClick={() => quizUnlocked && setActiveQuiz({ monthId: m.id })} style={{
+                            display: "flex", alignItems: "center", gap: 12, padding: "12px 14px",
+                            borderRadius: 12, marginBottom: 6,
+                            cursor: quizUnlocked ? "pointer" : "not-allowed",
+                            background: quizDone ? "rgba(234,179,8,0.1)" : quizUnlocked ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.01)",
+                            border: quizDone ? "1px solid rgba(234,179,8,0.3)" : quizUnlocked ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(255,255,255,0.04)",
+                            opacity: quizUnlocked || quizDone ? 1 : 0.4, transition: "all 0.2s"
+                          }}>
+                            <div style={{
+                              width: 22, height: 22, borderRadius: 6, flexShrink: 0,
+                              background: quizDone ? "#f59e0b" : "transparent",
+                              border: quizDone ? "none" : "1.5px solid rgba(255,255,255,0.2)",
+                              display: "flex", alignItems: "center", justifyContent: "center"
+                            }}>
+                              {quizDone ? <span style={{ fontSize: 12 }}>✓</span> : <span style={{ fontSize: 13 }}>🎮</span>}
+                            </div>
+                            <span style={{ color: quizDone ? "rgba(255,255,255,0.5)" : "#fff", fontSize: 14, flex: 1, textDecoration: quizDone ? "line-through" : "none" }}>
+                              משחקון סיכום חודש
+                            </span>
+                            {!quizUnlocked && !quizDone && <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>🔒 לאחר כל המשימות</span>}
+                            {quizUnlocked && !quizDone && <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 18 }}>›</span>}
+                          </div>
+                        );
+                      })()}
                     </div>
                   );
                 })}
