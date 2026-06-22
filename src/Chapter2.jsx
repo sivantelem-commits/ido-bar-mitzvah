@@ -5,13 +5,13 @@ import { useState, useEffect, useRef } from "react";
 
 // ── Shared helpers (duplicated for standalone use) ─────────────────────────
 function Card({ children, style }) {
-  return <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 20, ...style }}>{children}</div>;
+  return <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: 16, padding: 20, ...style }}>{children}</div>;
 }
 function Label({ children }) {
-  return <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 14, margin: "0 0 10px" }}>{children}</p>;
+  return <p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 14, margin: "0 0 10px" }}>{children}</p>;
 }
 function TextInput({ value, onChange, placeholder, multiline }) {
-  const style = { width: "100%", padding: "12px 14px", borderRadius: 12, boxSizing: "border-box", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "#fff", fontSize: 14, outline: "none", direction: "rtl", fontFamily: "inherit", lineHeight: 1.6, resize: "vertical" };
+  const style = { width: "100%", padding: "12px 14px", borderRadius: 12, boxSizing: "border-box", background: "#f3f4f6", border: "1px solid #d1d5db", color: "#1e1b4b", fontSize: 14, outline: "none", direction: "rtl", fontFamily: "inherit", lineHeight: 1.6, resize: "vertical" };
   return multiline
     ? <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={3} style={style} />
     : <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={style} />;
@@ -20,8 +20,8 @@ function Intro({ emoji, title, desc }) {
   return (
     <div style={{ padding: 20, borderRadius: 14, marginBottom: 20, background: "linear-gradient(135deg, rgba(124,58,237,0.12), rgba(168,85,247,0.06))", border: "1px solid rgba(124,58,237,0.25)" }}>
       <div style={{ fontSize: 32, marginBottom: 8 }}>{emoji}</div>
-      <p style={{ color: "#c4b5fd", fontWeight: 700, fontSize: 16, margin: "0 0 6px" }}>{title}</p>
-      <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 14, margin: 0, lineHeight: 1.7 }}>{desc}</p>
+      <p style={{ color: "#7c3aed", fontWeight: 700, fontSize: 16, margin: "0 0 6px" }}>{title}</p>
+      <p style={{ color: "#4b5563", fontSize: 14, margin: 0, lineHeight: 1.7 }}>{desc}</p>
     </div>
   );
 }
@@ -31,7 +31,7 @@ function ReflectionSection({ questions, values, onChange }) {
       <Label>💭 רפלקציה — אחרי שסיימת</Label>
       {questions.map((q, i) => (
         <div key={i} style={{ marginBottom: i < questions.length - 1 ? 14 : 0 }}>
-          <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, margin: "0 0 6px" }}>{q}</p>
+          <p style={{ color: "#4b5563", fontSize: 13, margin: "0 0 6px" }}>{q}</p>
           <TextInput multiline value={(values || [])[i] || ""} onChange={v => { const arr = [...(values || [])]; arr[i] = v; onChange(arr); }} placeholder="כתוב כאן..." />
         </div>
       ))}
@@ -58,22 +58,22 @@ export function T13_EmotionJournal({ state, onChange }) {
         desc="רגשות הם מידע, לא חולשה. כל פעם שמשהו מזיז אותך — כותבים. לא כדי לבכות על זה, כדי להבין את עצמך." />
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, margin: 0 }}>תעד כניסה לפחות פעם בשבוע</p>
-        <button onClick={addEntry} style={{ padding: "8px 18px", borderRadius: 10, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>+ כניסה חדשה</button>
+        <p style={{ color: "#6b7280", fontSize: 13, margin: 0 }}>תעד כניסה לפחות פעם בשבוע</p>
+        <button onClick={addEntry} style={{ padding: "8px 18px", borderRadius: 10, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#1e1b4b", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>+ כניסה חדשה</button>
       </div>
 
       {entries.length === 0 && (
         <Card style={{ textAlign: "center", padding: "32px 20px", border: "1px dashed rgba(255,255,255,0.1)" }}>
           <p style={{ fontSize: 40, margin: "0 0 10px" }}>📓</p>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: 0 }}>עדיין אין כניסות. לחץ "+ כניסה חדשה" כדי להתחיל.</p>
+          <p style={{ color: "#9ca3af", fontSize: 14, margin: 0 }}>עדיין אין כניסות. לחץ "+ כניסה חדשה" כדי להתחיל.</p>
         </Card>
       )}
 
       {entries.map((entry, i) => (
         <Card key={i} style={{ marginBottom: 14, border: "1px solid rgba(124,58,237,0.2)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-            <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>{entry.date}</span>
-            <span style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 13 }}>כניסה {i + 1}</span>
+            <span style={{ color: "#9ca3af", fontSize: 12 }}>{entry.date}</span>
+            <span style={{ color: "#7c3aed", fontWeight: 600, fontSize: 13 }}>כניסה {i + 1}</span>
           </div>
 
           <Label>מה הרגשת?</Label>
@@ -81,8 +81,8 @@ export function T13_EmotionJournal({ state, onChange }) {
             {emotions.map(em => (
               <button key={em} onClick={() => updateEntry(i, "emotion", em)} style={{
                 padding: "6px 12px", borderRadius: 20, fontSize: 12, cursor: "pointer",
-                background: entry.emotion === em ? "rgba(124,58,237,0.35)" : "rgba(255,255,255,0.05)",
-                border: entry.emotion === em ? "1.5px solid #7c3aed" : "1px solid rgba(255,255,255,0.1)",
+                background: entry.emotion === em ? "rgba(124,58,237,0.2)" : "#f9fafb",
+                border: entry.emotion === em ? "1.5px solid #7c3aed" : "1px solid #e5e7eb",
                 color: entry.emotion === em ? "#e9d5ff" : "rgba(255,255,255,0.6)"
               }}>{em}</button>
             ))}
@@ -93,7 +93,7 @@ export function T13_EmotionJournal({ state, onChange }) {
             <input type="range" min={1} max={10} value={entry.intensity || 5}
               onChange={e => updateEntry(i, "intensity", Number(e.target.value))}
               style={{ flex: 1, accentColor: "#7c3aed" }} />
-            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(124,58,237,0.3)", border: "1.5px solid #7c3aed", display: "flex", alignItems: "center", justifyContent: "center", color: "#c4b5fd", fontWeight: 700, flexShrink: 0 }}>
+            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(124,58,237,0.15)", border: "1.5px solid #7c3aed", display: "flex", alignItems: "center", justifyContent: "center", color: "#7c3aed", fontWeight: 700, flexShrink: 0 }}>
               {entry.intensity || 5}
             </div>
           </div>
@@ -148,23 +148,23 @@ export function T14_BraveConversation({ state, onChange }) {
         <div>
           <div style={{ display: "flex", gap: 4, marginBottom: 20 }}>
             {steps.map((_, i) => (
-              <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= step ? "#7c3aed" : "rgba(255,255,255,0.1)", transition: "background 0.3s" }} />
+              <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= step ? "#7c3aed" : "#e5e7eb", transition: "background 0.3s" }} />
             ))}
           </div>
 
           <Card style={{ border: "1px solid rgba(124,58,237,0.25)" }}>
-            <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, margin: "0 0 6px" }}>שאלה {step + 1} מתוך {steps.length}</p>
-            <p style={{ color: "#fff", fontSize: 16, fontWeight: 600, margin: "0 0 16px", lineHeight: 1.5 }}>{currentStep.q}</p>
+            <p style={{ color: "#6b7280", fontSize: 12, margin: "0 0 6px" }}>שאלה {step + 1} מתוך {steps.length}</p>
+            <p style={{ color: "#1e1b4b", fontSize: 16, fontWeight: 600, margin: "0 0 16px", lineHeight: 1.5 }}>{currentStep.q}</p>
             <TextInput multiline value={s[currentStep.key] || ""} onChange={v => onChange({ ...s, [currentStep.key]: v })} placeholder={currentStep.placeholder} />
           </Card>
 
           <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
             {step > 0 && (
-              <button onClick={() => setStep(step - 1)} style={{ padding: "11px 20px", borderRadius: 12, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)", cursor: "pointer", fontSize: 14 }}>← חזרה</button>
+              <button onClick={() => setStep(step - 1)} style={{ padding: "11px 20px", borderRadius: 12, background: "#f3f4f6", border: "1px solid #e5e7eb", color: "#6b7280", cursor: "pointer", fontSize: 14 }}>← חזרה</button>
             )}
             <button onClick={() => { onChange({ ...s, step: step + 1 }); setStep(step + 1); }}
               disabled={!s[currentStep.key]}
-              style={{ flex: 1, padding: "11px", borderRadius: 12, background: s[currentStep.key] ? "linear-gradient(135deg, #7c3aed, #a855f7)" : "rgba(255,255,255,0.05)", border: "none", color: s[currentStep.key] ? "#fff" : "rgba(255,255,255,0.3)", fontSize: 15, fontWeight: 600, cursor: s[currentStep.key] ? "pointer" : "not-allowed" }}>
+              style={{ flex: 1, padding: "11px", borderRadius: 12, background: s[currentStep.key] ? "linear-gradient(135deg, #7c3aed, #a855f7)" : "#f9fafb", border: "none", color: s[currentStep.key] ? "#fff" : "rgba(255,255,255,0.3)", fontSize: 15, fontWeight: 600, cursor: s[currentStep.key] ? "pointer" : "not-allowed" }}>
               {step < steps.length - 1 ? "הבא →" : "סיום ✓"}
             </button>
           </div>
@@ -174,11 +174,11 @@ export function T14_BraveConversation({ state, onChange }) {
       {allAnswered && (
         <div>
           <Card style={{ border: "1px solid rgba(16,185,129,0.3)", background: "rgba(16,185,129,0.06)", marginBottom: 14 }}>
-            <p style={{ color: "#6ee7b7", fontWeight: 700, fontSize: 15, margin: "0 0 12px" }}>✅ מוכן לשיחה</p>
+            <p style={{ color: "#059669", fontWeight: 700, fontSize: 15, margin: "0 0 12px" }}>✅ מוכן לשיחה</p>
             {steps.map(st => s[st.key] && (
               <div key={st.key} style={{ marginBottom: 10 }}>
-                <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, margin: "0 0 3px" }}>{st.q}</p>
-                <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 14, margin: 0, lineHeight: 1.5 }}>{s[st.key]}</p>
+                <p style={{ color: "#9ca3af", fontSize: 11, margin: "0 0 3px" }}>{st.q}</p>
+                <p style={{ color: "#374151", fontSize: 14, margin: 0, lineHeight: 1.5 }}>{s[st.key]}</p>
               </div>
             ))}
           </Card>
@@ -208,8 +208,8 @@ export function T15_Volunteer({ state, onChange }) {
           {causes.map(c => (
             <button key={c} onClick={() => onChange({ ...s, cause: c })} style={{
               padding: "8px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
-              background: s.cause === c ? "rgba(124,58,237,0.3)" : "rgba(255,255,255,0.05)",
-              border: s.cause === c ? "1.5px solid #7c3aed" : "1px solid rgba(255,255,255,0.1)",
+              background: s.cause === c ? "rgba(124,58,237,0.15)" : "#f9fafb",
+              border: s.cause === c ? "1.5px solid #7c3aed" : "1px solid #e5e7eb",
               color: s.cause === c ? "#e9d5ff" : "rgba(255,255,255,0.7)"
             }}>{c}</button>
           ))}
@@ -232,8 +232,8 @@ export function T15_Volunteer({ state, onChange }) {
           {["פעם אחת", "פעמיים", "פעם בשבוע", "פעמיים בחודש"].map(f => (
             <button key={f} onClick={() => onChange({ ...s, freq: f })} style={{
               flex: 1, padding: "9px 6px", borderRadius: 10, fontSize: 12, cursor: "pointer",
-              background: s.freq === f ? "rgba(124,58,237,0.3)" : "rgba(255,255,255,0.05)",
-              border: s.freq === f ? "1.5px solid #7c3aed" : "1px solid rgba(255,255,255,0.1)",
+              background: s.freq === f ? "rgba(124,58,237,0.15)" : "#f9fafb",
+              border: s.freq === f ? "1.5px solid #7c3aed" : "1px solid #e5e7eb",
               color: s.freq === f ? "#e9d5ff" : "rgba(255,255,255,0.6)"
             }}>{f}</button>
           ))}
@@ -273,19 +273,19 @@ export function T16_Commitment({ state, onChange }) {
       <div style={{ padding: "16px 20px", borderRadius: 14, marginBottom: 20, background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.3)", display: "flex", alignItems: "center", gap: 16 }}>
         <div style={{ position: "relative", width: 64, height: 64, flexShrink: 0 }}>
           <svg viewBox="0 0 64 64" style={{ transform: "rotate(-90deg)" }}>
-            <circle cx={32} cy={32} r={26} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth={6} />
+            <circle cx={32} cy={32} r={26} fill="none" stroke="#e5e7eb" strokeWidth={6} />
             <circle cx={32} cy={32} r={26} fill="none" stroke="#7c3aed" strokeWidth={6}
               strokeDasharray={2 * Math.PI * 26}
               strokeDashoffset={2 * Math.PI * 26 * (1 - doneCount / 8)}
               strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.5s ease" }} />
           </svg>
           <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ color: "#fff", fontWeight: 700, fontSize: 16 }}>{doneCount}/8</span>
+            <span style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 16 }}>{doneCount}/8</span>
           </div>
         </div>
         <div>
-          <p style={{ color: "#fff", fontWeight: 600, fontSize: 16, margin: "0 0 4px" }}>{doneCount} שבועות הושלמו</p>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, margin: 0 }}>
+          <p style={{ color: "#1e1b4b", fontWeight: 600, fontSize: 16, margin: "0 0 4px" }}>{doneCount} שבועות הושלמו</p>
+          <p style={{ color: "#6b7280", fontSize: 13, margin: 0 }}>
             {doneCount === 0 ? "התחל לסמן כל שבוע שהגעת" : doneCount === 8 ? "🎉 השלמת את כל ההתחייבות!" : `עוד ${8 - doneCount} שבועות`}
           </p>
         </div>
@@ -295,21 +295,21 @@ export function T16_Commitment({ state, onChange }) {
         {weeks.map((week, i) => (
           <div key={i} style={{
             padding: "12px 16px", borderRadius: 12,
-            background: week.done ? "rgba(16,185,129,0.08)" : "rgba(255,255,255,0.03)",
-            border: week.done ? "1px solid rgba(16,185,129,0.25)" : "1px solid rgba(255,255,255,0.08)",
+            background: week.done ? "rgba(16,185,129,0.08)" : "#fafafa",
+            border: week.done ? "1px solid rgba(16,185,129,0.25)" : "1px solid #e5e7eb",
             display: "flex", alignItems: "center", gap: 12, transition: "all 0.2s"
           }}>
             <button onClick={() => updateWeek(i, "done", !week.done)} style={{
               width: 28, height: 28, borderRadius: 8, flexShrink: 0, cursor: "pointer",
               background: week.done ? "#10b981" : "transparent",
-              border: week.done ? "none" : "1.5px solid rgba(255,255,255,0.2)",
+              border: week.done ? "none" : "1.5px solid #d1d5db",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 14, color: "#fff"
+              fontSize: 14, color: "#1e1b4b"
             }}>{week.done ? "✓" : ""}</button>
-            <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, width: 60, flexShrink: 0 }}>שבוע {i + 1}</span>
+            <span style={{ color: "#6b7280", fontSize: 13, width: 60, flexShrink: 0 }}>שבוע {i + 1}</span>
             <input value={week.note || ""} onChange={e => updateWeek(i, "note", e.target.value)}
               placeholder="מה עשית הפעם?"
-              style={{ flex: 1, padding: "6px 10px", borderRadius: 8, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "#fff", fontSize: 12, outline: "none", direction: "rtl" }} />
+              style={{ flex: 1, padding: "6px 10px", borderRadius: 8, background: "#f9fafb", border: "1px solid #e5e7eb", color: "#1e1b4b", fontSize: 12, outline: "none", direction: "rtl" }} />
           </div>
         ))}
       </div>
@@ -342,16 +342,16 @@ export function T17_PhysicalGoal({ state, onChange }) {
         {goals.map(g => (
           <button key={g.id} onClick={() => onChange({ ...s, goalId: g.id })} style={{
             padding: "14px 16px", borderRadius: 14, textAlign: "right",
-            background: s.goalId === g.id ? "rgba(124,58,237,0.2)" : "rgba(255,255,255,0.04)",
-            border: s.goalId === g.id ? "2px solid #7c3aed" : "1px solid rgba(255,255,255,0.1)",
+            background: s.goalId === g.id ? "rgba(124,58,237,0.1)" : "#ffffff",
+            border: s.goalId === g.id ? "2px solid #7c3aed" : "1px solid #e5e7eb",
             cursor: "pointer", display: "flex", alignItems: "center", gap: 14, transition: "all 0.2s"
           }}>
             <span style={{ fontSize: 28 }}>{g.icon}</span>
             <div style={{ flex: 1, textAlign: "right" }}>
-              <p style={{ color: "#fff", fontWeight: 600, fontSize: 15, margin: "0 0 3px" }}>{g.title}</p>
-              <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, margin: 0 }}>{g.desc}</p>
+              <p style={{ color: "#1e1b4b", fontWeight: 600, fontSize: 15, margin: "0 0 3px" }}>{g.title}</p>
+              <p style={{ color: "#6b7280", fontSize: 12, margin: 0 }}>{g.desc}</p>
             </div>
-            {s.goalId === g.id && <div style={{ width: 22, height: 22, borderRadius: "50%", background: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, flexShrink: 0 }}>✓</div>}
+            {s.goalId === g.id && <div style={{ width: 22, height: 22, borderRadius: "50%", background: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", color: "#1e1b4b", fontSize: 13, flexShrink: 0 }}>✓</div>}
           </button>
         ))}
       </div>
@@ -399,7 +399,7 @@ export function T18_TrainingPlan({ state, onChange }) {
         desc="יעד בלי תכנית הוא רק חלום. כאן אתה בונה — שבוע אחר שבוע — את הדרך ליעד." />
 
       <div style={{ marginBottom: 16, padding: "14px 18px", borderRadius: 14, background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.2)" }}>
-        <p style={{ color: "#c4b5fd", fontWeight: 600, margin: "0 0 4px", fontSize: 14 }}>היעד שלי: <span style={{ color: "#fff" }}>{s.goalName || "טרם נקבע"}</span></p>
+        <p style={{ color: "#7c3aed", fontWeight: 600, margin: "0 0 4px", fontSize: 14 }}>היעד שלי: <span style={{ color: "#1e1b4b" }}>{s.goalName || "טרם נקבע"}</span></p>
         <TextInput value={s.goalName || ""} onChange={v => onChange({ ...s, goalName: v })} placeholder="כתוב כאן את היעד שלך מהמשימה הקודמת..." />
       </div>
 
@@ -407,32 +407,32 @@ export function T18_TrainingPlan({ state, onChange }) {
         {weeks.map((week, i) => (
           <div key={i} style={{
             borderRadius: 14, overflow: "hidden",
-            border: week.done ? "1px solid rgba(16,185,129,0.3)" : "1px solid rgba(255,255,255,0.08)",
+            border: week.done ? "1px solid rgba(16,185,129,0.3)" : "1px solid #e5e7eb",
             background: week.done ? "rgba(16,185,129,0.06)" : "rgba(255,255,255,0.02)"
           }}>
             <div style={{ padding: "12px 16px", display: "flex", alignItems: "center", gap: 12 }}>
               <button onClick={() => updateWeek(i, "done", !week.done)} style={{
                 width: 26, height: 26, borderRadius: 6, flexShrink: 0, cursor: "pointer",
                 background: week.done ? "#10b981" : "transparent",
-                border: week.done ? "none" : "1.5px solid rgba(255,255,255,0.2)",
-                display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13
+                border: week.done ? "none" : "1.5px solid #d1d5db",
+                display: "flex", alignItems: "center", justifyContent: "center", color: "#1e1b4b", fontSize: 13
               }}>{week.done ? "✓" : ""}</button>
               <p style={{ color: week.done ? "#6ee7b7" : "#fff", fontWeight: 600, fontSize: 14, margin: 0, flex: 1 }}>שבוע {week.week}</p>
             </div>
             <div style={{ padding: "0 16px 14px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
               <div>
-                <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, margin: "0 0 4px" }}>מספר אימונים</p>
+                <p style={{ color: "#9ca3af", fontSize: 11, margin: "0 0 4px" }}>מספר אימונים</p>
                 <input value={week.sessions || ""} onChange={e => updateWeek(i, "sessions", e.target.value)}
-                  placeholder="x פעמים" style={{ width: "100%", padding: "7px 10px", borderRadius: 8, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontSize: 12, outline: "none", boxSizing: "border-box" }} />
+                  placeholder="x פעמים" style={{ width: "100%", padding: "7px 10px", borderRadius: 8, background: "#f3f4f6", border: "1px solid #e5e7eb", color: "#1e1b4b", fontSize: 12, outline: "none", boxSizing: "border-box" }} />
               </div>
               <div>
-                <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, margin: "0 0 4px" }}>מרחק / כמות</p>
+                <p style={{ color: "#9ca3af", fontSize: 11, margin: "0 0 4px" }}>מרחק / כמות</p>
                 <input value={week.distance || ""} onChange={e => updateWeek(i, "distance", e.target.value)}
-                  placeholder="ק״מ / דקות" style={{ width: "100%", padding: "7px 10px", borderRadius: 8, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontSize: 12, outline: "none", boxSizing: "border-box" }} />
+                  placeholder="ק״מ / דקות" style={{ width: "100%", padding: "7px 10px", borderRadius: 8, background: "#f3f4f6", border: "1px solid #e5e7eb", color: "#1e1b4b", fontSize: 12, outline: "none", boxSizing: "border-box" }} />
               </div>
               <div style={{ gridColumn: "span 2" }}>
                 <input value={week.notes || ""} onChange={e => updateWeek(i, "notes", e.target.value)}
-                  placeholder="הערות לשבוע זה..." style={{ width: "100%", padding: "7px 10px", borderRadius: 8, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontSize: 12, outline: "none", boxSizing: "border-box" }} />
+                  placeholder="הערות לשבוע זה..." style={{ width: "100%", padding: "7px 10px", borderRadius: 8, background: "#f3f4f6", border: "1px solid #e5e7eb", color: "#1e1b4b", fontSize: 12, outline: "none", boxSizing: "border-box" }} />
               </div>
             </div>
           </div>
@@ -503,17 +503,17 @@ export function T20_PlanRoute({ state, onChange }) {
       <Card style={{ marginBottom: 14 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <Label style={{ margin: 0 }}>קטעי הנסיעה</Label>
-          <button onClick={addLeg} style={{ padding: "6px 14px", borderRadius: 8, background: "rgba(124,58,237,0.3)", border: "1px solid rgba(124,58,237,0.5)", color: "#c4b5fd", fontSize: 12, cursor: "pointer" }}>+ קטע</button>
+          <button onClick={addLeg} style={{ padding: "6px 14px", borderRadius: 8, background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.5)", color: "#7c3aed", fontSize: 12, cursor: "pointer" }}>+ קטע</button>
         </div>
         {legs.map((leg, i) => (
           <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 80px", gap: 8, marginBottom: 8 }}>
             {[["from", "מ..."], ["to", "ל..."], ["line", "קו/רכבת"], ["time", "שעה"]].map(([field, ph]) => (
               <input key={field} value={leg[field] || ""} onChange={e => updateLeg(i, field, e.target.value)}
-                placeholder={ph} style={{ padding: "8px 10px", borderRadius: 8, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontSize: 12, outline: "none" }} />
+                placeholder={ph} style={{ padding: "8px 10px", borderRadius: 8, background: "#f3f4f6", border: "1px solid #e5e7eb", color: "#1e1b4b", fontSize: 12, outline: "none" }} />
             ))}
           </div>
         ))}
-        {legs.length === 0 && <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, textAlign: "center", padding: 16 }}>הוסף קטעי נסיעה</p>}
+        {legs.length === 0 && <p style={{ color: "#d1d5db", fontSize: 13, textAlign: "center", padding: 16 }}>הוסף קטעי נסיעה</p>}
       </Card>
 
       <Card>
@@ -536,8 +536,8 @@ export function T21_TakeTrip({ state, onChange }) {
           {["כן, הכל לפי התכנית", "כמעט — היו שינויים קטנים", "לא — נאלצתי לאלתר"].map(opt => (
             <button key={opt} onClick={() => onChange({ ...s, success: opt })} style={{
               flex: 1, padding: "10px 8px", borderRadius: 10, fontSize: 12, cursor: "pointer",
-              background: s.success === opt ? "rgba(124,58,237,0.3)" : "rgba(255,255,255,0.05)",
-              border: s.success === opt ? "1.5px solid #7c3aed" : "1px solid rgba(255,255,255,0.1)",
+              background: s.success === opt ? "rgba(124,58,237,0.15)" : "#f9fafb",
+              border: s.success === opt ? "1.5px solid #7c3aed" : "1px solid #e5e7eb",
               color: s.success === opt ? "#e9d5ff" : "rgba(255,255,255,0.6)", lineHeight: 1.4
             }}>{opt}</button>
           ))}
@@ -569,17 +569,17 @@ export function T22_TripBudget({ state, onChange }) {
       <Card>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
           <Label style={{ margin: 0 }}>הוצאות היום</Label>
-          <button onClick={addItem} style={{ padding: "6px 14px", borderRadius: 8, background: "rgba(124,58,237,0.3)", border: "1px solid rgba(124,58,237,0.5)", color: "#c4b5fd", fontSize: 12, cursor: "pointer" }}>+ הוצאה</button>
+          <button onClick={addItem} style={{ padding: "6px 14px", borderRadius: 8, background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.5)", color: "#7c3aed", fontSize: 12, cursor: "pointer" }}>+ הוצאה</button>
         </div>
         {items.map((it, i) => (
           <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8 }}>
-            <input value={it.what || ""} onChange={e => updateItem(i, "what", e.target.value)} placeholder="על מה?" style={{ flex: 1, padding: "8px 10px", borderRadius: 8, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontSize: 13, outline: "none" }} />
-            <input value={it.amount || ""} onChange={e => updateItem(i, "amount", e.target.value)} placeholder="₪" type="number" style={{ width: 70, padding: "8px", borderRadius: 8, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontSize: 13, outline: "none" }} />
+            <input value={it.what || ""} onChange={e => updateItem(i, "what", e.target.value)} placeholder="על מה?" style={{ flex: 1, padding: "8px 10px", borderRadius: 8, background: "#f3f4f6", border: "1px solid #e5e7eb", color: "#1e1b4b", fontSize: 13, outline: "none" }} />
+            <input value={it.amount || ""} onChange={e => updateItem(i, "amount", e.target.value)} placeholder="₪" type="number" style={{ width: 70, padding: "8px", borderRadius: 8, background: "#f3f4f6", border: "1px solid #e5e7eb", color: "#1e1b4b", fontSize: 13, outline: "none" }} />
           </div>
         ))}
         {total > 0 && (
           <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 10, background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.3)" }}>
-            <span style={{ color: "#c4b5fd", fontWeight: 700 }}>סה״כ: ₪{total}</span>
+            <span style={{ color: "#7c3aed", fontWeight: 700 }}>סה״כ: ₪{total}</span>
           </div>
         )}
       </Card>
@@ -611,7 +611,7 @@ export function T23_TripReport({ state, onChange }) {
           <input type="range" min={1} max={10} value={s.independenceScore || 7}
             onChange={e => onChange({ ...s, independenceScore: Number(e.target.value) })}
             style={{ flex: 1, accentColor: "#7c3aed" }} />
-          <div style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(124,58,237,0.3)", display: "flex", alignItems: "center", justifyContent: "center", color: "#c4b5fd", fontWeight: 700, fontSize: 18 }}>
+          <div style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(124,58,237,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#7c3aed", fontWeight: 700, fontSize: 18 }}>
             {s.independenceScore || 7}
           </div>
         </div>
@@ -635,7 +635,7 @@ export function Ch2Climax({ state, onChange, isParent, onApprove }) {
           <button onClick={() => onChange({ ...s, idoReady: true })} style={{
             marginTop: 12, padding: "11px 24px", borderRadius: 12, fontSize: 14, fontWeight: 600, cursor: "pointer",
             background: s.idoReady ? "rgba(16,185,129,0.2)" : "linear-gradient(135deg, #7c3aed, #a855f7)",
-            border: s.idoReady ? "1px solid rgba(16,185,129,0.4)" : "none", color: "#fff"
+            border: s.idoReady ? "1px solid rgba(16,185,129,0.4)" : "none", color: "#1e1b4b"
           }}>{s.idoReady ? "✓ מוכן!" : "סיימתי לתכנן — מוכן!"}</button>
         </Card>
       )}
@@ -645,13 +645,13 @@ export function Ch2Climax({ state, onChange, isParent, onApprove }) {
           {s.idoReady && !s.parentApproved && (
             <>
               <TextInput multiline value={s.note || ""} onChange={v => onChange({ ...s, note: v })} placeholder="כמה מילים על הנסיעה..." />
-              <button onClick={() => { onChange({ ...s, parentApproved: true }); onApprove && onApprove(); }} style={{ marginTop: 12, width: "100%", padding: "12px", borderRadius: 12, fontSize: 15, fontWeight: 600, background: "linear-gradient(135deg, #10b981, #059669)", border: "none", color: "#fff", cursor: "pointer" }}>
+              <button onClick={() => { onChange({ ...s, parentApproved: true }); onApprove && onApprove(); }} style={{ marginTop: 12, width: "100%", padding: "12px", borderRadius: 12, fontSize: 15, fontWeight: 600, background: "linear-gradient(135deg, #10b981, #059669)", border: "none", color: "#1e1b4b", cursor: "pointer" }}>
                 ✅ אישור — פתח פרק 3!
               </button>
             </>
           )}
-          {s.parentApproved && <div style={{ padding: "12px 16px", borderRadius: 10, background: "rgba(16,185,129,0.15)" }}><span style={{ color: "#6ee7b7", fontWeight: 600 }}>✓ פרק 3 נפתח!</span></div>}
-          {!s.idoReady && <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14 }}>ממתין לעידו שיסיים לתכנן...</p>}
+          {s.parentApproved && <div style={{ padding: "12px 16px", borderRadius: 10, background: "rgba(16,185,129,0.15)" }}><span style={{ color: "#059669", fontWeight: 600 }}>✓ פרק 3 נפתח!</span></div>}
+          {!s.idoReady && <p style={{ color: "#6b7280", fontSize: 14 }}>ממתין לעידו שיסיים לתכנן...</p>}
         </Card>
       )}
     </div>
@@ -682,18 +682,18 @@ export function QuizM5({ state, onChange }) {
     <div>
       <div style={{ textAlign: "center", padding: "24px 0 20px" }}>
         <div style={{ fontSize: 52, marginBottom: 12 }}>🌊</div>
-        <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 700, margin: "0 0 8px" }}>משחקון רגשות וחוסן</h2>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0 }}>גלגל הרגשות • סימולטור תגובות</p>
+        <h2 style={{ color: "#1e1b4b", fontSize: 22, fontWeight: 700, margin: "0 0 8px" }}>משחקון רגשות וחוסן</h2>
+        <p style={{ color: "#6b7280", fontSize: 14, margin: 0 }}>גלגל הרגשות • סימולטור תגובות</p>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
         {[{ icon: "🎡", title: "גלגל רגשות", desc: "בחר רגשות שחווית החודש" }, { icon: "🎭", title: "סימולטור תגובות", desc: "איך היית מגיב במצבים אמיתיים?" }].map(item => (
           <div key={item.icon} style={{ display: "flex", gap: 14, padding: "14px 16px", borderRadius: 14, background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.2)" }}>
             <span style={{ fontSize: 28 }}>{item.icon}</span>
-            <div><p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 14, margin: "0 0 2px" }}>{item.title}</p><p style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, margin: 0 }}>{item.desc}</p></div>
+            <div><p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 14, margin: "0 0 2px" }}>{item.title}</p><p style={{ color: "#6b7280", fontSize: 12, margin: 0 }}>{item.desc}</p></div>
           </div>
         ))}
       </div>
-      <button onClick={() => onChange({ ...s, step: "wheel" })} style={{ width: "100%", padding: "14px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>מתחילים! 🎡</button>
+      <button onClick={() => onChange({ ...s, step: "wheel" })} style={{ width: "100%", padding: "14px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#1e1b4b", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>מתחילים! 🎡</button>
     </div>
   );
 
@@ -701,8 +701,8 @@ export function QuizM5({ state, onChange }) {
     const selected = s.selectedEmotions || [];
     return (
       <div>
-        <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 15, textAlign: "center", marginBottom: 20 }}>🎡 אילו רגשות חווית החודש?</p>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, textAlign: "center", marginBottom: 20 }}>בחר כמה שרוצה</p>
+        <p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 15, textAlign: "center", marginBottom: 20 }}>🎡 אילו רגשות חווית החודש?</p>
+        <p style={{ color: "#9ca3af", fontSize: 12, textAlign: "center", marginBottom: 20 }}>בחר כמה שרוצה</p>
         {emotionCategories.map(cat => (
           <div key={cat.name} style={{ marginBottom: 16 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
@@ -718,8 +718,8 @@ export function QuizM5({ state, onChange }) {
                     onChange({ ...s, selectedEmotions: next });
                   }} style={{
                     padding: "8px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
-                    background: isSel ? `${cat.color}30` : "rgba(255,255,255,0.05)",
-                    border: isSel ? `1.5px solid ${cat.color}` : "1px solid rgba(255,255,255,0.1)",
+                    background: isSel ? `${cat.color}30` : "#f9fafb",
+                    border: isSel ? `1.5px solid ${cat.color}` : "1px solid #e5e7eb",
                     color: isSel ? "#fff" : "rgba(255,255,255,0.6)", transition: "all 0.15s"
                   }}>{isSel ? "✓ " : ""}{em}</button>
                 );
@@ -728,7 +728,7 @@ export function QuizM5({ state, onChange }) {
           </div>
         ))}
         {selected.length > 0 && (
-          <button onClick={() => onChange({ ...s, step: "scenario", scenarioIdx: 0 })} style={{ width: "100%", padding: "13px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer", marginTop: 8 }}>
+          <button onClick={() => onChange({ ...s, step: "scenario", scenarioIdx: 0 })} style={{ width: "100%", padding: "13px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#1e1b4b", fontSize: 15, fontWeight: 600, cursor: "pointer", marginTop: 8 }}>
             בחרתי {selected.length} רגשות — קדימה! →
           </button>
         )}
@@ -744,19 +744,19 @@ export function QuizM5({ state, onChange }) {
       <div>
         <div style={{ display: "flex", gap: 4, marginBottom: 20 }}>
           {scenarios.map((_, i) => (
-            <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= idx ? "#7c3aed" : "rgba(255,255,255,0.1)" }} />
+            <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= idx ? "#7c3aed" : "#e5e7eb" }} />
           ))}
         </div>
-        <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 14, textAlign: "center", marginBottom: 16 }}>🎭 איך היית מגיב?</p>
-        <div style={{ padding: 20, borderRadius: 16, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", marginBottom: 16 }}>
-          <p style={{ color: "#fff", fontSize: 16, lineHeight: 1.7, margin: 0, textAlign: "center" }}>{sc.text}</p>
+        <p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 14, textAlign: "center", marginBottom: 16 }}>🎭 איך היית מגיב?</p>
+        <div style={{ padding: 20, borderRadius: 16, background: "#ffffff", border: "1px solid #e5e7eb", marginBottom: 16 }}>
+          <p style={{ color: "#1e1b4b", fontSize: 16, lineHeight: 1.7, margin: 0, textAlign: "center" }}>{sc.text}</p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: answered ? 16 : 0 }}>
           {sc.options.map(opt => {
             const isSel = answered === opt.v;
             const isBest = opt.v === sc.best;
-            let bg = "rgba(255,255,255,0.04)";
-            let border = "1px solid rgba(255,255,255,0.1)";
+            let bg = "#ffffff";
+            let border = "1px solid #e5e7eb";
             let color = "#fff";
             if (answered) {
               if (isBest) { bg = "rgba(16,185,129,0.15)"; border = "1px solid rgba(16,185,129,0.4)"; color = "#6ee7b7"; }
@@ -772,13 +772,13 @@ export function QuizM5({ state, onChange }) {
         {answered && (
           <>
             <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(16,185,129,0.07)", border: "1px solid rgba(16,185,129,0.2)", marginBottom: 14 }}>
-              <p style={{ color: "#6ee7b7", fontWeight: 600, fontSize: 13, margin: "0 0 4px" }}>💬 מה חושבים על זה?</p>
-              <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 14, margin: 0, lineHeight: 1.6 }}>{sc.explain[answered]}</p>
+              <p style={{ color: "#059669", fontWeight: 600, fontSize: 13, margin: "0 0 4px" }}>💬 מה חושבים על זה?</p>
+              <p style={{ color: "#4b5563", fontSize: 14, margin: 0, lineHeight: 1.6 }}>{sc.explain[answered]}</p>
             </div>
             <button onClick={() => {
               if (idx < scenarios.length - 1) onChange({ ...s, scenarioIdx: idx + 1 });
               else onChange({ ...s, step: "result" });
-            }} style={{ width: "100%", padding: "13px", borderRadius: 12, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>
+            }} style={{ width: "100%", padding: "13px", borderRadius: 12, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#1e1b4b", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>
               {idx < scenarios.length - 1 ? "תרחיש הבא →" : "לתוצאות →"}
             </button>
           </>
@@ -795,11 +795,11 @@ export function QuizM5({ state, onChange }) {
       <div>
         <div style={{ textAlign: "center", padding: "28px 0 20px" }}>
           <div style={{ fontSize: 52, marginBottom: 12 }}>{correctCount === 2 ? "🌟" : correctCount === 1 ? "👍" : "💪"}</div>
-          <p style={{ color: "#fff", fontSize: 22, fontWeight: 700, margin: "0 0 6px" }}>{correctCount}/2 תגובות מיטביות</p>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0 }}>בחרת {selected.length} רגשות שחווית החודש</p>
+          <p style={{ color: "#1e1b4b", fontSize: 22, fontWeight: 700, margin: "0 0 6px" }}>{correctCount}/2 תגובות מיטביות</p>
+          <p style={{ color: "#6b7280", fontSize: 14, margin: 0 }}>בחרת {selected.length} רגשות שחווית החודש</p>
         </div>
         <div style={{ padding: 20, borderRadius: 16, background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.25)", marginBottom: 20 }}>
-          <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 14, margin: "0 0 10px" }}>הרגשות שלך החודש:</p>
+          <p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 14, margin: "0 0 10px" }}>הרגשות שלך החודש:</p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
             {selected.map(em => {
               const cat = emotionCategories.find(c => c.emotions.includes(em));
@@ -833,10 +833,10 @@ export function QuizM6({ state, onChange }) {
     <div>
       <div style={{ textAlign: "center", padding: "24px 0 20px" }}>
         <div style={{ fontSize: 52, marginBottom: 12 }}>🗺️</div>
-        <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 700, margin: "0 0 8px" }}>מפת השפעה</h2>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0 }}>כמה השפעה יצרת? בוא נמדוד.</p>
+        <h2 style={{ color: "#1e1b4b", fontSize: 22, fontWeight: 700, margin: "0 0 8px" }}>מפת השפעה</h2>
+        <p style={{ color: "#6b7280", fontSize: 14, margin: 0 }}>כמה השפעה יצרת? בוא נמדוד.</p>
       </div>
-      <button onClick={() => onChange({ ...s, step: "map" })} style={{ width: "100%", padding: "14px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>בוא נמדוד את ההשפעה שלך →</button>
+      <button onClick={() => onChange({ ...s, step: "map" })} style={{ width: "100%", padding: "14px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#1e1b4b", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>בוא נמדוד את ההשפעה שלך →</button>
     </div>
   );
 
@@ -845,20 +845,20 @@ export function QuizM6({ state, onChange }) {
     const allDone = impactAreas.every(a => answers[a.id]);
     return (
       <div>
-        <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 15, textAlign: "center", marginBottom: 20 }}>🗺️ מפת ההשפעה שלך</p>
+        <p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 15, textAlign: "center", marginBottom: 20 }}>🗺️ מפת ההשפעה שלך</p>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
           {impactAreas.map(area => (
-            <div key={area.id} style={{ padding: 16, borderRadius: 14, background: answers[area.id] ? "rgba(124,58,237,0.15)" : "rgba(255,255,255,0.04)", border: answers[area.id] ? "1.5px solid rgba(124,58,237,0.4)" : "1px solid rgba(255,255,255,0.1)" }}>
+            <div key={area.id} style={{ padding: 16, borderRadius: 14, background: answers[area.id] ? "rgba(124,58,237,0.15)" : "#ffffff", border: answers[area.id] ? "1.5px solid rgba(124,58,237,0.4)" : "1px solid #e5e7eb" }}>
               <div style={{ fontSize: 28, marginBottom: 6 }}>{area.icon}</div>
-              <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 13, margin: "0 0 8px" }}>{area.title}</p>
-              <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, margin: "0 0 8px" }}>{area.q}</p>
+              <p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 13, margin: "0 0 8px" }}>{area.title}</p>
+              <p style={{ color: "#6b7280", fontSize: 11, margin: "0 0 8px" }}>{area.q}</p>
               <input value={answers[area.id] || ""} onChange={e => onChange({ ...s, mapAnswers: { ...answers, [area.id]: e.target.value } })}
-                placeholder="הכנס תשובה..." style={{ width: "100%", padding: "8px 10px", borderRadius: 8, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontSize: 12, outline: "none", boxSizing: "border-box" }} />
+                placeholder="הכנס תשובה..." style={{ width: "100%", padding: "8px 10px", borderRadius: 8, background: "#f3f4f6", border: "1px solid #e5e7eb", color: "#1e1b4b", fontSize: 12, outline: "none", boxSizing: "border-box" }} />
             </div>
           ))}
         </div>
         {allDone && (
-          <button onClick={() => onChange({ ...s, step: "dilemma" })} style={{ width: "100%", padding: "13px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>מעולה! לשלב הבא →</button>
+          <button onClick={() => onChange({ ...s, step: "dilemma" })} style={{ width: "100%", padding: "13px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#1e1b4b", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>מעולה! לשלב הבא →</button>
         )}
       </div>
     );
@@ -880,15 +880,15 @@ export function QuizM6({ state, onChange }) {
     };
     return (
       <div>
-        <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 15, textAlign: "center", marginBottom: 20 }}>🤔 מה גרם לך להתנדב?</p>
+        <p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 15, textAlign: "center", marginBottom: 20 }}>🤔 מה גרם לך להתנדב?</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: answered ? 16 : 0 }}>
           {options.map(opt => {
             const isSel = answered === opt.v;
             return (
               <button key={opt.v} onClick={() => !answered && onChange({ ...s, dilemmaAnswer: opt.v })} style={{
                 padding: "14px 16px", borderRadius: 12, textAlign: "right",
-                background: isSel ? "rgba(124,58,237,0.25)" : "rgba(255,255,255,0.04)",
-                border: isSel ? "1.5px solid #7c3aed" : "1px solid rgba(255,255,255,0.1)",
+                background: isSel ? "rgba(124,58,237,0.25)" : "#ffffff",
+                border: isSel ? "1.5px solid #7c3aed" : "1px solid #e5e7eb",
                 color: isSel ? "#e9d5ff" : "#fff", fontSize: 14, cursor: answered ? "default" : "pointer"
               }}>{opt.t}</button>
             );
@@ -897,9 +897,9 @@ export function QuizM6({ state, onChange }) {
         {answered && (
           <>
             <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(16,185,129,0.07)", border: "1px solid rgba(16,185,129,0.2)", marginBottom: 14 }}>
-              <p style={{ color: "#6ee7b7", fontSize: 14, margin: 0, lineHeight: 1.6 }}>{feedback[answered]}</p>
+              <p style={{ color: "#059669", fontSize: 14, margin: 0, lineHeight: 1.6 }}>{feedback[answered]}</p>
             </div>
-            <button onClick={() => onChange({ ...s, step: "result" })} style={{ width: "100%", padding: "13px", borderRadius: 12, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>לתוצאות →</button>
+            <button onClick={() => onChange({ ...s, step: "result" })} style={{ width: "100%", padding: "13px", borderRadius: 12, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#1e1b4b", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>לתוצאות →</button>
           </>
         )}
       </div>
@@ -912,14 +912,14 @@ export function QuizM6({ state, onChange }) {
       <div>
         <div style={{ textAlign: "center", padding: "24px 0 20px" }}>
           <div style={{ fontSize: 52, marginBottom: 10 }}>🌟</div>
-          <p style={{ color: "#fff", fontSize: 20, fontWeight: 700, margin: "0 0 6px" }}>מפת ההשפעה שלך</p>
+          <p style={{ color: "#1e1b4b", fontSize: 20, fontWeight: 700, margin: "0 0 6px" }}>מפת ההשפעה שלך</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
           {impactAreas.map(area => (
             <div key={area.id} style={{ padding: "14px 16px", borderRadius: 14, background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.3)", textAlign: "center" }}>
               <div style={{ fontSize: 24, marginBottom: 6 }}>{area.icon}</div>
-              <p style={{ color: "#c4b5fd", fontSize: 12, margin: "0 0 4px" }}>{area.title}</p>
-              <p style={{ color: "#fff", fontWeight: 600, fontSize: 14, margin: 0 }}>{answers[area.id] || "—"}</p>
+              <p style={{ color: "#7c3aed", fontSize: 12, margin: "0 0 4px" }}>{area.title}</p>
+              <p style={{ color: "#1e1b4b", fontWeight: 600, fontSize: 14, margin: 0 }}>{answers[area.id] || "—"}</p>
             </div>
           ))}
         </div>
@@ -949,10 +949,10 @@ export function QuizM7({ state, onChange }) {
     <div>
       <div style={{ textAlign: "center", padding: "24px 0 20px" }}>
         <div style={{ fontSize: 52, marginBottom: 12 }}>💪</div>
-        <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 700, margin: "0 0 8px" }}>משחקון כושר ומנטליות</h2>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0 }}>מה הגוף שלך למד? מה הראש שלך למד?</p>
+        <h2 style={{ color: "#1e1b4b", fontSize: 22, fontWeight: 700, margin: "0 0 8px" }}>משחקון כושר ומנטליות</h2>
+        <p style={{ color: "#6b7280", fontSize: 14, margin: 0 }}>מה הגוף שלך למד? מה הראש שלך למד?</p>
       </div>
-      <button onClick={() => onChange({ ...s, step: "reframe" })} style={{ width: "100%", padding: "14px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>בואו נבדוק! →</button>
+      <button onClick={() => onChange({ ...s, step: "reframe" })} style={{ width: "100%", padding: "14px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#1e1b4b", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>בואו נבדוק! →</button>
     </div>
   );
 
@@ -961,8 +961,8 @@ export function QuizM7({ state, onChange }) {
     const allFlipped = mindBlocks.every(b => flipped[b.id]);
     return (
       <div>
-        <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 15, textAlign: "center", marginBottom: 8 }}>🔄 הפוך את החסימה</p>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, textAlign: "center", marginBottom: 20 }}>לחץ על כל כרטיס לגלות איך לחשוב אחרת</p>
+        <p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 15, textAlign: "center", marginBottom: 8 }}>🔄 הפוך את החסימה</p>
+        <p style={{ color: "#6b7280", fontSize: 13, textAlign: "center", marginBottom: 20 }}>לחץ על כל כרטיס לגלות איך לחשוב אחרת</p>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
           {mindBlocks.map(block => (
             <div key={block.id} onClick={() => onChange({ ...s, flipped: { ...flipped, [block.id]: true } })} style={{
@@ -980,7 +980,7 @@ export function QuizM7({ state, onChange }) {
           ))}
         </div>
         {allFlipped && (
-          <button onClick={() => onChange({ ...s, step: "achievement" })} style={{ width: "100%", padding: "13px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>הבנתי! ממשיכים →</button>
+          <button onClick={() => onChange({ ...s, step: "achievement" })} style={{ width: "100%", padding: "13px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#1e1b4b", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>הבנתי! ממשיכים →</button>
         )}
       </div>
     );
@@ -989,7 +989,7 @@ export function QuizM7({ state, onChange }) {
   if (step === "achievement") {
     return (
       <div>
-        <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 15, textAlign: "center", marginBottom: 20 }}>🏅 תעד את ההישג שלך</p>
+        <p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 15, textAlign: "center", marginBottom: 20 }}>🏅 תעד את ההישג שלך</p>
         {[
           { key: "before", label: "לפני האימונים — מה לא יכולת לעשות?", ph: "לא יכולתי..." },
           { key: "after", label: "אחרי — מה עכשיו אתה יכול?", ph: "עכשיו אני יכול..." },
@@ -1001,7 +1001,7 @@ export function QuizM7({ state, onChange }) {
           </Card>
         ))}
         {s.before && s.after && s.moment && (
-          <button onClick={() => onChange({ ...s, step: "result" })} style={{ width: "100%", padding: "13px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>לתוצאות 🏆</button>
+          <button onClick={() => onChange({ ...s, step: "result" })} style={{ width: "100%", padding: "13px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#1e1b4b", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>לתוצאות 🏆</button>
         )}
       </div>
     );
@@ -1011,13 +1011,13 @@ export function QuizM7({ state, onChange }) {
     <div>
       <div style={{ textAlign: "center", padding: "28px 0 20px" }}>
         <div style={{ fontSize: 64, marginBottom: 10 }}>🏆</div>
-        <p style={{ color: "#fff", fontSize: 22, fontWeight: 700, margin: "0 0 6px" }}>עשית את זה!</p>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0 }}>הגוף שלך הוכיח שהראש יכול להוביל</p>
+        <p style={{ color: "#1e1b4b", fontSize: 22, fontWeight: 700, margin: "0 0 6px" }}>עשית את זה!</p>
+        <p style={{ color: "#6b7280", fontSize: 14, margin: 0 }}>הגוף שלך הוכיח שהראש יכול להוביל</p>
       </div>
       <Card style={{ border: "1px solid rgba(234,179,8,0.3)", background: "rgba(234,179,8,0.07)", marginBottom: 16 }}>
         <p style={{ color: "#fbbf24", fontWeight: 600, fontSize: 14, margin: "0 0 10px" }}>לפני ← אחרי</p>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, margin: "0 0 6px" }}>{s.before}</p>
-        <p style={{ color: "#6ee7b7", fontSize: 14, fontWeight: 600, margin: 0 }}>↓ {s.after}</p>
+        <p style={{ color: "#6b7280", fontSize: 13, margin: "0 0 6px" }}>{s.before}</p>
+        <p style={{ color: "#059669", fontSize: 14, fontWeight: 600, margin: 0 }}>↓ {s.after}</p>
       </Card>
       <Card style={{ border: "1px solid rgba(124,58,237,0.25)" }}>
         <Label>המשפט שתגיד לעצמך בפעם הבאה שיגיד לך "אי אפשר":</Label>
@@ -1044,10 +1044,10 @@ export function QuizM8({ state, onChange }) {
     <div>
       <div style={{ textAlign: "center", padding: "24px 0 20px" }}>
         <div style={{ fontSize: 52, marginBottom: 12 }}>🗺️</div>
-        <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 700, margin: "0 0 8px" }}>יומן הרפתקאות</h2>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0 }}>תיעוד, אתגרים, ואיך הגעת ליעד</p>
+        <h2 style={{ color: "#1e1b4b", fontSize: 22, fontWeight: 700, margin: "0 0 8px" }}>יומן הרפתקאות</h2>
+        <p style={{ color: "#6b7280", fontSize: 14, margin: 0 }}>תיעוד, אתגרים, ואיך הגעת ליעד</p>
       </div>
-      <button onClick={() => onChange({ ...s, step: "challenges" })} style={{ width: "100%", padding: "14px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>פתח את היומן →</button>
+      <button onClick={() => onChange({ ...s, step: "challenges" })} style={{ width: "100%", padding: "14px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#1e1b4b", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>פתח את היומן →</button>
     </div>
   );
 
@@ -1057,7 +1057,7 @@ export function QuizM8({ state, onChange }) {
     const facedChallenges = challenges.filter(c => faced.includes(c.id));
     return (
       <div>
-        <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 15, textAlign: "center", marginBottom: 20 }}>⚡ אילו אתגרים פגשת בדרך?</p>
+        <p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 15, textAlign: "center", marginBottom: 20 }}>⚡ אילו אתגרים פגשת בדרך?</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
           {challenges.map(ch => {
             const isSel = faced.includes(ch.id);
@@ -1065,16 +1065,16 @@ export function QuizM8({ state, onChange }) {
               <div key={ch.id}>
                 <button onClick={() => onChange({ ...s, faced: isSel ? faced.filter(f => f !== ch.id) : [...faced, ch.id] })} style={{
                   width: "100%", padding: "12px 16px", borderRadius: 12, textAlign: "right",
-                  background: isSel ? "rgba(239,68,68,0.12)" : "rgba(255,255,255,0.04)",
-                  border: isSel ? "1.5px solid rgba(239,68,68,0.4)" : "1px solid rgba(255,255,255,0.1)",
-                  color: "#fff", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", gap: 12
+                  background: isSel ? "rgba(239,68,68,0.12)" : "#ffffff",
+                  border: isSel ? "1.5px solid rgba(239,68,68,0.4)" : "1px solid #e5e7eb",
+                  color: "#1e1b4b", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", gap: 12
                 }}>
                   <span style={{ fontSize: 18 }}>{isSel ? "⚡" : "○"}</span> {ch.text}
                 </button>
                 {isSel && (
                   <div style={{ marginTop: 6, marginBottom: 4 }}>
                     <input value={solutions[ch.id] || ""} onChange={e => onChange({ ...s, solutions: { ...solutions, [ch.id]: e.target.value } })}
-                      placeholder="איך התמודדת עם זה?" style={{ width: "100%", padding: "9px 12px", borderRadius: 10, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontSize: 13, outline: "none", boxSizing: "border-box", marginTop: 4 }} />
+                      placeholder="איך התמודדת עם זה?" style={{ width: "100%", padding: "9px 12px", borderRadius: 10, background: "#f3f4f6", border: "1px solid #e5e7eb", color: "#1e1b4b", fontSize: 13, outline: "none", boxSizing: "border-box", marginTop: 4 }} />
                   </div>
                 )}
               </div>
@@ -1086,7 +1086,7 @@ export function QuizM8({ state, onChange }) {
           <TextInput multiline value={s.proudMoment || ""} onChange={v => onChange({ ...s, proudMoment: v })} placeholder="הרגע הכי טוב היה..." />
         </Card>
         {s.proudMoment && (
-          <button onClick={() => onChange({ ...s, step: "rating" })} style={{ width: "100%", padding: "13px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>לדרג את הנסיעה →</button>
+          <button onClick={() => onChange({ ...s, step: "rating" })} style={{ width: "100%", padding: "13px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#1e1b4b", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>לדרג את הנסיעה →</button>
         )}
       </div>
     );
@@ -1102,12 +1102,12 @@ export function QuizM8({ state, onChange }) {
     const allRated = ratings.every(r => s[r.key]);
     return (
       <div>
-        <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 15, textAlign: "center", marginBottom: 20 }}>⭐ דרג את עצמך</p>
+        <p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 15, textAlign: "center", marginBottom: 20 }}>⭐ דרג את עצמך</p>
         {ratings.map(r => (
           <Card key={r.key} style={{ marginBottom: 12 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
               <Label style={{ margin: 0 }}>{r.label}</Label>
-              <span style={{ color: "#c4b5fd", fontWeight: 700, fontSize: 18 }}>{s[r.key] || "—"}</span>
+              <span style={{ color: "#7c3aed", fontWeight: 700, fontSize: 18 }}>{s[r.key] || "—"}</span>
             </div>
             <input type="range" min={1} max={10} value={s[r.key] || 5}
               onChange={e => onChange({ ...s, [r.key]: Number(e.target.value) })}
@@ -1115,7 +1115,7 @@ export function QuizM8({ state, onChange }) {
           </Card>
         ))}
         {allRated && (
-          <button onClick={() => onChange({ ...s, step: "result" })} style={{ width: "100%", padding: "13px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer", marginTop: 8 }}>לתוצאות →</button>
+          <button onClick={() => onChange({ ...s, step: "result" })} style={{ width: "100%", padding: "13px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#1e1b4b", fontSize: 15, fontWeight: 600, cursor: "pointer", marginTop: 8 }}>לתוצאות →</button>
         )}
       </div>
     );
@@ -1133,18 +1133,18 @@ export function QuizM8({ state, onChange }) {
       <div>
         <div style={{ textAlign: "center", padding: "24px 0 20px" }}>
           <div style={{ fontSize: 52, marginBottom: 10 }}>🗺️</div>
-          <p style={{ color: "#fff", fontSize: 22, fontWeight: 700, margin: "0 0 6px" }}>הנוסע העצמאי</p>
-          <p style={{ color: "#c4b5fd", fontSize: 16, margin: 0 }}>ממוצע: {avg}/10</p>
+          <p style={{ color: "#1e1b4b", fontSize: 22, fontWeight: 700, margin: "0 0 6px" }}>הנוסע העצמאי</p>
+          <p style={{ color: "#7c3aed", fontSize: 16, margin: 0 }}>ממוצע: {avg}/10</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
           {ratings.map(r => (
             <div key={r.key} style={{ padding: "14px 16px", borderRadius: 14, background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.25)", textAlign: "center" }}>
               <p style={{ fontSize: 20, margin: "0 0 4px" }}>{r.label.split(" ")[0]}</p>
-              <p style={{ color: "#c4b5fd", fontSize: 12, margin: "0 0 6px" }}>{r.label.split(" ")[1]}</p>
-              <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,0.1)", margin: "0 0 6px" }}>
+              <p style={{ color: "#7c3aed", fontSize: 12, margin: "0 0 6px" }}>{r.label.split(" ")[1]}</p>
+              <div style={{ height: 6, borderRadius: 3, background: "#e5e7eb", margin: "0 0 6px" }}>
                 <div style={{ height: "100%", borderRadius: 3, background: "#7c3aed", width: `${(s[r.key] || 0) * 10}%`, transition: "width 0.5s ease" }} />
               </div>
-              <p style={{ color: "#fff", fontWeight: 700, fontSize: 16, margin: 0 }}>{s[r.key] || 0}</p>
+              <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 16, margin: 0 }}>{s[r.key] || 0}</p>
             </div>
           ))}
         </div>
