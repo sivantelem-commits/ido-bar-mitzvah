@@ -5,6 +5,12 @@ import {
   T20_PlanRoute, T21_TakeTrip, T22_TripBudget, T23_TripReport,
   Ch2Climax, QuizM5, QuizM6, QuizM7, QuizM8,
 } from "./Chapter2.jsx";
+import {
+  T24_HomeRepair, T25_BasicTools, T26_IndependenceDay, T27_TimeMoneyOwnership,
+  T28_FireSkills, T29_SetupTent, T30_CampingPlan, T31_EquipmentOwnership,
+  T32_StrengthsMap, T33_Dreams, T34_AnnualGoal,
+  Ch3Climax, QuizM9, QuizM10, QuizM11, QuizM12,
+} from "./Chapter3.jsx";
 
 // ─── Shared UI helpers ────────────────────────────────────────────────────────
 
@@ -1269,34 +1275,24 @@ export function MonthlyQuiz({ monthId, state, onChange }) {
 export const MONTH_QUIZ_IDS = Object.keys(MONTH_QUIZZES);
 
 export const TASK_ACTIVITIES = {
-  t1: T1_OpeningCeremony,
-  t2: T2_ValueMap,
-  t3: T3_ChooseValues,
-  t4: T4_Responsibility,
-  t5: T5_Standard,
-  t6: T6_Feedback,
-  t7: T7_Allowance,
-  t8: T8_ExpenseTable,
-  t9: T9_NeedsWants,
-  t10: T10_Cooking,
-  t11: T11_Laundry,
-  t12: T12_PlanDay,
-  t13: T13_EmotionJournal,
-  t14: T14_BraveConversation,
-  t15: T15_Volunteer,
-  t16: T16_Commitment,
-  t17: T17_PhysicalGoal,
-  t18: T18_TrainingPlan,
-  t19: T19_AchieveGoal,
-  t20: T20_PlanRoute,
-  t21: T21_TakeTrip,
-  t22: T22_TripBudget,
-  t23: T23_TripReport,
+  t1: T1_OpeningCeremony, t2: T2_ValueMap, t3: T3_ChooseValues,
+  t4: T4_Responsibility, t5: T5_Standard, t6: T6_Feedback,
+  t7: T7_Allowance, t8: T8_ExpenseTable, t9: T9_NeedsWants,
+  t10: T10_Cooking, t11: T11_Laundry, t12: T12_PlanDay,
+  t13: T13_EmotionJournal, t14: T14_BraveConversation,
+  t15: T15_Volunteer, t16: T16_Commitment,
+  t17: T17_PhysicalGoal, t18: T18_TrainingPlan, t19: T19_AchieveGoal,
+  t20: T20_PlanRoute, t21: T21_TakeTrip, t22: T22_TripBudget, t23: T23_TripReport,
+  t24: T24_HomeRepair, t25: T25_BasicTools,
+  t26: T26_IndependenceDay, t27: T27_TimeMoneyOwnership,
+  t28: T28_FireSkills, t29: T29_SetupTent, t30: T30_CampingPlan, t31: T31_EquipmentOwnership,
+  t32: T32_StrengthsMap, t33: T33_Dreams, t34: T34_AnnualGoal,
 };
 
 export const CHAPTER_CLIMAX = {
   1: Ch1Climax,
   2: Ch2Climax,
+  3: Ch3Climax,
 };
 
 export const MONTH_QUIZZES_CH2 = {
@@ -1304,6 +1300,13 @@ export const MONTH_QUIZZES_CH2 = {
   m6: { component: QuizM6, title: "סיכום חודש אפריל — קהילה ותרומה", emoji: "🗺️" },
   m7: { component: QuizM7, title: "סיכום חודש מאי — אתגר פיזי", emoji: "💪" },
   m8: { component: QuizM8, title: "סיכום חודש יוני — נסיעה עצמאית", emoji: "🗺️" },
+};
+
+export const MONTH_QUIZZES_CH3 = {
+  m9:  { component: QuizM9,  title: "סיכום חודש יולי — מיומנות טכנית", emoji: "🔧" },
+  m10: { component: QuizM10, title: "סיכום חודש אוגוסט — יום עצמאות", emoji: "☀️" },
+  m11: { component: QuizM11, title: "סיכום חודש ספטמבר — מחנאות", emoji: "🏕️" },
+  m12: { component: QuizM12, title: "סיכום חודש אוקטובר — תיק עתיד", emoji: "🚀" },
 };
 
 // ─── Task modal wrapper ───────────────────────────────────────────────────────
