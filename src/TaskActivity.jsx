@@ -1,4 +1,10 @@
 import { useState, useEffect } from "react";
+import {
+  T13_EmotionJournal, T14_BraveConversation, T15_Volunteer, T16_Commitment,
+  T17_PhysicalGoal, T18_TrainingPlan, T19_AchieveGoal,
+  T20_PlanRoute, T21_TakeTrip, T22_TripBudget, T23_TripReport,
+  Ch2Climax, QuizM5, QuizM6, QuizM7, QuizM8,
+} from "./Chapter2.jsx";
 
 // ─── Shared UI helpers ────────────────────────────────────────────────────────
 
@@ -1275,10 +1281,29 @@ export const TASK_ACTIVITIES = {
   t10: T10_Cooking,
   t11: T11_Laundry,
   t12: T12_PlanDay,
+  t13: T13_EmotionJournal,
+  t14: T14_BraveConversation,
+  t15: T15_Volunteer,
+  t16: T16_Commitment,
+  t17: T17_PhysicalGoal,
+  t18: T18_TrainingPlan,
+  t19: T19_AchieveGoal,
+  t20: T20_PlanRoute,
+  t21: T21_TakeTrip,
+  t22: T22_TripBudget,
+  t23: T23_TripReport,
 };
 
 export const CHAPTER_CLIMAX = {
   1: Ch1Climax,
+  2: Ch2Climax,
+};
+
+export const MONTH_QUIZZES_CH2 = {
+  m5: { component: QuizM5, title: "סיכום חודש מרץ — רגשות וחוסן", emoji: "🌊" },
+  m6: { component: QuizM6, title: "סיכום חודש אפריל — קהילה ותרומה", emoji: "🗺️" },
+  m7: { component: QuizM7, title: "סיכום חודש מאי — אתגר פיזי", emoji: "💪" },
+  m8: { component: QuizM8, title: "סיכום חודש יוני — נסיעה עצמאית", emoji: "🗺️" },
 };
 
 // ─── Task modal wrapper ───────────────────────────────────────────────────────
