@@ -211,7 +211,7 @@ function ProgressRing({ pct, size = 80, stroke = 7, color = "#7c3aed" }) {
   const circ = 2 * Math.PI * r;
   return (
     <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth={stroke} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#e5e7eb" strokeWidth={stroke} />
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={stroke}
         strokeDasharray={circ} strokeDashoffset={circ * (1 - pct / 100)}
         strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.6s ease" }} />
@@ -241,22 +241,22 @@ function LoginScreen({ onLogin }) {
       fontFamily: "'Segoe UI', Tahoma, sans-serif", direction: "rtl"
     }}>
       <div style={{
-        background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)",
-        border: "1px solid rgba(255,255,255,0.1)", borderRadius: 24,
+        background: "#f9fafb", backdropFilter: "blur(20px)",
+        border: "1px solid #e5e7eb", borderRadius: 24,
         padding: "48px 40px", width: 340, textAlign: "center",
         boxShadow: "0 25px 50px rgba(0,0,0,0.5)"
       }}>
         <div style={{ fontSize: 56, marginBottom: 8 }}>🧭</div>
-        <h1 style={{ color: "#fff", fontSize: 22, fontWeight: 700, margin: "0 0 4px" }}>שנת בר מצווה</h1>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: "0 0 32px" }}>להוביל את החיים</p>
+        <h1 style={{ color: "#1e1b4b", fontSize: 22, fontWeight: 700, margin: "0 0 4px" }}>שנת בר מצווה</h1>
+        <p style={{ color: "#6b7280", fontSize: 14, margin: "0 0 32px" }}>להוביל את החיים</p>
 
         <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
           {["ido", "parents"].map(k => (
             <button key={k} onClick={() => setUser(k)} style={{
               flex: 1, padding: "10px", borderRadius: 12,
-              border: user === k ? "2px solid #7c3aed" : "1px solid rgba(255,255,255,0.15)",
-              background: user === k ? "rgba(124,58,237,0.2)" : "transparent",
-              color: "#fff", cursor: "pointer", fontSize: 14, fontWeight: user === k ? 600 : 400,
+              border: user === k ? "2px solid #7c3aed" : "1px solid #d1d5db",
+              background: user === k ? "rgba(124,58,237,0.1)" : "transparent",
+              color: "#1e1b4b", cursor: "pointer", fontSize: 14, fontWeight: user === k ? 600 : 400,
               transition: "all 0.2s"
             }}>
               {k === "ido" ? "👦 עידו" : "👩‍👩‍👦 הורים"}
@@ -270,15 +270,15 @@ function LoginScreen({ onLogin }) {
           onKeyDown={e => e.key === "Enter" && handleLogin()}
           style={{
             width: "100%", padding: "12px 16px", borderRadius: 12, boxSizing: "border-box",
-            border: error ? "1.5px solid #ef4444" : "1px solid rgba(255,255,255,0.15)",
-            background: "rgba(255,255,255,0.07)", color: "#fff", fontSize: 15,
+            border: error ? "1.5px solid #ef4444" : "1px solid #d1d5db",
+            background: "#f3f4f6", color: "#1e1b4b", fontSize: 15,
             outline: "none", marginBottom: 12, textAlign: "right", transition: "border 0.2s"
           }}
         />
         <button onClick={handleLogin} style={{
           width: "100%", padding: "13px", borderRadius: 12,
           background: "linear-gradient(135deg, #7c3aed, #a855f7)",
-          border: "none", color: "#fff", fontSize: 16, fontWeight: 600, cursor: "pointer"
+          border: "none", color: "#1e1b4b", fontSize: 16, fontWeight: 600, cursor: "pointer"
         }}>
           כניסה
         </button>
@@ -331,9 +331,9 @@ function TasksView({ data, save, isParent }) {
           onApprove={() => setActiveClimax(null)} />
       )}
       {activeQuiz && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "#0a0a1a", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-          <div style={{ background: "#0f0f23", borderBottom: "1px solid rgba(255,255,255,0.08)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
-            <button onClick={() => setActiveQuiz(null)} style={{ background: "rgba(255,255,255,0.08)", border: "none", color: "#fff", width: 34, height: 34, borderRadius: "50%", cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>←</button>
+        <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "#f4f2ff", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <div style={{ background: "#f4f2ff", borderBottom: "1px solid #e5e7eb", padding: "14px 20px", display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
+            <button onClick={() => setActiveQuiz(null)} style={{ background: "#e5e7eb", border: "none", color: "#1e1b4b", width: 34, height: 34, borderRadius: "50%", cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>←</button>
             <p style={{ color: "#fbbf24", fontWeight: 700, fontSize: 15, margin: 0, flex: 1 }}>🎮 משחקון סיכום חודש</p>
             {!!data.completed?.[`quiz_${activeQuiz.monthId}`] && (
               <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, background: "rgba(16,185,129,0.2)", color: "#6ee7b7", border: "1px solid rgba(16,185,129,0.3)" }}>✓ הושלם</span>
@@ -367,12 +367,12 @@ function TasksView({ data, save, isParent }) {
             }
           </div>
           {!isParent && !data.completed?.[`quiz_${activeQuiz.monthId}`] && (
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "16px", background: "rgba(10,10,26,0.95)", backdropFilter: "blur(10px)", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "16px", background: "#ffffff", backdropFilter: "blur(10px)", borderTop: "1px solid #e9ecef" }}>
               <button onClick={() => {
                 const newCompleted = { ...(data.completed || {}), [`quiz_${activeQuiz.monthId}`]: true };
                 save({ ...data, completed: newCompleted });
                 setActiveQuiz(null);
-              }} style={{ width: "100%", padding: "14px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
+              }} style={{ width: "100%", padding: "14px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#1e1b4b", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
                 ✓ סיימתי את המשחקון
               </button>
             </div>
@@ -382,7 +382,7 @@ function TasksView({ data, save, isParent }) {
 
       {/* Overall progress */}
       <div style={{
-        background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.3)",
+        background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.3)",
         borderRadius: 20, padding: 24, marginBottom: 24, display: "flex", alignItems: "center", gap: 24
       }}>
         <div style={{ position: "relative", flexShrink: 0 }}>
@@ -391,15 +391,15 @@ function TasksView({ data, save, isParent }) {
             position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
             display: "flex", alignItems: "center", justifyContent: "center"
           }}>
-            <span style={{ color: "#fff", fontSize: 22, fontWeight: 700 }}>{overallPct}%</span>
+            <span style={{ color: "#1e1b4b", fontSize: 22, fontWeight: 700 }}>{overallPct}%</span>
           </div>
         </div>
         <div>
-          <p style={{ color: "rgba(255,255,255,0.6)", margin: "0 0 4px", fontSize: 14 }}>התקדמות כוללת</p>
-          <p style={{ color: "#fff", fontSize: 20, fontWeight: 700, margin: "0 0 4px" }}>
+          <p style={{ color: "#6b7280", margin: "0 0 4px", fontSize: 14 }}>התקדמות כוללת</p>
+          <p style={{ color: "#1e1b4b", fontSize: 20, fontWeight: 700, margin: "0 0 4px" }}>
             {totalDone} / {TOTAL_TASKS} משימות
           </p>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, margin: 0 }}>
+          <p style={{ color: "#6b7280", fontSize: 13, margin: 0 }}>
             {TOTAL_TASKS - totalDone} משימות נותרו במסע
           </p>
         </div>
@@ -418,9 +418,9 @@ function TasksView({ data, save, isParent }) {
         return (
           <div key={ch.id} style={{
             marginBottom: 16,
-            border: !chUnlocked ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(255,255,255,0.1)",
+            border: !chUnlocked ? "1px solid rgba(255,255,255,0.05)" : "1px solid #e5e7eb",
             borderRadius: 16, overflow: "hidden",
-            background: !chUnlocked ? "rgba(255,255,255,0.01)" : isOpen ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.02)",
+            background: !chUnlocked ? "rgba(255,255,255,0.01)" : isOpen ? "#ffffff" : "rgba(255,255,255,0.02)",
             opacity: !chUnlocked ? 0.5 : 1, transition: "opacity 0.3s"
           }}>
             {/* Chapter header */}
@@ -431,10 +431,10 @@ function TasksView({ data, save, isParent }) {
             }}>
               <span style={{ fontSize: 28 }}>{!chUnlocked ? "🔒" : ch.emoji}</span>
               <div style={{ flex: 1 }}>
-                <p style={{ color: !chUnlocked ? "rgba(255,255,255,0.4)" : "#fff", fontWeight: 600, margin: "0 0 2px", fontSize: 16 }}>
+                <p style={{ color: !chUnlocked ? "#9ca3af" : "#1e1b4b", fontWeight: 600, margin: "0 0 2px", fontSize: 16 }}>
                   {ch.title}
                 </p>
-                <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, margin: 0 }}>
+                <p style={{ color: "#9ca3af", fontSize: 12, margin: 0 }}>
                   {!chUnlocked
                     ? `נפתח לאחר אישור הורים על אירוע השיא של "${CHAPTERS[chIdx-1]?.title}"`
                     : ch.period}
@@ -445,10 +445,10 @@ function TasksView({ data, save, isParent }) {
                   <>
                     <div style={{ textAlign: "left" }}>
                       <span style={{ color: "#a855f7", fontWeight: 700, fontSize: 16 }}>{chPct}%</span>
-                      <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, margin: 0 }}>{chDone}/{chTasks.length}</p>
+                      <p style={{ color: "#9ca3af", fontSize: 11, margin: 0 }}>{chDone}/{chTasks.length}</p>
                     </div>
                     <span style={{
-                      color: "rgba(255,255,255,0.4)", fontSize: 18,
+                      color: "#9ca3af", fontSize: 18,
                       transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s"
                     }}>▾</span>
                   </>
@@ -459,8 +459,8 @@ function TasksView({ data, save, isParent }) {
             {isOpen && chUnlocked && (
               <div style={{ padding: "0 20px 20px" }}>
                 <p style={{
-                  color: "rgba(255,255,255,0.5)", fontSize: 13, margin: "0 0 16px",
-                  borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 16
+                  color: "#6b7280", fontSize: 13, margin: "0 0 16px",
+                  borderTop: "1px solid #e5e7eb", paddingTop: 16
                 }}>
                   {ch.question}
                 </p>
@@ -483,7 +483,7 @@ function TasksView({ data, save, isParent }) {
                         <p style={{ color: mUnlocked ? "#c4b5fd" : "rgba(255,255,255,0.3)", fontWeight: 600, fontSize: 14, margin: 0 }}>
                           {m.month} – {m.title}
                         </p>
-                        {!mUnlocked && <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>🔒 נפתח אחרי החודש הקודם</span>}
+                        {!mUnlocked && <span style={{ color: "#d1d5db", fontSize: 11 }}>🔒 נפתח אחרי החודש הקודם</span>}
                         {mDone && <span style={{ color: "#6ee7b7", fontSize: 11 }}>✓ הושלם</span>}
                       </div>
 
@@ -495,24 +495,24 @@ function TasksView({ data, save, isParent }) {
                             display: "flex", alignItems: "center", gap: 12, padding: "12px 14px",
                             borderRadius: 12, marginBottom: 6,
                             cursor: taskUnlocked ? "pointer" : "not-allowed",
-                            background: done ? "rgba(124,58,237,0.12)" : taskUnlocked ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.01)",
-                            border: done ? "1px solid rgba(124,58,237,0.25)" : "1px solid rgba(255,255,255,0.07)",
+                            background: done ? "rgba(124,58,237,0.1)" : taskUnlocked ? "#ffffff" : "rgba(255,255,255,0.01)",
+                            border: done ? "1px solid rgba(124,58,237,0.25)" : "1px solid #e9ecef",
                             transition: "all 0.2s"
                           }}>
                             <div style={{
                               width: 22, height: 22, borderRadius: 6, flexShrink: 0,
-                              border: done ? "none" : "1.5px solid rgba(255,255,255,0.2)",
+                              border: done ? "none" : "1.5px solid #d1d5db",
                               background: done ? "#7c3aed" : "transparent",
                               display: "flex", alignItems: "center", justifyContent: "center"
                             }}>
-                              {done && <span style={{ color: "#fff", fontSize: 13 }}>✓</span>}
+                              {done && <span style={{ color: "#1e1b4b", fontSize: 13 }}>✓</span>}
                             </div>
                             <span style={{
                               color: done ? "rgba(255,255,255,0.5)" : "#fff", fontSize: 14, flex: 1,
                               textDecoration: done ? "line-through" : "none"
                             }}>{task.text}</span>
                             {taskUnlocked && !done && (
-                              <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 18 }}>›</span>
+                              <span style={{ color: "#d1d5db", fontSize: 18 }}>›</span>
                             )}
                           </div>
                         );
@@ -530,14 +530,14 @@ function TasksView({ data, save, isParent }) {
                             display: "flex", alignItems: "center", gap: 12, padding: "12px 14px",
                             borderRadius: 12, marginBottom: 6,
                             cursor: quizUnlocked ? "pointer" : "not-allowed",
-                            background: quizDone ? "rgba(234,179,8,0.1)" : quizUnlocked ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.01)",
-                            border: quizDone ? "1px solid rgba(234,179,8,0.3)" : quizUnlocked ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(255,255,255,0.04)",
+                            background: quizDone ? "rgba(234,179,8,0.1)" : quizUnlocked ? "#ffffff" : "rgba(255,255,255,0.01)",
+                            border: quizDone ? "1px solid rgba(234,179,8,0.3)" : quizUnlocked ? "1px solid #e5e7eb" : "1px solid rgba(255,255,255,0.04)",
                             opacity: quizUnlocked || quizDone ? 1 : 0.4, transition: "all 0.2s"
                           }}>
                             <div style={{
                               width: 22, height: 22, borderRadius: 6, flexShrink: 0,
                               background: quizDone ? "#f59e0b" : "transparent",
-                              border: quizDone ? "none" : "1.5px solid rgba(255,255,255,0.2)",
+                              border: quizDone ? "none" : "1.5px solid #d1d5db",
                               display: "flex", alignItems: "center", justifyContent: "center"
                             }}>
                               {quizDone ? <span style={{ fontSize: 12 }}>✓</span> : <span style={{ fontSize: 13 }}>🎮</span>}
@@ -545,8 +545,8 @@ function TasksView({ data, save, isParent }) {
                             <span style={{ color: quizDone ? "rgba(255,255,255,0.5)" : "#fff", fontSize: 14, flex: 1, textDecoration: quizDone ? "line-through" : "none" }}>
                               משחקון סיכום חודש
                             </span>
-                            {!quizUnlocked && !quizDone && <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>🔒 לאחר כל המשימות</span>}
-                            {quizUnlocked && !quizDone && <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 18 }}>›</span>}
+                            {!quizUnlocked && !quizDone && <span style={{ color: "#d1d5db", fontSize: 11 }}>🔒 לאחר כל המשימות</span>}
+                            {quizUnlocked && !quizDone && <span style={{ color: "#d1d5db", fontSize: 18 }}>›</span>}
                           </div>
                         );
                       })()}
@@ -561,12 +561,12 @@ function TasksView({ data, save, isParent }) {
                     ? "rgba(16,185,129,0.1)"
                     : climaxUnlocked
                     ? "rgba(234,179,8,0.1)"
-                    : "rgba(255,255,255,0.03)",
+                    : "#fafafa",
                   border: climaxApproved
                     ? "1px solid rgba(16,185,129,0.3)"
                     : climaxUnlocked
                     ? "1px solid rgba(234,179,8,0.3)"
-                    : "1px solid rgba(255,255,255,0.06)",
+                    : "1px solid #f3f4f6",
                   cursor: (climaxUnlocked || isParent) ? "pointer" : "default",
                   opacity: !climaxUnlocked && !isParent ? 0.4 : 1,
                   display: "flex", alignItems: "center", gap: 12
@@ -578,11 +578,11 @@ function TasksView({ data, save, isParent }) {
                     <p style={{ color: climaxApproved ? "#6ee7b7" : climaxUnlocked ? "#fbbf24" : "rgba(255,255,255,0.4)", fontSize: 14, fontWeight: 600, margin: "0 0 2px" }}>
                       אירוע שיא
                     </p>
-                    <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, margin: 0 }}>
+                    <p style={{ color: "#6b7280", fontSize: 12, margin: 0 }}>
                       {climaxApproved ? "הושלם ואושר ✓" : climaxUnlocked ? ch.climax : "יפתח כשכל המשימות יושלמו"}
                     </p>
                   </div>
-                  {(climaxUnlocked || isParent) && <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 18 }}>›</span>}
+                  {(climaxUnlocked || isParent) && <span style={{ color: "#d1d5db", fontSize: 18 }}>›</span>}
                 </div>
               </div>
             )}
@@ -625,15 +625,15 @@ function JournalView({ data, save, isParent }) {
           placeholder={isParent ? "הוסיפו הערה או תצפית על עידו..." : "מה עבר עליך היום? מה למדת? מה הרגשת?"}
           style={{
             width: "100%", minHeight: 100, padding: "14px 16px", borderRadius: 14,
-            background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
-            color: "#fff", fontSize: 15, resize: "vertical", outline: "none",
+            background: "#f3f4f6", border: "1px solid #d1d5db",
+            color: "#1e1b4b", fontSize: 15, resize: "vertical", outline: "none",
             boxSizing: "border-box", fontFamily: "inherit", lineHeight: 1.6, direction: "rtl"
           }}
         />
         <button onClick={addEntry} style={{
           marginTop: 10, padding: "11px 24px", borderRadius: 12,
           background: "linear-gradient(135deg, #7c3aed, #a855f7)",
-          border: "none", color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer"
+          border: "none", color: "#1e1b4b", fontSize: 15, fontWeight: 600, cursor: "pointer"
         }}>
           הוסף כניסה
         </button>
@@ -644,9 +644,9 @@ function JournalView({ data, save, isParent }) {
           {[["all", "הכל"], ["ido", "של עידו"], ["parents", "שלנו"]].map(([k, l]) => (
             <button key={k} onClick={() => setFilter(k)} style={{
               padding: "7px 16px", borderRadius: 10, fontSize: 13, cursor: "pointer",
-              background: filter === k ? "rgba(124,58,237,0.3)" : "rgba(255,255,255,0.05)",
-              border: filter === k ? "1px solid rgba(124,58,237,0.5)" : "1px solid rgba(255,255,255,0.1)",
-              color: "#fff"
+              background: filter === k ? "rgba(124,58,237,0.15)" : "#f9fafb",
+              border: filter === k ? "1px solid rgba(124,58,237,0.5)" : "1px solid #e5e7eb",
+              color: "#1e1b4b"
             }}>{l}</button>
           ))}
         </div>
@@ -654,25 +654,25 @@ function JournalView({ data, save, isParent }) {
 
       <div>
         {displayed.length === 0 && (
-          <p style={{ color: "rgba(255,255,255,0.4)", textAlign: "center", padding: 40, fontSize: 15 }}>
+          <p style={{ color: "#9ca3af", textAlign: "center", padding: 40, fontSize: 15 }}>
             עדיין אין כניסות. התחל לכתוב!
           </p>
         )}
         {[...displayed].reverse().map(e => (
           <div key={e.id} style={{
             padding: "16px 20px", borderRadius: 14, marginBottom: 12,
-            background: e.author === "ההורים" ? "rgba(16,185,129,0.07)" : "rgba(124,58,237,0.07)",
+            background: e.author === "ההורים" ? "rgba(16,185,129,0.06)" : "rgba(124,58,237,0.06)",
             border: e.author === "ההורים" ? "1px solid rgba(16,185,129,0.2)" : "1px solid rgba(124,58,237,0.2)",
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
               <span style={{
                 fontSize: 12, padding: "3px 10px", borderRadius: 20,
-                background: e.author === "ההורים" ? "rgba(16,185,129,0.15)" : "rgba(124,58,237,0.15)",
+                background: e.author === "ההורים" ? "rgba(16,185,129,0.15)" : "rgba(124,58,237,0.12)",
                 color: e.author === "ההורים" ? "#6ee7b7" : "#c4b5fd"
               }}>{e.author}</span>
-              <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 12 }}>{e.date}</span>
+              <span style={{ color: "#9ca3af", fontSize: 12 }}>{e.date}</span>
             </div>
-            <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 15, margin: 0, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
+            <p style={{ color: "#374151", fontSize: 15, margin: 0, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
               {e.text}
             </p>
           </div>
@@ -695,7 +695,7 @@ function ProgressView({ data }) {
           return (
             <div key={ch.id} style={{
               padding: 20, borderRadius: 16,
-              background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)"
+              background: "#ffffff", border: "1px solid #e5e7eb"
             }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
                 <span style={{ fontSize: 28 }}>{ch.emoji}</span>
@@ -705,13 +705,13 @@ function ProgressView({ data }) {
                     position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
                     display: "flex", alignItems: "center", justifyContent: "center"
                   }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>{pct}%</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#1e1b4b" }}>{pct}%</span>
                   </div>
                 </div>
               </div>
-              <p style={{ color: "#fff", fontWeight: 600, fontSize: 13, margin: "0 0 4px" }}>{ch.title}</p>
-              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: 0 }}>{done}/{tasks.length} משימות</p>
-              <div style={{ marginTop: 12, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.08)" }}>
+              <p style={{ color: "#1e1b4b", fontWeight: 600, fontSize: 13, margin: "0 0 4px" }}>{ch.title}</p>
+              <p style={{ color: "#9ca3af", fontSize: 12, margin: 0 }}>{done}/{tasks.length} משימות</p>
+              <div style={{ marginTop: 12, height: 4, borderRadius: 2, background: "#e5e7eb" }}>
                 <div style={{
                   height: "100%", borderRadius: 2, background: colors[i],
                   width: `${pct}%`, transition: "width 0.6s ease"
@@ -724,22 +724,22 @@ function ProgressView({ data }) {
 
       <div style={{
         padding: 24, borderRadius: 16,
-        background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)"
+        background: "#fafafa", border: "1px solid #e5e7eb"
       }}>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, margin: "0 0 16px" }}>התקדמות כרונולוגית</p>
+        <p style={{ color: "#6b7280", fontSize: 13, margin: "0 0 16px" }}>התקדמות כרונולוגית</p>
         {CHAPTERS.flatMap(ch => ch.months).map(m => {
           const done = m.tasks.filter(t => data.completed[t.id]).length;
           const pct = Math.round((done / m.tasks.length) * 100);
           const color = done === m.tasks.length ? "#10b981" : done > 0 ? "#7c3aed" : "rgba(255,255,255,0.15)";
           return (
             <div key={m.id} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
-              <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, width: 100, flexShrink: 0, textAlign: "left" }}>
+              <span style={{ color: "#9ca3af", fontSize: 12, width: 100, flexShrink: 0, textAlign: "left" }}>
                 {m.month}
               </span>
-              <div style={{ flex: 1, height: 6, borderRadius: 3, background: "rgba(255,255,255,0.06)" }}>
+              <div style={{ flex: 1, height: 6, borderRadius: 3, background: "#f3f4f6" }}>
                 <div style={{ height: "100%", borderRadius: 3, background: color, width: `${pct}%`, transition: "width 0.6s ease" }} />
               </div>
-              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, width: 30, textAlign: "right" }}>
+              <span style={{ color: "#6b7280", fontSize: 12, width: 30, textAlign: "right" }}>
                 {done}/{m.tasks.length}
               </span>
             </div>
@@ -988,12 +988,12 @@ function ValuesView({ data, save }) {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-        <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 14, lineHeight: 1.7, margin: 0 }}>
+        <p style={{ color: "#6b7280", fontSize: 14, lineHeight: 1.7, margin: 0 }}>
           בחר עד 5 ערכים — לחץ על ערך לתיאור.
         </p>
         <button onClick={() => setGamePhase("game")} style={{
           padding: "7px 14px", borderRadius: 10, fontSize: 12, cursor: "pointer", flexShrink: 0,
-          background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.3)",
+          background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.3)",
           color: "#c4b5fd"
         }}>🏆 חזור למשחק</button>
       </div>
@@ -1011,11 +1011,11 @@ function ValuesView({ data, save }) {
             {selected.map(v => (
               <div key={v} style={{
                 display: "flex", alignItems: "center", gap: 8, padding: "6px 14px",
-                borderRadius: 30, background: "rgba(124,58,237,0.2)", border: "1px solid rgba(124,58,237,0.4)"
+                borderRadius: 30, background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.4)"
               }}>
                 <span style={{ color: "#e9d5ff", fontSize: 14, fontWeight: 500 }}>{v}</span>
                 <button onClick={() => toggleValue(v)} style={{
-                  background: "none", border: "none", color: "rgba(255,255,255,0.4)",
+                  background: "none", border: "none", color: "#9ca3af",
                   cursor: "pointer", fontSize: 16, lineHeight: 1, padding: 0
                 }}>×</button>
               </div>
@@ -1029,8 +1029,8 @@ function ValuesView({ data, save }) {
         placeholder="חפש ערך..."
         style={{
           width: "100%", padding: "10px 16px", borderRadius: 12, boxSizing: "border-box",
-          background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
-          color: "#fff", fontSize: 14, outline: "none", direction: "rtl", marginBottom: 16
+          background: "#f3f4f6", border: "1px solid #d1d5db",
+          color: "#1e1b4b", fontSize: 14, outline: "none", direction: "rtl", marginBottom: 16
         }}
       />
 
@@ -1046,8 +1046,8 @@ function ValuesView({ data, save }) {
                 onClick={() => setExpandedValue(isExpanded ? null : v.name)}
                 style={{
                   padding: "8px 14px", borderRadius: 10, fontSize: 14, cursor: isDisabled ? "not-allowed" : "pointer",
-                  background: isSelected ? "rgba(124,58,237,0.3)" : isExpanded ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.05)",
-                  border: isSelected ? "1px solid rgba(124,58,237,0.6)" : "1px solid rgba(255,255,255,0.1)",
+                  background: isSelected ? "rgba(124,58,237,0.15)" : isExpanded ? "#e5e7eb" : "#f9fafb",
+                  border: isSelected ? "1px solid rgba(124,58,237,0.6)" : "1px solid #e5e7eb",
                   color: isSelected ? "#e9d5ff" : isDisabled ? "rgba(255,255,255,0.25)" : "#fff",
                   transition: "all 0.15s"
                 }}
@@ -1060,11 +1060,11 @@ function ValuesView({ data, save }) {
                 <div style={{
                   position: "absolute", top: "calc(100% + 8px)", right: 0, zIndex: 50,
                   width: 240, padding: "14px 16px", borderRadius: 12,
-                  background: "#1a1a2e", border: "1px solid rgba(124,58,237,0.4)",
+                  background: "#ffffff", border: "1px solid rgba(124,58,237,0.4)",
                   boxShadow: "0 8px 32px rgba(0,0,0,0.6)"
                 }}>
                   <p style={{ color: "#c4b5fd", fontWeight: 600, margin: "0 0 6px", fontSize: 14 }}>{v.name}</p>
-                  <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, margin: "0 0 12px", lineHeight: 1.6 }}>{v.desc}</p>
+                  <p style={{ color: "#4b5563", fontSize: 13, margin: "0 0 12px", lineHeight: 1.6 }}>{v.desc}</p>
                   <div style={{ display: "flex", gap: 8 }}>
                     <button onClick={() => { toggleValue(v.name); setExpandedValue(null); }} style={{
                       flex: 1, padding: "8px", borderRadius: 8, fontSize: 13, cursor: isDisabled && !isSelected ? "not-allowed" : "pointer",
@@ -1076,8 +1076,8 @@ function ValuesView({ data, save }) {
                     </button>
                     <button onClick={() => setExpandedValue(null)} style={{
                       padding: "8px 12px", borderRadius: 8, fontSize: 13,
-                      background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-                      color: "rgba(255,255,255,0.5)", cursor: "pointer"
+                      background: "#f9fafb", border: "1px solid #e5e7eb",
+                      color: "#6b7280", cursor: "pointer"
                     }}>סגור</button>
                   </div>
                 </div>
@@ -1103,32 +1103,32 @@ function ManifestoView() {
     <div>
       <div style={{
         padding: 28, borderRadius: 20, marginBottom: 24,
-        background: "linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(168,85,247,0.05) 100%)",
+        background: "linear-gradient(135deg, rgba(124,58,237,0.08) 0%, rgba(168,85,247,0.03) 100%)",
         border: "1px solid rgba(124,58,237,0.3)"
       }}>
         <h2 style={{ color: "#c4b5fd", fontSize: 20, fontWeight: 700, margin: "0 0 8px" }}>טקס פתיחה</h2>
-        <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 14, lineHeight: 1.8, margin: 0 }}>
+        <p style={{ color: "#4b5563", fontSize: 14, lineHeight: 1.8, margin: 0 }}>
           היום אנחנו מתחילים במסע משותף. זה לא מסע דתי או מסורתי, אלא מסע של התבגרות. מסע שבו אתה מתחיל להוביל את החיים שלך בצעד ראשון.
         </p>
-        <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 14, lineHeight: 1.8, margin: "12px 0 0" }}>
+        <p style={{ color: "#6b7280", fontSize: 14, lineHeight: 1.8, margin: "12px 0 0" }}>
           יש בך המון שכל, רגישות, מחשבה, כח, לב גדול ואכפתיות עצומה. השנה הזו נועדה לעזור לך להכיר את עצמך טוב יותר, להעז יותר, לקחת אחריות אמיתית.
         </p>
       </div>
 
-      <h3 style={{ color: "#fff", fontSize: 17, fontWeight: 600, margin: "0 0 16px" }}>אמנת התבגרות המשפחתית</h3>
+      <h3 style={{ color: "#1e1b4b", fontSize: 17, fontWeight: 600, margin: "0 0 16px" }}>אמנת התבגרות המשפחתית</h3>
       {commitments.map((c, i) => (
         <div key={i} style={{
           display: "flex", alignItems: "flex-start", gap: 14, padding: "14px 16px",
           marginBottom: 10, borderRadius: 12,
-          background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)"
+          background: "#ffffff", border: "1px solid #e5e7eb"
         }}>
           <div style={{
             width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
-            background: "rgba(124,58,237,0.2)", border: "1px solid rgba(124,58,237,0.4)",
+            background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.4)",
             display: "flex", alignItems: "center", justifyContent: "center",
             color: "#c4b5fd", fontSize: 13, fontWeight: 700
           }}>{i + 1}</div>
-          <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 15, margin: 0, lineHeight: 1.6 }}>{c}</p>
+          <p style={{ color: "#374151", fontSize: 15, margin: 0, lineHeight: 1.6 }}>{c}</p>
         </div>
       ))}
 
@@ -1137,7 +1137,7 @@ function ManifestoView() {
         background: "rgba(16,185,129,0.07)", border: "1px solid rgba(16,185,129,0.2)"
       }}>
         <p style={{ color: "#6ee7b7", fontWeight: 600, margin: "0 0 6px" }}>הבטחה מאיתנו</p>
-        <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 14, margin: 0, lineHeight: 1.7 }}>
+        <p style={{ color: "#4b5563", fontSize: 14, margin: 0, lineHeight: 1.7 }}>
           אנחנו מתחייבות להיות לצידך במסע הזה. לא להוביל במקומך, לא לפתור עבורך, לא להחליט — אלא לצעוד לצידך, לשאול, להקשיב, לאתגר כשצריך ולתמוך תמיד.
         </p>
       </div>
@@ -1267,8 +1267,8 @@ function HeroCard({ hero, isSelected, isDisabled, onExpand, isExpanded, onToggle
   return (
     <div style={{
       borderRadius: 16, overflow: "visible", position: "relative",
-      border: isSelected ? "2px solid #7c3aed" : "1px solid rgba(255,255,255,0.08)",
-      background: isSelected ? "rgba(124,58,237,0.12)" : "rgba(255,255,255,0.03)",
+      border: isSelected ? "2px solid #7c3aed" : "1px solid #e5e7eb",
+      background: isSelected ? "rgba(124,58,237,0.1)" : "#fafafa",
       opacity: isDisabled ? 0.4 : 1, transition: "all 0.2s"
     }}>
       <button onClick={() => onExpand(isExpanded ? null : hero.id)} style={{
@@ -1286,7 +1286,7 @@ function HeroCard({ hero, isSelected, isDisabled, onExpand, isExpanded, onToggle
           ) : (
             <div style={{
               width: 80, height: 80, borderRadius: "50%",
-              background: "rgba(124,58,237,0.2)", border: "2px solid rgba(124,58,237,0.3)",
+              background: "rgba(124,58,237,0.1)", border: "2px solid rgba(124,58,237,0.3)",
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: 28
             }}>
@@ -1298,13 +1298,13 @@ function HeroCard({ hero, isSelected, isDisabled, onExpand, isExpanded, onToggle
               position: "absolute", bottom: 0, right: 0,
               width: 24, height: 24, borderRadius: "50%",
               background: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 13, color: "#fff", border: "2px solid #0a0a1a"
+              fontSize: 13, color: "#1e1b4b", border: "2px solid #0a0a1a"
             }}>✓</div>
           )}
         </div>
         <div style={{ textAlign: "center" }}>
-          <p style={{ color: "#fff", fontWeight: 600, fontSize: 13, margin: "0 0 2px" }}>{hero.name}</p>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, margin: 0, lineHeight: 1.4 }}>{hero.title}</p>
+          <p style={{ color: "#1e1b4b", fontWeight: 600, fontSize: 13, margin: "0 0 2px" }}>{hero.name}</p>
+          <p style={{ color: "#9ca3af", fontSize: 10, margin: 0, lineHeight: 1.4 }}>{hero.title}</p>
         </div>
       </button>
 
@@ -1313,7 +1313,7 @@ function HeroCard({ hero, isSelected, isDisabled, onExpand, isExpanded, onToggle
           position: "absolute", top: "calc(100% + 8px)",
           right: 0, left: 0, zIndex: 200,
           padding: "16px", borderRadius: 14,
-          background: "#13132a", border: "1px solid rgba(124,58,237,0.5)",
+          background: "#ffffff", border: "1px solid rgba(124,58,237,0.5)",
           boxShadow: "0 12px 40px rgba(0,0,0,0.8)"
         }}>
           {imgUrl && (
@@ -1324,12 +1324,12 @@ function HeroCard({ hero, isSelected, isDisabled, onExpand, isExpanded, onToggle
             }} />
           )}
           <p style={{ color: "#c4b5fd", fontWeight: 700, fontSize: 14, margin: "0 0 6px" }}>{hero.name}</p>
-          <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, margin: "0 0 10px", lineHeight: 1.6, clear: "both" }}>{hero.bio}</p>
+          <p style={{ color: "#4b5563", fontSize: 12, margin: "0 0 10px", lineHeight: 1.6, clear: "both" }}>{hero.bio}</p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 12 }}>
             {hero.values.slice(0, 4).map(v => (
               <span key={v} style={{
                 padding: "3px 10px", borderRadius: 20, fontSize: 11,
-                background: "rgba(124,58,237,0.2)", color: "#c4b5fd",
+                background: "rgba(124,58,237,0.1)", color: "#c4b5fd",
                 border: "1px solid rgba(124,58,237,0.3)"
               }}>{v}</span>
             ))}
@@ -1347,8 +1347,8 @@ function HeroCard({ hero, isSelected, isDisabled, onExpand, isExpanded, onToggle
             )}
             <button onClick={onClose} style={{
               padding: "8px 12px", borderRadius: 8, fontSize: 12,
-              background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-              color: "rgba(255,255,255,0.5)", cursor: "pointer"
+              background: "#f9fafb", border: "1px solid #e5e7eb",
+              color: "#6b7280", cursor: "pointer"
             }}>סגור</button>
           </div>
         </div>
@@ -1389,8 +1389,8 @@ function HeroGame({ onFinish }) {
       <div>
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <div style={{ fontSize: 48, marginBottom: 8 }}>🔍</div>
-          <h2 style={{ color: "#fff", fontSize: 20, fontWeight: 700, margin: "0 0 8px" }}>הצוות שלך מגלה משהו</h2>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0 }}>
+          <h2 style={{ color: "#1e1b4b", fontSize: 20, fontWeight: 700, margin: "0 0 8px" }}>הצוות שלך מגלה משהו</h2>
+          <p style={{ color: "#6b7280", fontSize: 14, margin: 0 }}>
             בחרת ב{pickedHeroes.map(h => h.name).join(", ")}
           </p>
         </div>
@@ -1403,7 +1403,7 @@ function HeroGame({ onFinish }) {
 
         <div style={{
           padding: 20, borderRadius: 16, marginBottom: 20,
-          background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.3)"
+          background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.3)"
         }}>
           <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 15, margin: "0 0 14px" }}>
             הערכים שמאפיינים את הצוות שלך:
@@ -1412,8 +1412,8 @@ function HeroGame({ onFinish }) {
             {topValues.map((v, i) => (
               <div key={v} style={{
                 padding: "8px 16px", borderRadius: 30, fontSize: 14, fontWeight: 500,
-                background: i < 3 ? "rgba(124,58,237,0.35)" : "rgba(255,255,255,0.07)",
-                border: i < 3 ? "1px solid rgba(124,58,237,0.6)" : "1px solid rgba(255,255,255,0.1)",
+                background: i < 3 ? "rgba(124,58,237,0.2)" : "#f3f4f6",
+                border: i < 3 ? "1px solid rgba(124,58,237,0.6)" : "1px solid #e5e7eb",
                 color: i < 3 ? "#e9d5ff" : "rgba(255,255,255,0.6)"
               }}>
                 {i < 3 && <span style={{ marginLeft: 6 }}>⭐</span>}
@@ -1435,15 +1435,15 @@ function HeroGame({ onFinish }) {
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => { setSelected([]); setPhase("pick"); }} style={{
             flex: 1, padding: "12px", borderRadius: 12,
-            background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
-            color: "rgba(255,255,255,0.7)", fontSize: 15, cursor: "pointer"
+            background: "#f3f4f6", border: "1px solid #e5e7eb",
+            color: "#4b5563", fontSize: 15, cursor: "pointer"
           }}>
             🔄 שחק שוב
           </button>
           <button onClick={() => onFinish(topValues, selected)} style={{
             flex: 2, padding: "12px", borderRadius: 12,
             background: "linear-gradient(135deg, #7c3aed, #a855f7)",
-            border: "none", color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer"
+            border: "none", color: "#1e1b4b", fontSize: 15, fontWeight: 600, cursor: "pointer"
           }}>
             בחר את 5 הערכים שלי ←
           </button>
@@ -1456,8 +1456,8 @@ function HeroGame({ onFinish }) {
     <div>
       <div style={{ textAlign: "center", marginBottom: 24 }}>
         <div style={{ fontSize: 40, marginBottom: 8 }}>🏆</div>
-        <h2 style={{ color: "#fff", fontSize: 20, fontWeight: 700, margin: "0 0 6px" }}>בנה את הצוות שלך</h2>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: "0 0 4px" }}>
+        <h2 style={{ color: "#1e1b4b", fontSize: 20, fontWeight: 700, margin: "0 0 6px" }}>בנה את הצוות שלך</h2>
+        <p style={{ color: "#6b7280", fontSize: 14, margin: "0 0 4px" }}>
           בחר 3 דמויות שהיית רוצה שיהיו לצידך במסע הזה
         </p>
         <p style={{ color: selected.length === 3 ? "#a855f7" : "rgba(255,255,255,0.35)", fontSize: 13, fontWeight: 600 }}>
@@ -1484,7 +1484,7 @@ function HeroGame({ onFinish }) {
         <button onClick={() => setPhase("result")} style={{
           width: "100%", padding: "14px", borderRadius: 14,
           background: "linear-gradient(135deg, #7c3aed, #a855f7)",
-          border: "none", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer"
+          border: "none", color: "#1e1b4b", fontSize: 16, fontWeight: 700, cursor: "pointer"
         }}>
           גלה מה הצוות שלך אומר עליך ←
         </button>
@@ -1505,7 +1505,7 @@ function HeroAvatar({ hero, size = 64 }) {
     <div style={{ textAlign: "center" }}>
       {imgUrl
         ? <img src={imgUrl} alt={hero.name} style={{ width: size, height: size, borderRadius: "50%", objectFit: "cover", objectPosition: "top", border: "2px solid #7c3aed" }} />
-        : <div style={{ width: size, height: size, borderRadius: "50%", background: "rgba(124,58,237,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, border: "2px solid #7c3aed" }}>{hero.name[0]}</div>
+        : <div style={{ width: size, height: size, borderRadius: "50%", background: "rgba(124,58,237,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, border: "2px solid #7c3aed" }}>{hero.name[0]}</div>
       }
       <p style={{ color: "#c4b5fd", fontSize: 11, margin: "6px 0 0" }}>{hero.name.split(" ")[0]}</p>
     </div>
@@ -1559,8 +1559,8 @@ function ValuesMapView({ data, save }) {
     return (
       <div style={{ textAlign: "center", padding: "60px 20px" }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>🗺️</div>
-        <p style={{ color: "#fff", fontSize: 18, fontWeight: 600, margin: "0 0 8px" }}>מפת הערכים ריקה עדיין</p>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0 }}>
+        <p style={{ color: "#1e1b4b", fontSize: 18, fontWeight: 600, margin: "0 0 8px" }}>מפת הערכים ריקה עדיין</p>
+        <p style={{ color: "#6b7280", fontSize: 14, margin: 0 }}>
           שחק את משחק הדמויות כדי ליצור את הצילום הראשון שלך
         </p>
       </div>
@@ -1570,7 +1570,7 @@ function ValuesMapView({ data, save }) {
   return (
     <div>
       <div style={{ marginBottom: 20 }}>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, margin: "0 0 12px" }}>
+        <p style={{ color: "#6b7280", fontSize: 13, margin: "0 0 12px" }}>
           בחר צילומים להשוואה:
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -1582,19 +1582,19 @@ function ValuesMapView({ data, save }) {
               <div key={snap.id} style={{ position: "relative" }}>
                 <button onClick={() => toggleSnapshot(snap.id)} style={{
                   padding: "8px 14px", borderRadius: 10, fontSize: 12, cursor: "pointer",
-                  background: isSel ? `${color}25` : "rgba(255,255,255,0.04)",
-                  border: isSel ? `1.5px solid ${color}` : "1px solid rgba(255,255,255,0.1)",
+                  background: isSel ? `${color}25` : "#ffffff",
+                  border: isSel ? `1.5px solid ${color}` : "1px solid #e5e7eb",
                   color: isSel ? "#fff" : "rgba(255,255,255,0.5)",
                   display: "flex", alignItems: "center", gap: 8
                 }}>
                   <span style={{ width: 10, height: 10, borderRadius: "50%", background: color, display: "inline-block", flexShrink: 0 }} />
                   <span>{snap.date}</span>
-                  {heroes.length > 0 && <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 10 }}>({heroes.join(", ")})</span>}
+                  {heroes.length > 0 && <span style={{ color: "#9ca3af", fontSize: 10 }}>({heroes.join(", ")})</span>}
                 </button>
                 <button onClick={() => deleteSnapshot(snap.id)} style={{
                   position: "absolute", top: -6, left: -6, width: 18, height: 18,
                   borderRadius: "50%", background: "rgba(239,68,68,0.8)", border: "none",
-                  color: "#fff", fontSize: 10, cursor: "pointer", display: "flex",
+                  color: "#1e1b4b", fontSize: 10, cursor: "pointer", display: "flex",
                   alignItems: "center", justifyContent: "center", lineHeight: 1, zIndex: 10
                 }}>×</button>
               </div>
@@ -1625,14 +1625,14 @@ function ValuesMapView({ data, save }) {
       {/* Value map grid */}
       {visibleSnapshots.length > 0 && (
         <div>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: "0 0 12px" }}>
+          <p style={{ color: "#9ca3af", fontSize: 12, margin: "0 0 12px" }}>
             ⬛ לא הופיע &nbsp; 🟦 הוצע &nbsp; ⭐ הוצע בחוזקה &nbsp; 💛 נבחר
           </p>
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", direction: "rtl" }}>
               <thead>
                 <tr>
-                  <th style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, padding: "6px 8px", textAlign: "right", minWidth: 90 }}>ערך</th>
+                  <th style={{ color: "#9ca3af", fontSize: 12, fontWeight: 500, padding: "6px 8px", textAlign: "right", minWidth: 90 }}>ערך</th>
                   {visibleSnapshots.map((snap, i) => {
                     const color = SNAPSHOT_COLORS[snapshots.indexOf(snap) % SNAPSHOT_COLORS.length];
                     return (
@@ -1687,8 +1687,8 @@ function ValuesMapView({ data, save }) {
 
       {/* Timeline visual */}
       {snapshots.length > 1 && (
-        <div style={{ marginTop: 28, padding: 20, borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, margin: "0 0 16px", fontWeight: 600 }}>ציר זמן — שינויים בערכים</p>
+        <div style={{ marginTop: 28, padding: 20, borderRadius: 16, background: "#fafafa", border: "1px solid #e9ecef" }}>
+          <p style={{ color: "#6b7280", fontSize: 13, margin: "0 0 16px", fontWeight: 600 }}>ציר זמן — שינויים בערכים</p>
           {allValues.filter(v => {
             const scores = snapshots.map(s => getValueScore(s.id, v));
             return scores.some(s => s > 0);
@@ -1711,11 +1711,11 @@ function ValuesMapView({ data, save }) {
                     <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
                       <div style={{
                         width: 32, height: s.score === 0 ? 6 : s.score === 1 ? 14 : s.score === 2 ? 22 : 30,
-                        borderRadius: 4, background: s.score === 0 ? "rgba(255,255,255,0.06)" : s.color,
+                        borderRadius: 4, background: s.score === 0 ? "#f3f4f6" : s.color,
                         opacity: s.score === 0 ? 1 : 0.6 + s.score * 0.13,
                         transition: "height 0.4s ease"
                       }} />
-                      <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 9 }}>{s.date.split("/").slice(0, 2).join("/")}</span>
+                      <span style={{ color: "#d1d5db", fontSize: 9 }}>{s.date.split("/").slice(0, 2).join("/")}</span>
                     </div>
                   ))}
                 </div>
@@ -1745,7 +1745,7 @@ const NAV_PARENT = [
 ];
 
 export default function App() {
-  const [role, setRole] = useState("kid"); // "kid" | "parent"
+  const [role, setRole] = useState("kid");
   const session = role === "kid"
     ? { key: "ido", name: "עידו", role: "kid" }
     : { key: "parents", name: "ההורים", role: "parent" };
@@ -1754,8 +1754,11 @@ export default function App() {
 
   if (!data) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#0f0f23" }}>
-        <div style={{ width: 40, height: 40, borderRadius: "50%", border: "3px solid #7c3aed", borderTopColor: "transparent", animation: "spin 0.8s linear infinite" }} />
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f4f2ff" }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ width: 44, height: 44, borderRadius: "50%", border: "3px solid #7c3aed", borderTopColor: "transparent", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
+          <p style={{ color: "#7c3aed", fontSize: 14 }}>טוען...</p>
+        </div>
         <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
       </div>
     );
@@ -1767,60 +1770,74 @@ export default function App() {
   const overallPct = Math.round((totalDone / TOTAL_TASKS) * 100);
 
   return (
-    <div style={{
-      minHeight: "100vh", background: "#0a0a1a",
-      fontFamily: "'Segoe UI', Tahoma, sans-serif", direction: "rtl", color: "#fff"
-    }}>
-      <div style={{
-        background: "rgba(10,10,26,0.95)", borderBottom: "1px solid rgba(255,255,255,0.07)",
-        padding: "14px 20px", display: "flex", alignItems: "center", justifyContent: "space-between",
-        position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(10px)"
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 22 }}>🧭</span>
-          <div>
-            <p style={{ color: "#fff", fontWeight: 700, margin: 0, fontSize: 15 }}>שנת בר מצווה – עידו</p>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, margin: 0 }}>{overallPct}% מהמסע הושלם</p>
-          </div>
-        </div>
-        <button onClick={() => { setRole(r => r === "kid" ? "parent" : "kid"); setTab("tasks"); }} style={{
-          background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
-          color: "rgba(255,255,255,0.6)", padding: "7px 14px", borderRadius: 10,
-          cursor: "pointer", fontSize: 13
-        }}>
-          {role === "kid" ? "👩‍👩‍👦 הורים" : "👦 עידו"}
-        </button>
-      </div>
+    <div style={{ minHeight: "100vh", background: "#f4f2ff", fontFamily: "'Segoe UI', Tahoma, sans-serif", direction: "rtl" }}>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg) } }
+        * { box-sizing: border-box; }
+        button { font-family: 'Segoe UI', Tahoma, sans-serif; }
+        textarea, input, select { font-family: 'Segoe UI', Tahoma, sans-serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f4f2ff; }
+        ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 3px; }
+      `}</style>
 
-      <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 16px 100px" }}>
+      {/* Top Navigation */}
+      <header style={{
+        background: "#ffffff", borderBottom: "1px solid #e5e7eb",
+        position: "sticky", top: 0, zIndex: 100,
+        boxShadow: "0 1px 8px rgba(124,58,237,0.08)"
+      }}>
+        {/* Progress bar */}
+        <div style={{ height: 3, background: "#f3f4f6" }}>
+          <div style={{ height: "100%", background: "linear-gradient(90deg, #7c3aed, #a855f7)", width: `${overallPct}%`, transition: "width 0.6s ease" }} />
+        </div>
+
+        <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 20px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 60 }}>
+          {/* Logo */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #7c3aed, #a855f7)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🧭</div>
+            <div>
+              <p style={{ color: "#1e1b4b", fontWeight: 700, margin: 0, fontSize: 14, lineHeight: 1.2 }}>שנת בר מצווה</p>
+              <p style={{ color: "#9ca3af", fontSize: 11, margin: 0 }}>{overallPct}% הושלם</p>
+            </div>
+          </div>
+
+          {/* Nav tabs */}
+          <nav style={{ display: "flex", gap: 2 }}>
+            {nav.map(n => (
+              <button key={n.id} onClick={() => setTab(n.id)} style={{
+                padding: "8px 14px", borderRadius: 8, fontSize: 13, cursor: "pointer",
+                background: tab === n.id ? "rgba(124,58,237,0.1)" : "transparent",
+                border: "none",
+                color: tab === n.id ? "#7c3aed" : "#6b7280",
+                fontWeight: tab === n.id ? 600 : 400,
+                display: "flex", alignItems: "center", gap: 6, transition: "all 0.15s"
+              }}>
+                <span style={{ fontSize: 15 }}>{n.icon}</span>
+                <span>{n.label}</span>
+              </button>
+            ))}
+          </nav>
+
+          {/* Role switcher */}
+          <button onClick={() => { setRole(r => r === "kid" ? "parent" : "kid"); setTab("tasks"); }} style={{
+            padding: "7px 14px", borderRadius: 20, fontSize: 12, cursor: "pointer",
+            background: "rgba(124,58,237,0.08)", border: "1.5px solid rgba(124,58,237,0.2)",
+            color: "#7c3aed", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, flexShrink: 0
+          }}>
+            {role === "kid" ? "👩‍👩‍👦 הורים" : "👦 עידו"}
+          </button>
+        </div>
+      </header>
+
+      {/* Page content */}
+      <main style={{ maxWidth: 900, margin: "0 auto", padding: "28px 20px 60px" }}>
         {tab === "tasks" && <TasksView data={data} save={save} isParent={isParent} />}
         {tab === "progress" && <ProgressView data={data} />}
         {tab === "journal" && <JournalView data={data} save={save} isParent={isParent} />}
-        {tab === "values" && !isParent && <ValuesView data={data} save={save} />}
         {tab === "map" && <ValuesMapView data={data} save={save} />}
         {tab === "manifesto" && <ManifestoView />}
-      </div>
-
-      <div style={{
-        position: "fixed", bottom: 0, left: 0, right: 0,
-        background: "rgba(10,10,26,0.95)", backdropFilter: "blur(10px)",
-        borderTop: "1px solid rgba(255,255,255,0.07)",
-        display: "flex", justifyContent: "center", padding: "10px 16px 20px", gap: 4
-      }}>
-        {nav.map(n => (
-          <button key={n.id} onClick={() => setTab(n.id)} style={{
-            flex: 1, maxWidth: 100, padding: "10px 8px", borderRadius: 12,
-            background: tab === n.id ? "rgba(124,58,237,0.2)" : "transparent",
-            border: tab === n.id ? "1px solid rgba(124,58,237,0.4)" : "1px solid transparent",
-            color: tab === n.id ? "#c4b5fd" : "rgba(255,255,255,0.4)",
-            cursor: "pointer", display: "flex", flexDirection: "column",
-            alignItems: "center", gap: 4, transition: "all 0.2s"
-          }}>
-            <span style={{ fontSize: 18 }}>{n.icon}</span>
-            <span style={{ fontSize: 11 }}>{n.label}</span>
-          </button>
-        ))}
-      </div>
+      </main>
     </div>
   );
 }
