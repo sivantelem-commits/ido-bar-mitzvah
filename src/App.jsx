@@ -297,18 +297,29 @@ function TasksView({ data, save, isParent }) {
   const totalDone = ALL_TASKS.filter(t => data.completed[t.id]).length;
   const overallPct = Math.round((totalDone / TOTAL_TASKS) * 100);
 
-  // A month is unlocked when all tasks in all previous months (across all chapters) are done
+  // A month is unlocked when all tasks in all previous months are done
   function isMonthUnlocked(chapterIdx, monthIdx) {
-    return true; // TODO: restore locking after review
+    if (isParent) return true;
+    for (let ci = 0; ci <= chapterIdx; ci++) {
+      const ch = CHAPTERS[ci];
+      const mEnd = ci === chapterIdx ? monthIdx : ch.months.length;
+      for (let mi = 0; mi < mEnd; mi++) {
+        if (!ch.months[mi].tasks.every(t => data.completed[t.id])) return false;
+      }
+    }
+    return true;
   }
 
-  // Climax unlocked when all tasks in a chapter are done
   function isClimaxUnlocked(ch) {
-    return true; // TODO: restore locking after review
+    if (isParent) return true;
+    return ch.months.flatMap(m => m.tasks).every(t => data.completed[t.id]);
   }
 
   function isChapterUnlocked(chIdx) {
-    return true; // TODO: restore locking after review
+    if (isParent) return true;
+    if (chIdx === 0) return true;
+    const prevCh = CHAPTERS[chIdx - 1];
+    return !!(data.climaxData || {})[prevCh.id]?.parentApproved;
   }
 
   return (
@@ -1729,72 +1740,347 @@ function ValuesMapView({ data, save }) {
   );
 }
 
-const NAV_IDO = [
-  { id: "tasks", label: "משימות", icon: "✓" },
-  { id: "progress", label: "התקדמות", icon: "📊" },
-  { id: "journal", label: "יומן", icon: "📝" },
-  { id: "map", label: "מפה", icon: "🗺️" },
-  { id: "manifesto", label: "המסע", icon: "🧭" },
-];
 
+// ─── Confetti ─────────────────────────────────────────────────────────────────
+function Confetti({ onDone }) {
+  useEffect(() => { const t = setTimeout(onDone, 3000); return () => clearTimeout(t); }, []);
+  const pieces = Array.from({ length: 40 }, (_, i) => ({
+    left: `${Math.random() * 100}%`,
+    delay: `${Math.random() * 1}s`,
+    color: ["#7c3aed","#a855f7","#f59e0b","#10b981","#3b82f6","#ec4899"][i % 6],
+    size: 6 + Math.random() * 8,
+    duration: `${2 + Math.random() * 1.5}s`,
+  }));
+  return (
+    <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 9999, overflow: "hidden" }}>
+      <style>{`@keyframes confettiFall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }`}</style>
+      {pieces.map((p, i) => (
+        <div key={i} style={{ position: "absolute", top: 0, left: p.left, width: p.size, height: p.size, borderRadius: "2px", background: p.color, animation: `confettiFall ${p.duration} ${p.delay} ease-in forwards` }} />
+      ))}
+    </div>
+  );
+}
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+function Toast({ message, onDone }) {
+  useEffect(() => { const t = setTimeout(onDone, 2500); return () => clearTimeout(t); }, []);
+  return (
+    <div style={{ position: "fixed", bottom: 80, left: "50%", transform: "translateX(-50%)", background: "#1e1b4b", color: "#fff", padding: "12px 24px", borderRadius: 30, fontSize: 14, fontWeight: 600, zIndex: 500, boxShadow: "0 4px 20px rgba(124,58,237,0.3)", display: "flex", alignItems: "center", gap: 10, whiteSpace: "nowrap", animation: "toastIn 0.3s ease" }}>
+      <span style={{ fontSize: 20 }}>✨</span>{message}
+      <style>{`@keyframes toastIn { from { opacity:0; transform: translateX(-50%) translateY(20px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }`}</style>
+    </div>
+  );
+}
+
+// ─── PIN Modal ────────────────────────────────────────────────────────────────
+const PARENT_PIN = "2027";
+function PinModal({ onSuccess, onCancel }) {
+  const [pin, setPin] = useState("");
+  const [error, setError] = useState(false);
+  function tryPin(p) {
+    if (p === PARENT_PIN) { onSuccess(); }
+    else if (p.length === 4) { setError(true); setTimeout(() => { setError(false); setPin(""); }, 1000); }
+  }
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ background: "#fff", borderRadius: 24, padding: "36px 32px", width: 320, textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.15)" }}>
+        <p style={{ fontSize: 40, margin: "0 0 8px" }}>👩‍👩‍👦</p>
+        <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 18, margin: "0 0 6px" }}>כניסת הורים</p>
+        <p style={{ color: "#9ca3af", fontSize: 13, margin: "0 0 24px" }}>הזינו את קוד הגישה</p>
+        <div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 20 }}>
+          {[0,1,2,3].map(i => <div key={i} style={{ width: 14, height: 14, borderRadius: "50%", background: pin.length > i ? "#7c3aed" : "#e5e7eb", transition: "background 0.2s" }} />)}
+        </div>
+        {error && <p style={{ color: "#ef4444", fontSize: 13, margin: "0 0 12px" }}>קוד שגוי</p>}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 16 }}>
+          {[1,2,3,4,5,6,7,8,9,"",0,"⌫"].map((k, i) => (
+            <button key={i} onClick={() => {
+              if (k === "⌫") { setPin(p => p.slice(0,-1)); }
+              else if (k !== "" && pin.length < 4) { const np = pin + k; setPin(np); tryPin(np); }
+            }} style={{ height: 52, borderRadius: 12, fontSize: k === "⌫" ? 20 : 22, fontWeight: 600, background: k === "" ? "transparent" : "#f9fafb", border: k === "" ? "none" : "1.5px solid #e5e7eb", color: "#1e1b4b", cursor: k === "" ? "default" : "pointer" }}>{k}</button>
+          ))}
+        </div>
+        <button onClick={onCancel} style={{ color: "#9ca3af", fontSize: 13, background: "none", border: "none", cursor: "pointer" }}>ביטול</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Dashboard ────────────────────────────────────────────────────────────────
+function DashboardView({ data, isParent, onNavigate }) {
+  const totalDone = ALL_TASKS.filter(t => data.completed[t.id]).length;
+  const overallPct = Math.round((totalDone / TOTAL_TASKS) * 100);
+  const currentChapter = CHAPTERS.find(ch => ch.months.flatMap(m => m.tasks).some(t => !data.completed[t.id])) || CHAPTERS[CHAPTERS.length - 1];
+  const currentMonth = currentChapter?.months.find(m => m.tasks.some(t => !data.completed[t.id])) || currentChapter?.months[currentChapter.months.length - 1];
+  const monthDone = currentMonth?.tasks.filter(t => data.completed[t.id]).length || 0;
+  const monthTotal = currentMonth?.tasks.length || 0;
+  const nextTask = currentMonth?.tasks.find(t => !data.completed[t.id]);
+  const wisdoms = ["כוח אמיתי הוא לא להפסיק אחרי כישלון אחד.", "מה שעושים כשאף אחד לא מסתכל — זה מי שאתה.", "האנשים שהכי משפיעים הם אלה שמקשיבים הכי טוב.", "כל יום הוא הזדמנות להיות קצת יותר טוב מאתמול.", "תחייב את עצמך לדברים שמפחידים אותך — שם הצמיחה.", "אחריות לא אומרת שלא טועים — אומרת שמודים ומתקנים.", "שנה של מאמץ שווה יותר מעשר שנות כוונות טובות."];
+  const todayWisdom = wisdoms[new Date().getDay()];
+  const recentEntries = [...(data.journal || [])].reverse().slice(0, 2);
+  return (
+    <div>
+      <div style={{ padding: "28px 24px", borderRadius: 20, marginBottom: 20, background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)", color: "#fff", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: -20, left: -20, width: 120, height: 120, borderRadius: "50%", background: "rgba(255,255,255,0.08)" }} />
+        <div style={{ position: "absolute", bottom: -30, right: -10, width: 160, height: 160, borderRadius: "50%", background: "rgba(255,255,255,0.05)" }} />
+        <p style={{ fontSize: 13, opacity: 0.8, margin: "0 0 4px", position: "relative" }}>{new Date().toLocaleDateString("he-IL", { weekday: "long", day: "numeric", month: "long" })}</p>
+        <h1 style={{ fontSize: 24, fontWeight: 700, margin: "0 0 6px", position: "relative", color: "#fff" }}>שלום {isParent ? "ההורים" : "עידו"} 👋</h1>
+        <p style={{ fontSize: 14, opacity: 0.85, margin: 0, position: "relative", color: "#fff" }}>{overallPct === 100 ? "השלמתם את כל המסע! 🏆" : `${totalDone} מתוך ${TOTAL_TASKS} משימות הושלמו`}</p>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
+        {[{ label: "הושלם", value: `${overallPct}%`, color: "#7c3aed" }, { label: "משימות", value: `${totalDone}/${TOTAL_TASKS}`, color: "#10b981" }, { label: "פרק", value: currentChapter?.emoji, color: "#f59e0b", sub: currentChapter?.title }].map(s => (
+          <div key={s.label} style={{ background: "#fff", borderRadius: 16, padding: "16px 12px", border: "1px solid #e5e7eb", textAlign: "center", boxShadow: "0 1px 4px rgba(124,58,237,0.06)" }}>
+            <p style={{ fontSize: s.sub ? 28 : 18, fontWeight: 700, color: s.color, margin: "0 0 4px" }}>{s.value}</p>
+            {s.sub && <p style={{ color: "#9ca3af", fontSize: 10, margin: "0 0 2px", lineHeight: 1.3 }}>{s.sub}</p>}
+            <p style={{ color: "#9ca3af", fontSize: 11, margin: 0 }}>{s.label}</p>
+          </div>
+        ))}
+      </div>
+      {currentMonth && (
+        <div style={{ background: "#fff", borderRadius: 20, padding: 20, marginBottom: 20, border: "1px solid #e5e7eb", boxShadow: "0 1px 4px rgba(124,58,237,0.06)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+            <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 15, margin: 0 }}>{currentMonth.month}</p>
+            <span style={{ color: "#7c3aed", fontWeight: 600, fontSize: 13 }}>{monthDone}/{monthTotal}</span>
+          </div>
+          <p style={{ color: "#6b7280", fontSize: 13, margin: "0 0 12px" }}>{currentMonth.title}</p>
+          <div style={{ height: 8, borderRadius: 4, background: "#f3f4f6", marginBottom: 16 }}>
+            <div style={{ height: "100%", borderRadius: 4, background: "linear-gradient(90deg, #7c3aed, #a855f7)", width: `${monthTotal ? (monthDone / monthTotal) * 100 : 0}%`, transition: "width 0.5s" }} />
+          </div>
+          {nextTask && !isParent && (
+            <button onClick={() => onNavigate("tasks")} style={{ width: "100%", padding: "12px", borderRadius: 12, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>המשך: {nextTask.text} ›</button>
+          )}
+        </div>
+      )}
+      <div style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.07), rgba(168,85,247,0.03))", borderRadius: 16, padding: 20, marginBottom: 20, border: "1.5px solid rgba(124,58,237,0.15)" }}>
+        <p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 11, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: 1 }}>💡 מחשבה ליום</p>
+        <p style={{ color: "#1e1b4b", fontSize: 15, lineHeight: 1.7, margin: 0, fontStyle: "italic" }}>"{todayWisdom}"</p>
+      </div>
+      <div style={{ background: "#fff", borderRadius: 20, padding: 20, marginBottom: 20, border: "1px solid #e5e7eb", boxShadow: "0 1px 4px rgba(124,58,237,0.06)" }}>
+        <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 15, margin: "0 0 16px" }}>המסע שלך</p>
+        {CHAPTERS.map((ch, i) => {
+          const tasks = ch.months.flatMap(m => m.tasks);
+          const done = tasks.filter(t => data.completed[t.id]).length;
+          const pct = Math.round((done / tasks.length) * 100);
+          return (
+            <div key={ch.id} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+              <span style={{ fontSize: 20, width: 28 }}>{ch.emoji}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                  <span style={{ color: "#1e1b4b", fontSize: 13, fontWeight: 500 }}>{ch.title}</span>
+                  <span style={{ color: "#7c3aed", fontSize: 12, fontWeight: 600 }}>{pct}%</span>
+                </div>
+                <div style={{ height: 6, borderRadius: 3, background: "#f3f4f6" }}>
+                  <div style={{ height: "100%", borderRadius: 3, background: ["#7c3aed","#0ea5e9","#f59e0b","#10b981"][i], width: `${pct}%`, transition: "width 0.5s" }} />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {recentEntries.length > 0 && (
+        <div style={{ background: "#fff", borderRadius: 20, padding: 20, border: "1px solid #e5e7eb", boxShadow: "0 1px 4px rgba(124,58,237,0.06)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 15, margin: 0 }}>📝 מהיומן</p>
+            <button onClick={() => onNavigate("journal")} style={{ color: "#7c3aed", fontSize: 12, background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>הכל ›</button>
+          </div>
+          {recentEntries.map(e => (
+            <div key={e.id} style={{ padding: "12px 14px", borderRadius: 12, background: "#f9fafb", border: "1px solid #e5e7eb", marginBottom: 8 }}>
+              <p style={{ color: "#9ca3af", fontSize: 11, margin: "0 0 4px" }}>{e.date}</p>
+              <p style={{ color: "#1e1b4b", fontSize: 13, margin: 0, lineHeight: 1.5, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>{e.text}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Year Calendar ────────────────────────────────────────────────────────────
+function YearCalendarView({ data }) {
+  return (
+    <div>
+      <div style={{ background: "#fff", borderRadius: 20, padding: 24, border: "1px solid #e5e7eb", boxShadow: "0 1px 4px rgba(124,58,237,0.06)" }}>
+        <h2 style={{ color: "#1e1b4b", fontSize: 18, fontWeight: 700, margin: "0 0 4px" }}>לוח שנת המסע</h2>
+        <p style={{ color: "#9ca3af", fontSize: 13, margin: "0 0 20px" }}>נובמבר 2026 — נובמבר 2027</p>
+        <div style={{ display: "flex", gap: 14, marginBottom: 20, flexWrap: "wrap" }}>
+          {[["#10b981","הושלם"], ["#7c3aed","בתהליך"], ["#e5e7eb","לא התחיל"]].map(([c, l]) => (
+            <div key={l} style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 12, height: 12, borderRadius: "50%", background: c }} /><span style={{ color: "#6b7280", fontSize: 12 }}>{l}</span></div>
+          ))}
+        </div>
+        {CHAPTERS.map((ch, ci) => {
+          const chColors = ["#7c3aed","#0ea5e9","#f59e0b","#10b981"];
+          const chDone = ch.months.flatMap(m => m.tasks).filter(t => data.completed[t.id]).length;
+          const chTotal = ch.months.flatMap(m => m.tasks).length;
+          return (
+            <div key={ch.id} style={{ marginBottom: 24 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                <span style={{ fontSize: 18 }}>{ch.emoji}</span>
+                <span style={{ color: "#1e1b4b", fontWeight: 600, fontSize: 14 }}>{ch.title}</span>
+                <span style={{ color: "#9ca3af", fontSize: 12 }}>{ch.period}</span>
+                <span style={{ marginRight: "auto", color: chColors[ci], fontWeight: 700, fontSize: 13 }}>{chDone}/{chTotal}</span>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
+                {ch.months.map(m => {
+                  const done = m.tasks.filter(t => data.completed[t.id]).length;
+                  const pct = Math.round((done / m.tasks.length) * 100);
+                  const status = pct === 100 ? "done" : pct > 0 ? "partial" : "pending";
+                  return (
+                    <div key={m.id} style={{ borderRadius: 14, overflow: "hidden", border: `1.5px solid ${status === "done" ? "rgba(16,185,129,0.3)" : status === "partial" ? "rgba(124,58,237,0.25)" : "#e5e7eb"}`, background: status === "done" ? "rgba(16,185,129,0.04)" : status === "partial" ? "rgba(124,58,237,0.04)" : "#fafafa" }}>
+                      <div style={{ height: 4, background: "#f3f4f6" }}><div style={{ height: "100%", background: status === "done" ? "#10b981" : "#7c3aed", width: `${pct}%` }} /></div>
+                      <div style={{ padding: 12 }}>
+                        <p style={{ color: "#1e1b4b", fontWeight: 600, fontSize: 11, margin: "0 0 3px", lineHeight: 1.3 }}>{m.month.split(" ")[0]}</p>
+                        <p style={{ color: "#9ca3af", fontSize: 10, margin: "0 0 8px", lineHeight: 1.3 }}>{m.title}</p>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          <span style={{ fontSize: 14 }}>{status === "done" ? "✅" : status === "partial" ? "🔄" : "⏳"}</span>
+                          <span style={{ color: status === "done" ? "#10b981" : status === "partial" ? "#7c3aed" : "#9ca3af", fontWeight: 700, fontSize: 12 }}>{pct}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Journey Book ─────────────────────────────────────────────────────────────
+function JourneyBookView({ data }) {
+  const [chapter, setChapter] = useState("intro");
+  const totalDone = ALL_TASKS.filter(t => data.completed[t.id]).length;
+  const bookChapters = [{ id: "intro", label: "פתיחה", icon: "📖" }, { id: "values", label: "ערכים", icon: "⭐" }, { id: "journal", label: "יומן", icon: "📝" }, { id: "insights", label: "תובנות", icon: "💡" }, { id: "letter", label: "מכתב", icon: "✉️" }];
+  return (
+    <div>
+      <div style={{ background: "linear-gradient(135deg, #7c3aed, #a855f7)", borderRadius: 20, padding: "24px 20px", marginBottom: 20, color: "#fff", textAlign: "center" }}>
+        <p style={{ fontSize: 40, margin: "0 0 8px" }}>📚</p>
+        <h2 style={{ fontSize: 20, fontWeight: 700, margin: "0 0 6px", color: "#fff" }}>ספר המסע של עידו</h2>
+        <p style={{ fontSize: 13, opacity: 0.85, margin: 0, color: "#fff" }}>{totalDone} משימות · שנת בר מצווה 2026–2027</p>
+      </div>
+      <div style={{ display: "flex", gap: 8, marginBottom: 20, overflowX: "auto", paddingBottom: 4 }}>
+        {bookChapters.map(bc => (
+          <button key={bc.id} onClick={() => setChapter(bc.id)} style={{ padding: "8px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer", flexShrink: 0, background: chapter === bc.id ? "rgba(124,58,237,0.15)" : "#fff", border: chapter === bc.id ? "1.5px solid #7c3aed" : "1px solid #e5e7eb", color: chapter === bc.id ? "#7c3aed" : "#6b7280", fontWeight: chapter === bc.id ? 600 : 400 }}>{bc.icon} {bc.label}</button>
+        ))}
+      </div>
+      {chapter === "intro" && (
+        <div>
+          <div style={{ background: "#fff", borderRadius: 20, padding: 24, border: "1px solid #e5e7eb", marginBottom: 16 }}>
+            <p style={{ color: "#7c3aed", fontWeight: 700, fontSize: 16, margin: "0 0 12px" }}>עמוד הפתיחה</p>
+            <p style={{ color: "#1e1b4b", fontSize: 15, lineHeight: 1.8, margin: "0 0 12px" }}>זהו ספר המסע של <strong>עידו</strong>, מנובמבר 2026 עד נובמבר 2027.</p>
+            <p style={{ color: "#4b5563", fontSize: 14, lineHeight: 1.8, margin: 0 }}>מסע של התבגרות — אחריות, עצמאות, תרומה וחלומות.</p>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {[["42","משימות"],[CHAPTERS.length.toString(),"פרקים"],[(data.journal?.length||0).toString(),"כניסות יומן"],[Math.round((totalDone/TOTAL_TASKS)*100)+"%","הושלם"]].map(([val,label]) => (
+              <div key={label} style={{ background: "#fff", borderRadius: 16, padding: "18px 16px", border: "1px solid #e5e7eb", textAlign: "center" }}>
+                <p style={{ color: "#7c3aed", fontWeight: 700, fontSize: 28, margin: "0 0 4px" }}>{val}</p>
+                <p style={{ color: "#9ca3af", fontSize: 12, margin: 0 }}>{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {chapter === "values" && (
+        <div style={{ background: "#fff", borderRadius: 20, padding: 24, border: "1px solid #e5e7eb" }}>
+          <p style={{ color: "#7c3aed", fontWeight: 700, fontSize: 16, margin: "0 0 16px" }}>⭐ הערכים שבחרתי</p>
+          {(data.values||[]).length > 0 ? <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>{(data.values||[]).map(v => <span key={v} style={{ padding: "10px 20px", borderRadius: 30, background: "rgba(124,58,237,0.1)", border: "1.5px solid rgba(124,58,237,0.25)", color: "#7c3aed", fontSize: 15, fontWeight: 600 }}>{v}</span>)}</div>
+          : <p style={{ color: "#9ca3af", fontSize: 14 }}>עדיין לא נבחרו ערכים</p>}
+        </div>
+      )}
+      {chapter === "journal" && (
+        <div>{(data.journal||[]).length === 0 ? <div style={{ background: "#fff", borderRadius: 20, padding: 40, border: "1px solid #e5e7eb", textAlign: "center" }}><p style={{ color: "#9ca3af" }}>עדיין אין כניסות</p></div>
+          : [...(data.journal||[])].reverse().map(e => <div key={e.id} style={{ background: "#fff", borderRadius: 16, padding: 20, border: "1px solid #e5e7eb", marginBottom: 12 }}><p style={{ color: "#9ca3af", fontSize: 11, margin: "0 0 8px" }}>{e.date}</p><p style={{ color: "#1e1b4b", fontSize: 14, lineHeight: 1.7, margin: 0, whiteSpace: "pre-wrap" }}>{e.text}</p></div>)}
+        </div>
+      )}
+      {chapter === "insights" && (
+        <div>{(data.taskData?.t39?.insights||[]).filter(i => i?.text).length > 0
+          ? (data.taskData.t39.insights).map((ins, i) => ins?.text && <div key={i} style={{ background: "#fff", borderRadius: 16, padding: 20, border: "1px solid #e5e7eb", marginBottom: 12 }}>{ins.category && <span style={{ padding: "2px 8px", borderRadius: 20, background: "rgba(124,58,237,0.08)", color: "#7c3aed", fontSize: 11, marginBottom: 8, display: "inline-block" }}>{ins.category}</span>}<p style={{ color: "#1e1b4b", fontSize: 14, lineHeight: 1.7, margin: 0 }}>{ins.text}</p></div>)
+          : <div style={{ background: "#fff", borderRadius: 20, padding: 40, border: "1px solid #e5e7eb", textAlign: "center" }}><p style={{ color: "#9ca3af", fontSize: 14 }}>התובנות יופיעו אחרי משימה t39</p></div>}
+        </div>
+      )}
+      {chapter === "letter" && (
+        <div style={{ background: "#fff", borderRadius: 20, padding: 24, border: "1px solid #e5e7eb" }}>
+          <p style={{ color: "#7c3aed", fontWeight: 700, fontSize: 16, margin: "0 0 16px" }}>✉️ מכתב לעצמי</p>
+          {data.taskData?.t40?.letter ? <div style={{ padding: 20, borderRadius: 14, background: "#fdf8ff", border: "1.5px solid rgba(124,58,237,0.15)", lineHeight: 1.9 }}><p style={{ color: "#1e1b4b", fontSize: 14, margin: 0, whiteSpace: "pre-wrap" }}>{data.taskData.t40.letter}</p></div>
+          : <p style={{ color: "#9ca3af", fontSize: 14 }}>המכתב יופיע אחרי משימה t40</p>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Nav ──────────────────────────────────────────────────────────────────────
+const NAV_IDO = [
+  { id: "home",     label: "בית",      icon: "🏠" },
+  { id: "tasks",    label: "משימות",   icon: "✓" },
+  { id: "calendar", label: "לוח שנה", icon: "📅" },
+  { id: "journal",  label: "יומן",     icon: "📝" },
+  { id: "book",     label: "ספר המסע",icon: "📚" },
+];
 const NAV_PARENT = [
+  { id: "home",     label: "בית",      icon: "🏠" },
+  { id: "tasks",    label: "משימות",   icon: "✓" },
   { id: "progress", label: "התקדמות", icon: "📊" },
-  { id: "tasks", label: "משימות", icon: "✓" },
-  { id: "journal", label: "הערות", icon: "📝" },
-  { id: "map", label: "מפה", icon: "🗺️" },
-  { id: "manifesto", label: "המסע", icon: "🧭" },
+  { id: "calendar", label: "לוח שנה", icon: "📅" },
+  { id: "journal",  label: "הערות",   icon: "📝" },
 ];
 
 export default function App() {
   const [role, setRole] = useState("kid");
-  const session = role === "kid"
-    ? { key: "ido", name: "עידו", role: "kid" }
-    : { key: "parents", name: "ההורים", role: "parent" };
-  const [tab, setTab] = useState("tasks");
+  const [showPin, setShowPin] = useState(false);
+  const [tab, setTab] = useState("home");
   const [data, save] = useStorage();
+  const [toast, setToast] = useState(null);
+  const [confetti, setConfetti] = useState(false);
+  const prevDone = useRef(0);
 
-  if (!data) {
-    return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f4f2ff" }}>
-        <div style={{ textAlign: "center" }}>
-          <div style={{ width: 44, height: 44, borderRadius: "50%", border: "3px solid #7c3aed", borderTopColor: "transparent", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
-          <p style={{ color: "#7c3aed", fontSize: 14 }}>טוען...</p>
-        </div>
-        <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+  const session = role === "kid" ? { name: "עידו", role: "kid" } : { name: "ההורים", role: "parent" };
+
+  useEffect(() => {
+    if (!data) return;
+    const cur = Object.keys(data.completed || {}).filter(k => data.completed[k]).length;
+    if (cur > prevDone.current) {
+      setToast("משימה הושלמה! ✓");
+      if (cur % 5 === 0 || cur === TOTAL_TASKS) setConfetti(true);
+    }
+    prevDone.current = cur;
+  }, [data?.completed]);
+
+  if (!data) return (
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f4f2ff" }}>
+      <div style={{ textAlign: "center" }}>
+        <div style={{ width: 44, height: 44, borderRadius: "50%", border: "3px solid #7c3aed", borderTopColor: "transparent", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
+        <p style={{ color: "#7c3aed", fontSize: 14 }}>טוען...</p>
       </div>
-    );
-  }
+      <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+    </div>
+  );
 
   const isParent = session.role === "parent";
   const nav = isParent ? NAV_PARENT : NAV_IDO;
   const totalDone = ALL_TASKS.filter(t => data.completed[t.id]).length;
   const overallPct = Math.round((totalDone / TOTAL_TASKS) * 100);
+  const allDone = totalDone === TOTAL_TASKS;
 
   return (
     <div style={{ minHeight: "100vh", background: "#f4f2ff", fontFamily: "'Segoe UI', Tahoma, sans-serif", direction: "rtl" }}>
-      <style>{`
-        @keyframes spin { to { transform: rotate(360deg) } }
-        * { box-sizing: border-box; }
-        button { font-family: 'Segoe UI', Tahoma, sans-serif; }
-        textarea, input, select { font-family: 'Segoe UI', Tahoma, sans-serif; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f4f2ff; }
-        ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 3px; }
-      `}</style>
+      <style>{`@keyframes spin { to { transform: rotate(360deg) } } * { box-sizing: border-box; } button { font-family: inherit; } textarea, input, select { font-family: inherit; } ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #f4f2ff; } ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 3px; }`}</style>
 
-      {/* Top Navigation */}
-      <header style={{
-        background: "#ffffff", borderBottom: "1px solid #e5e7eb",
-        position: "sticky", top: 0, zIndex: 100,
-        boxShadow: "0 1px 8px rgba(124,58,237,0.08)"
-      }}>
-        {/* Progress bar */}
+      {showPin && <PinModal onSuccess={() => { setRole("parent"); setShowPin(false); setTab("home"); }} onCancel={() => setShowPin(false)} />}
+      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {confetti && <Confetti onDone={() => setConfetti(false)} />}
+
+      {allDone && (
+        <div style={{ background: "linear-gradient(90deg, #7c3aed, #a855f7, #f59e0b)", padding: "10px 20px", textAlign: "center", color: "#fff", fontWeight: 700, fontSize: 15 }}>
+          🎉 מזל טוב עידו! השלמת את כל מסע שנת הבר מצווה! 🏆
+        </div>
+      )}
+
+      <header style={{ background: "#fff", borderBottom: "1px solid #e5e7eb", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 1px 8px rgba(124,58,237,0.08)" }}>
         <div style={{ height: 3, background: "#f3f4f6" }}>
           <div style={{ height: "100%", background: "linear-gradient(90deg, #7c3aed, #a855f7)", width: `${overallPct}%`, transition: "width 0.6s ease" }} />
         </div>
-
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 20px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 60 }}>
-          {/* Logo */}
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #7c3aed, #a855f7)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🧭</div>
             <div>
@@ -1802,42 +2088,28 @@ export default function App() {
               <p style={{ color: "#9ca3af", fontSize: 11, margin: 0 }}>{overallPct}% הושלם</p>
             </div>
           </div>
-
-          {/* Nav tabs */}
           <nav style={{ display: "flex", gap: 2 }}>
             {nav.map(n => (
-              <button key={n.id} onClick={() => setTab(n.id)} style={{
-                padding: "8px 14px", borderRadius: 8, fontSize: 13, cursor: "pointer",
-                background: tab === n.id ? "rgba(124,58,237,0.1)" : "transparent",
-                border: "none",
-                color: tab === n.id ? "#7c3aed" : "#6b7280",
-                fontWeight: tab === n.id ? 600 : 400,
-                display: "flex", alignItems: "center", gap: 6, transition: "all 0.15s"
-              }}>
-                <span style={{ fontSize: 15 }}>{n.icon}</span>
-                <span>{n.label}</span>
+              <button key={n.id} onClick={() => setTab(n.id)} style={{ padding: "8px 14px", borderRadius: 8, fontSize: 13, cursor: "pointer", background: tab === n.id ? "rgba(124,58,237,0.1)" : "transparent", border: "none", color: tab === n.id ? "#7c3aed" : "#6b7280", fontWeight: tab === n.id ? 600 : 400, display: "flex", alignItems: "center", gap: 6, transition: "all 0.15s" }}>
+                <span style={{ fontSize: 15 }}>{n.icon}</span><span>{n.label}</span>
               </button>
             ))}
           </nav>
-
-          {/* Role switcher */}
-          <button onClick={() => { setRole(r => r === "kid" ? "parent" : "kid"); setTab("tasks"); }} style={{
-            padding: "7px 14px", borderRadius: 20, fontSize: 12, cursor: "pointer",
-            background: "rgba(124,58,237,0.08)", border: "1.5px solid rgba(124,58,237,0.2)",
-            color: "#7c3aed", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, flexShrink: 0
-          }}>
+          <button onClick={() => role === "kid" ? setShowPin(true) : (setRole("kid"), setTab("home"))} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12, cursor: "pointer", background: "rgba(124,58,237,0.08)", border: "1.5px solid rgba(124,58,237,0.2)", color: "#7c3aed", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
             {role === "kid" ? "👩‍👩‍👦 הורים" : "👦 עידו"}
           </button>
         </div>
       </header>
 
-      {/* Page content */}
       <main style={{ maxWidth: 900, margin: "0 auto", padding: "28px 20px 60px" }}>
-        {tab === "tasks" && <TasksView data={data} save={save} isParent={isParent} />}
+        {tab === "home"     && <DashboardView data={data} save={save} isParent={isParent} onNavigate={setTab} />}
+        {tab === "tasks"    && <TasksView data={data} save={save} isParent={isParent} />}
         {tab === "progress" && <ProgressView data={data} />}
-        {tab === "journal" && <JournalView data={data} save={save} isParent={isParent} />}
-        {tab === "map" && <ValuesMapView data={data} save={save} />}
-        {tab === "manifesto" && <ManifestoView />}
+        {tab === "calendar" && <YearCalendarView data={data} />}
+        {tab === "journal"  && <JournalView data={data} save={save} isParent={isParent} />}
+        {tab === "map"      && <ValuesMapView data={data} save={save} />}
+        {tab === "manifesto"&& <ManifestoView />}
+        {tab === "book"     && <JourneyBookView data={data} />}
       </main>
     </div>
   );
