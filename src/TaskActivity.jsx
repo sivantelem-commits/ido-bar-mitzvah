@@ -11,6 +11,12 @@ import {
   T32_StrengthsMap, T33_Dreams, T34_AnnualGoal,
   Ch3Climax, QuizM9, QuizM10, QuizM11, QuizM12,
 } from "./Chapter3.jsx";
+import {
+  T35_DefineProject, T36_GoalMetrics, T37_ExecuteProject,
+  T38_PersonalSpeech, T39_YearInsights, T40_FutureLetter,
+  T41_PresentJourney, T42_SignManifesto,
+  Ch4Climax, QuizM13, QuizM14, QuizM15,
+} from "./Chapter4.jsx";
 
 // ─── Shared UI helpers ────────────────────────────────────────────────────────
 
@@ -1287,26 +1293,31 @@ export const TASK_ACTIVITIES = {
   t26: T26_IndependenceDay, t27: T27_TimeMoneyOwnership,
   t28: T28_FireSkills, t29: T29_SetupTent, t30: T30_CampingPlan, t31: T31_EquipmentOwnership,
   t32: T32_StrengthsMap, t33: T33_Dreams, t34: T34_AnnualGoal,
+  t35: T35_DefineProject, t36: T36_GoalMetrics, t37: T37_ExecuteProject,
+  t38: T38_PersonalSpeech, t39: T39_YearInsights, t40: T40_FutureLetter,
+  t41: T41_PresentJourney, t42: T42_SignManifesto,
 };
 
 export const CHAPTER_CLIMAX = {
-  1: Ch1Climax,
-  2: Ch2Climax,
-  3: Ch3Climax,
+  1: Ch1Climax, 2: Ch2Climax, 3: Ch3Climax, 4: Ch4Climax,
 };
 
 export const MONTH_QUIZZES_CH2 = {
-  m5: { component: QuizM5, title: "סיכום חודש מרץ — רגשות וחוסן", emoji: "🌊" },
-  m6: { component: QuizM6, title: "סיכום חודש אפריל — קהילה ותרומה", emoji: "🗺️" },
-  m7: { component: QuizM7, title: "סיכום חודש מאי — אתגר פיזי", emoji: "💪" },
-  m8: { component: QuizM8, title: "סיכום חודש יוני — נסיעה עצמאית", emoji: "🗺️" },
+  m5: { component: QuizM5,  title: "סיכום חודש מרץ — רגשות וחוסן",    emoji: "🌊" },
+  m6: { component: QuizM6,  title: "סיכום חודש אפריל — קהילה ותרומה", emoji: "🗺️" },
+  m7: { component: QuizM7,  title: "סיכום חודש מאי — אתגר פיזי",      emoji: "💪" },
+  m8: { component: QuizM8,  title: "סיכום חודש יוני — נסיעה עצמאית",  emoji: "🗺️" },
 };
-
 export const MONTH_QUIZZES_CH3 = {
-  m9:  { component: QuizM9,  title: "סיכום חודש יולי — מיומנות טכנית", emoji: "🔧" },
-  m10: { component: QuizM10, title: "סיכום חודש אוגוסט — יום עצמאות", emoji: "☀️" },
-  m11: { component: QuizM11, title: "סיכום חודש ספטמבר — מחנאות", emoji: "🏕️" },
-  m12: { component: QuizM12, title: "סיכום חודש אוקטובר — תיק עתיד", emoji: "🚀" },
+  m9:  { component: QuizM9,  title: "סיכום חודש יולי — מיומנות טכנית",  emoji: "🔧" },
+  m10: { component: QuizM10, title: "סיכום חודש אוגוסט — יום עצמאות",   emoji: "☀️" },
+  m11: { component: QuizM11, title: "סיכום חודש ספטמבר — מחנאות",        emoji: "🏕️" },
+  m12: { component: QuizM12, title: "סיכום חודש אוקטובר — תיק עתיד",    emoji: "🚀" },
+};
+export const MONTH_QUIZZES_CH4 = {
+  m13: { component: QuizM13, title: "משחקון שבוע א׳ — Design Thinking",  emoji: "🎨" },
+  m14: { component: QuizM14, title: "משחקון שבוע ב׳ — מבוך הערכים",      emoji: "🧩" },
+  m15: { component: QuizM15, title: "האתגר הסופי — ברוך הבא לבגרות",     emoji: "🏆" },
 };
 
 // ─── Task modal wrapper ───────────────────────────────────────────────────────
