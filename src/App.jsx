@@ -484,7 +484,7 @@ function TasksView({ data, save, isParent }) {
                           {m.month} – {m.title}
                         </p>
                         {!mUnlocked && <span style={{ color: "#d1d5db", fontSize: 11 }}>🔒 נפתח אחרי החודש הקודם</span>}
-                        {mDone && <span style={{ color: "#6ee7b7", fontSize: 11 }}>✓ הושלם</span>}
+                        {mDone && <span style={{ color: "#059669", fontSize: 11 }}>✓ הושלם</span>}
                       </div>
 
                       {m.tasks.map(task => {
@@ -508,7 +508,7 @@ function TasksView({ data, save, isParent }) {
                               {done && <span style={{ color: "#1e1b4b", fontSize: 13 }}>✓</span>}
                             </div>
                             <span style={{
-                              color: done ? "rgba(255,255,255,0.5)" : "#fff", fontSize: 14, flex: 1,
+                              color: done ? "#9ca3af" : "#1e1b4b", fontSize: 14, flex: 1,
                               textDecoration: done ? "line-through" : "none"
                             }}>{task.text}</span>
                             {taskUnlocked && !done && (
@@ -542,7 +542,7 @@ function TasksView({ data, save, isParent }) {
                             }}>
                               {quizDone ? <span style={{ fontSize: 12 }}>✓</span> : <span style={{ fontSize: 13 }}>🎮</span>}
                             </div>
-                            <span style={{ color: quizDone ? "rgba(255,255,255,0.5)" : "#fff", fontSize: 14, flex: 1, textDecoration: quizDone ? "line-through" : "none" }}>
+                            <span style={{ color: quizDone ? "#9ca3af" : "#1e1b4b", fontSize: 14, flex: 1, textDecoration: quizDone ? "line-through" : "none" }}>
                               משחקון סיכום חודש
                             </span>
                             {!quizUnlocked && !quizDone && <span style={{ color: "#d1d5db", fontSize: 11 }}>🔒 לאחר כל המשימות</span>}
