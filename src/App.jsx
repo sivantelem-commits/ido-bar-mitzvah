@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { TaskModal, ClimaxModal, MonthlyQuiz, MONTH_QUIZZES } from "./TaskActivity.jsx";
+import { TaskModal, ClimaxModal, MonthlyQuiz, MONTH_QUIZZES, MONTH_QUIZZES_CH2 } from "./TaskActivity.jsx";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -347,13 +347,24 @@ function TasksView({ data, save, isParent }) {
             }} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 12, cursor: "pointer", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", color: "#fca5a5" }}>🔄 אפס</button>
           </div>
           <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px 100px" }}>
-            <MonthlyQuiz
-              monthId={activeQuiz.monthId}
-              state={(data.taskData || {})[`quiz_${activeQuiz.monthId}`] || {}}
-              onChange={newState => {
-                const newTaskData = { ...(data.taskData || {}), [`quiz_${activeQuiz.monthId}`]: newState };
-                save({ ...data, taskData: newTaskData });
-              }} />
+            {MONTH_QUIZZES_CH2[activeQuiz.monthId]
+              ? (() => {
+                  const QuizComp = MONTH_QUIZZES_CH2[activeQuiz.monthId].component;
+                  return <QuizComp
+                    state={(data.taskData || {})[`quiz_${activeQuiz.monthId}`] || {}}
+                    onChange={newState => {
+                      const newTaskData = { ...(data.taskData || {}), [`quiz_${activeQuiz.monthId}`]: newState };
+                      save({ ...data, taskData: newTaskData });
+                    }} />;
+                })()
+              : <MonthlyQuiz
+                  monthId={activeQuiz.monthId}
+                  state={(data.taskData || {})[`quiz_${activeQuiz.monthId}`] || {}}
+                  onChange={newState => {
+                    const newTaskData = { ...(data.taskData || {}), [`quiz_${activeQuiz.monthId}`]: newState };
+                    save({ ...data, taskData: newTaskData });
+                  }} />
+            }
           </div>
           {!isParent && !data.completed?.[`quiz_${activeQuiz.monthId}`] && (
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "16px", background: "rgba(10,10,26,0.95)", backdropFilter: "blur(10px)", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
@@ -509,7 +520,7 @@ function TasksView({ data, save, isParent }) {
 
                       {/* Monthly quiz — appears after all tasks done */}
                       {(() => {
-                        const hasQuiz = MONTH_QUIZZES[m.id];
+                        const hasQuiz = MONTH_QUIZZES[m.id] || MONTH_QUIZZES_CH2[m.id];
                         if (!hasQuiz) return null;
                         const allTasksDone = m.tasks.every(t => data.completed[t.id]);
                         const quizDone = !!data.completed?.[`quiz_${m.id}`];
