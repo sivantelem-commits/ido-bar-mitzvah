@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { TaskModal, ClimaxModal, MonthlyQuiz, MONTH_QUIZZES, MONTH_QUIZZES_CH2 } from "./TaskActivity.jsx";
+import { TaskModal, ClimaxModal, MonthlyQuiz, MONTH_QUIZZES, MONTH_QUIZZES_CH2, MONTH_QUIZZES_CH3 } from "./TaskActivity.jsx";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -347,9 +347,10 @@ function TasksView({ data, save, isParent }) {
             }} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 12, cursor: "pointer", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", color: "#fca5a5" }}>🔄 אפס</button>
           </div>
           <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px 100px" }}>
-            {MONTH_QUIZZES_CH2[activeQuiz.monthId]
+            {MONTH_QUIZZES_CH2[activeQuiz.monthId] || MONTH_QUIZZES_CH3[activeQuiz.monthId]
               ? (() => {
-                  const QuizComp = MONTH_QUIZZES_CH2[activeQuiz.monthId].component;
+                  const quizDef = MONTH_QUIZZES_CH2[activeQuiz.monthId] || MONTH_QUIZZES_CH3[activeQuiz.monthId];
+                  const QuizComp = quizDef.component;
                   return <QuizComp
                     state={(data.taskData || {})[`quiz_${activeQuiz.monthId}`] || {}}
                     onChange={newState => {
@@ -520,7 +521,7 @@ function TasksView({ data, save, isParent }) {
 
                       {/* Monthly quiz — appears after all tasks done */}
                       {(() => {
-                        const hasQuiz = MONTH_QUIZZES[m.id] || MONTH_QUIZZES_CH2[m.id];
+                        const hasQuiz = MONTH_QUIZZES[m.id] || MONTH_QUIZZES_CH2[m.id] || MONTH_QUIZZES_CH3[m.id];
                         if (!hasQuiz) return null;
                         const allTasksDone = m.tasks.every(t => data.completed[t.id]);
                         const quizDone = !!data.completed?.[`quiz_${m.id}`];
