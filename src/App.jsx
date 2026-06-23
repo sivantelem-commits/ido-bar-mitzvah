@@ -451,7 +451,7 @@ function TasksView({ data, save, isParent }) {
         const climaxApproved = (data.climaxData || {})[ch.id]?.parentApproved;
 
         return (
-          <div key={ch.id} style={{
+          <div key={ch.id} className={`card-enter-${Math.min(chIdx, 5)}`} style={{
             marginBottom: 16,
             border: !chUnlocked ? "1px solid rgba(255,255,255,0.05)" : "1px solid #e5e7eb",
             borderRadius: 16, overflow: "hidden",
@@ -2164,7 +2164,7 @@ function DashboardView({ data, isParent, onNavigate }) {
   const recentEntries = [...(data.journal || [])].reverse().slice(0, 2);
   return (
     <div>
-      <div style={{ padding: "28px 24px", borderRadius: 20, marginBottom: 20, background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)", color: "#fff", position: "relative", overflow: "hidden" }}>
+      <div className="card-enter" style={{ padding: "28px 24px", borderRadius: 20, marginBottom: 20, background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)", color: "#fff", position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: -20, left: -20, width: 120, height: 120, borderRadius: "50%", background: "rgba(255,255,255,0.08)" }} />
         <div style={{ position: "absolute", bottom: -30, right: -10, width: 160, height: 160, borderRadius: "50%", background: "rgba(255,255,255,0.05)" }} />
         <p style={{ fontSize: 13, opacity: 0.8, margin: "0 0 4px", position: "relative" }}>{new Date().toLocaleDateString("he-IL", { weekday: "long", day: "numeric", month: "long" })}</p>
@@ -2191,7 +2191,7 @@ function DashboardView({ data, isParent, onNavigate }) {
           );
         })()}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 20 }}>
+      <div className="card-enter-1" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 20 }}>
         {[{ label: "הושלם", value: `${overallPct}%`, color: "#7c3aed" }, { label: "משימות", value: `${totalDone}/${TOTAL_TASKS}`, color: "#10b981" }, { label: "פרק", value: currentChapter?.emoji, color: "#f59e0b", sub: currentChapter?.title }].map(s => (
           <div key={s.label} style={{ background: "#fff", borderRadius: 16, padding: "16px 12px", border: "1px solid #e5e7eb", textAlign: "center", boxShadow: "0 1px 4px rgba(124,58,237,0.06)" }}>
             <p style={{ fontSize: s.sub ? 28 : 18, fontWeight: 700, color: s.color, margin: "0 0 4px" }}>{s.value}</p>
@@ -2201,7 +2201,7 @@ function DashboardView({ data, isParent, onNavigate }) {
         ))}
       </div>
       {currentMonth && (
-        <div style={{ background: "#fff", borderRadius: 20, padding: 20, marginBottom: 20, border: "1px solid #e5e7eb", boxShadow: "0 1px 4px rgba(124,58,237,0.06)" }}>
+        <div className="card-enter-2" style={{ background: "#fff", borderRadius: 20, padding: 20, marginBottom: 20, border: "1px solid #e5e7eb", boxShadow: "0 1px 4px rgba(124,58,237,0.06)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
             <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 15, margin: 0 }}>{currentMonth.month}</p>
             <span style={{ color: "#7c3aed", fontWeight: 600, fontSize: 13 }}>{monthDone}/{monthTotal}</span>
@@ -2252,6 +2252,38 @@ function DashboardView({ data, isParent, onNavigate }) {
           ))}
         </div>
       )}
+
+      {/* Parent messages to Ido */}
+      {!isParent && (() => {
+        // Collect all parent notes (journal + task comments)
+        const parentJournal = (data.parentNotes || []).slice(-2).reverse();
+        const taskComments = Object.entries(data.taskComments || {})
+          .flatMap(([taskId, comments]) => (comments || []).filter(c => c.author === "ההורים").map(c => ({ ...c, taskId })))
+          .sort((a, b) => b.id - a.id).slice(0, 2);
+        const allParentMsgs = [...parentJournal, ...taskComments]
+          .sort((a, b) => b.id - a.id).slice(0, 3);
+        if (allParentMsgs.length === 0) return null;
+        return (
+          <div style={{ background: "#fff", borderRadius: 20, padding: 20, marginTop: 14, border: "1.5px solid rgba(16,185,129,0.2)", boxShadow: "0 1px 4px rgba(16,185,129,0.06)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 18 }}>💌</span>
+                <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 15, margin: 0 }}>ההורים כתבו לך</p>
+              </div>
+              <button onClick={() => onNavigate("journal")} style={{ color: "#059669", fontSize: 12, background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>הכל ›</button>
+            </div>
+            {allParentMsgs.map((msg, i) => (
+              <div key={i} style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.15)", marginBottom: 8 }}>
+                {msg.taskId && (
+                  <p style={{ color: "#059669", fontSize: 10, fontWeight: 600, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: 0.5 }}>על משימה</p>
+                )}
+                <p style={{ color: "#9ca3af", fontSize: 11, margin: "0 0 4px" }}>{msg.date}</p>
+                <p style={{ color: "#1e1b4b", fontSize: 13, margin: 0, lineHeight: 1.5, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>{msg.text}</p>
+              </div>
+            ))}
+          </div>
+        );
+      })()}
 
       {/* Half year report button */}
       <button onClick={() => onNavigate("halfyear")} style={{ width: "100%", marginTop: 14, padding: "14px 16px", borderRadius: 16, background: "#fff", border: "1.5px solid rgba(124,58,237,0.2)", cursor: "pointer", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 1px 4px rgba(124,58,237,0.06)" }}>
@@ -2479,6 +2511,15 @@ export default function App() {
       <style>{`
         @keyframes spin { to { transform: rotate(360deg) } }
         @keyframes toastIn { from { opacity:0; transform: translateX(-50%) translateY(20px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .card-enter   { animation: fadeUp 0.35s ease both; }
+        .card-enter-1 { animation: fadeUp 0.35s 0.06s ease both; }
+        .card-enter-2 { animation: fadeUp 0.35s 0.12s ease both; }
+        .card-enter-3 { animation: fadeUp 0.35s 0.18s ease both; }
+        .card-enter-4 { animation: fadeUp 0.35s 0.24s ease both; }
+        .card-enter-5 { animation: fadeUp 0.35s 0.30s ease both; }
+        .page-enter   { animation: fadeIn 0.25s ease both; }
         * { box-sizing: border-box; }
         button { font-family: inherit; }
         textarea, input, select { font-family: inherit; }
@@ -2491,19 +2532,14 @@ export default function App() {
           .mobile-nav { display: flex !important; }
           .desktop-logo-text { display: none !important; }
           .main-content { padding: 14px 12px 76px !important; }
-          /* Inputs full width */
           input[type="range"] { width: 100%; }
-          /* Prevent horizontal scroll */
           body { overflow-x: hidden; }
-          /* Smaller cards on mobile */
           .card-grid-2 { grid-template-columns: 1fr !important; }
         }
         @media (min-width: 641px) {
           .mobile-nav { display: none !important; }
         }
-        /* Touch targets */
         button { min-height: 36px; }
-        /* Safe area for iPhone notch */
         .mobile-nav { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
       `}</style>
 
@@ -2553,7 +2589,7 @@ export default function App() {
       </header>
 
       {/* Content */}
-      <main className="main-content" style={{ maxWidth: 900, margin: "0 auto", padding: "24px 16px 80px" }}>
+      <main className="main-content page-enter" style={{ maxWidth: 900, margin: "0 auto", padding: "24px 16px 80px" }} key={tab}>
         {tab === "home"        && !isParent && <DashboardView data={data} save={save} isParent={false} onNavigate={setTab} />}
         {tab === "parent-home" && isParent  && <ParentDashboard data={data} save={save} onNavigate={setTab} />}
         {tab === "home"        && isParent  && <ParentDashboard data={data} save={save} onNavigate={setTab} />}
