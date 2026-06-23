@@ -1326,6 +1326,8 @@ export function TaskModal({ task, chapter, data, save, isParent, onClose, PhotoU
   const ActivityComponent = TASK_ACTIVITIES[task.id];
   const activityData = (data.taskData || {})[task.id] || {};
   const isCompleted = !!data.completed?.[task.id];
+  const [showJournalPrompt, setShowJournalPrompt] = useState(false);
+  const [journalText, setJournalText] = useState("");
 
   function saveActivity(newState) {
     const newTaskData = { ...(data.taskData || {}), [task.id]: newState };
@@ -1336,34 +1338,51 @@ export function TaskModal({ task, chapter, data, save, isParent, onClose, PhotoU
     const newCompleted = { ...(data.completed || {}), [task.id]: true };
     const newTaskData = { ...(data.taskData || {}), [task.id]: activityData };
     save({ ...data, completed: newCompleted, taskData: newTaskData });
+    setShowJournalPrompt(true);
+  }
+
+  function saveJournalAndClose(write) {
+    if (write && journalText.trim()) {
+      const entry = {
+        id: Date.now(), text: journalText.trim(),
+        date: new Date().toLocaleDateString("he-IL"),
+        author: "עידו", taskRef: task.text
+      };
+      save({ ...data, completed: { ...(data.completed || {}), [task.id]: true }, taskData: { ...(data.taskData || {}), [task.id]: activityData }, journal: [...(data.journal || []), entry] });
+    }
+    onClose();
   }
 
   return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 1000, background: "#f4f2ff",
-      display: "flex", flexDirection: "column", overflow: "hidden"
-    }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "#f4f2ff", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      {/* Journal prompt overlay */}
+      {showJournalPrompt && (
+        <div style={{ position: "absolute", inset: 0, zIndex: 10, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+          <div style={{ background: "#fff", borderRadius: "24px 24px 0 0", padding: "28px 20px 32px", width: "100%", maxWidth: 520 }}>
+            <div style={{ textAlign: "center", marginBottom: 16 }}>
+              <p style={{ fontSize: 40, margin: "0 0 8px" }}>✨</p>
+              <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 18, margin: "0 0 4px" }}>כל הכבוד! סיימת!</p>
+              <p style={{ color: "#6b7280", fontSize: 14, margin: 0 }}>רוצה לכתוב משהו ביומן על {task.text}?</p>
+            </div>
+            <textarea value={journalText} onChange={e => setJournalText(e.target.value)}
+              placeholder={`מה הרגשת? מה למדת מ"${task.text}"?`}
+              rows={3} style={{ width: "100%", padding: "12px 14px", borderRadius: 12, background: "#f9fafb", border: "1.5px solid #e5e7eb", color: "#1e1b4b", fontSize: 14, resize: "none", outline: "none", direction: "rtl", fontFamily: "inherit", lineHeight: 1.6, boxSizing: "border-box", marginBottom: 12 }} />
+            <div style={{ display: "flex", gap: 10 }}>
+              <button onClick={() => saveJournalAndClose(false)} style={{ flex: 1, padding: "12px", borderRadius: 12, background: "#f3f4f6", border: "none", color: "#6b7280", fontSize: 14, fontWeight: 500, cursor: "pointer" }}>דלג</button>
+              <button onClick={() => saveJournalAndClose(true)} disabled={!journalText.trim()} style={{ flex: 2, padding: "12px", borderRadius: 12, background: journalText.trim() ? "linear-gradient(135deg, #7c3aed, #a855f7)" : "#f3f4f6", border: "none", color: journalText.trim() ? "#fff" : "#9ca3af", fontSize: 14, fontWeight: 700, cursor: journalText.trim() ? "pointer" : "not-allowed" }}>כתוב ביומן ✍️</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
-      <div style={{
-        background: "#ffffff", borderBottom: "1px solid #e5e7eb",
-        padding: "14px 20px", display: "flex", alignItems: "center", gap: 14, flexShrink: 0
-      }}>
-        <button onClick={onClose} style={{
-          background: "#f3f4f6", border: "1px solid #e5e7eb", color: "#6b7280",
-          width: 34, height: 34, borderRadius: "50%", cursor: "pointer", fontSize: 18,
-          display: "flex", alignItems: "center", justifyContent: "center"
-        }}>←</button>
+      <div style={{ background: "#ffffff", borderBottom: "1px solid #e5e7eb", padding: "14px 20px", display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
+        <button onClick={onClose} style={{ background: "#f3f4f6", border: "1px solid #e5e7eb", color: "#6b7280", width: 34, height: 34, borderRadius: "50%", cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>←</button>
         <div style={{ flex: 1 }}>
           <p style={{ color: "#1e1b4b", fontWeight: 600, fontSize: 15, margin: 0 }}>{task.text}</p>
           <p style={{ color: "#9ca3af", fontSize: 12, margin: 0 }}>פרק {chapter?.title}</p>
         </div>
-        {isCompleted && (
-          <span style={{
-            padding: "4px 12px", borderRadius: 20, fontSize: 12,
-            background: "rgba(16,185,129,0.1)", color: "#059669",
-            border: "1px solid rgba(16,185,129,0.3)"
-          }}>✓ הושלם</span>
-        )}
+        {isCompleted && <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, background: "rgba(16,185,129,0.1)", color: "#059669", border: "1px solid rgba(16,185,129,0.3)" }}>✓ הושלם</span>}
       </div>
 
       {/* Body */}
@@ -1372,11 +1391,9 @@ export function TaskModal({ task, chapter, data, save, isParent, onClose, PhotoU
           ? <ActivityComponent state={activityData} onChange={saveActivity} isParent={isParent} data={data} save={save} />
           : <p style={{ color: "#6b7280", textAlign: "center", padding: 40 }}>הפעילות בדרך...</p>
         }
-        {/* Photo upload if available */}
         {PhotoUploadComponent && !isParent && (
           <PhotoUploadComponent taskId={task.id} taskName={task.text} data={data} save={save} />
         )}
-        {/* Task comments */}
         {TaskCommentsComponent && (
           <TaskCommentsComponent taskId={task.id} taskText={task.text} data={data} save={save} isParent={isParent} />
         )}
@@ -1384,15 +1401,8 @@ export function TaskModal({ task, chapter, data, save, isParent, onClose, PhotoU
 
       {/* Footer */}
       {!isParent && !isCompleted && ActivityComponent && (
-        <div style={{
-          position: "absolute", bottom: 0, left: 0, right: 0,
-          padding: "16px", background: "#ffffff", borderTop: "1px solid #e5e7eb"
-        }}>
-          <button onClick={markComplete} style={{
-            width: "100%", padding: "14px", borderRadius: 14,
-            background: "linear-gradient(135deg, #7c3aed, #a855f7)",
-            border: "none", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer"
-          }}>
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "16px", background: "#ffffff", borderTop: "1px solid #e5e7eb" }}>
+          <button onClick={markComplete} style={{ width: "100%", padding: "14px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
             ✓ סיימתי את המשימה הזו
           </button>
         </div>
