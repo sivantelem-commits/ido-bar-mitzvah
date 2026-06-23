@@ -120,27 +120,155 @@ function ReflectionSection({ questions, values, onChange }) {
 
 // ─── Individual task activities ───────────────────────────────────────────────
 
+function CovenantLine({ text }) {
+  return <p style={{ color: "#1e1b4b", fontSize: 14, lineHeight: 1.9, margin: "0 0 6px", paddingRight: 12, borderRight: "2px solid rgba(124,58,237,0.2)" }}>{text}</p>;
+}
+
+function SignatureField({ label, value, onChange, placeholder }) {
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 12, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1 }}>{label}</p>
+      <input value={value || ""} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+        style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "#f9fafb", border: "1.5px solid #e5e7eb", color: "#1e1b4b", fontSize: 15, fontFamily: "Georgia, serif", outline: "none", direction: "rtl", fontStyle: "italic" }} />
+    </div>
+  );
+}
+
 function T1_OpeningCeremony({ state, onChange }) {
-  const s = state || { promise: "", word: "", feeling: "" };
+  const s = state || {};
+  const [phase, setPhase] = useState(s.phase || "read");
+
+  const allSigned = s.idoSig && s.mom1Sig && s.mom2Sig;
+
+  function printCovenant() {
+    const html = `<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head><meta charset="UTF-8"><title>אמנת המסע</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Heebo', Arial, sans-serif; direction: rtl; color: #1e1b4b; background: #fff; padding: 40px; max-width: 600px; margin: 0 auto; }
+@media print { body { padding: 20mm; } }
+.header { text-align: center; margin-bottom: 40px; }
+.emoji { font-size: 48pt; display: block; margin-bottom: 12px; }
+h1 { font-size: 28pt; font-weight: 900; color: #1e1b4b; margin-bottom: 4px; }
+.subtitle { font-size: 12pt; color: #9ca3af; }
+.divider { height: 2px; background: linear-gradient(90deg, transparent, #7c3aed, transparent); margin: 28px 0; }
+.section-title { font-size: 10pt; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
+.commitment { font-size: 13pt; line-height: 2; color: #1e1b4b; margin-bottom: 8px; padding-right: 14px; border-right: 3px solid rgba(124,58,237,0.25); }
+.signatures { display: flex; gap: 24px; margin-top: 32px; }
+.sig-box { flex: 1; text-align: center; border-top: 1.5px solid #1e1b4b; padding-top: 10px; }
+.sig-name { font-size: 14pt; font-family: Georgia, serif; font-style: italic; margin-bottom: 4px; }
+.sig-label { font-size: 9pt; color: #9ca3af; }
+.date { text-align: center; font-size: 10pt; color: #9ca3af; margin-top: 20px; }
+-webkit-print-color-adjust: exact; print-color-adjust: exact;
+</style></head><body>
+<div class="header">
+  <span class="emoji">🕯️</span>
+  <h1>אמנת המסע</h1>
+  <p class="subtitle">שנת בר מצווה — עידו 2026–2027</p>
+</div>
+<div class="divider"></div>
+<p class="section-title">אני, עידו, מתחייב:</p>
+<p class="commitment">לצאת למסע הזה בכוונה אמיתית, לא כי אני חייב, אלא כי בחרתי.</p>
+<p class="commitment">לנסות, גם כשקשה. להכשל, לעבד ולקום.</p>
+<p class="commitment">לדבר אמת עם עצמי ועם אנשים שאוהבים אותי.</p>
+<p class="commitment">לקחת אחריות על המילים, המעשים והבחירות שלי.</p>
+<p class="commitment">להגיע ליום בר המצווה כאדם שמכיר את עצמו טוב יותר.</p>
+<div class="divider"></div>
+<p class="section-title">אנחנו, אמא ואמא, מתחייבות:</p>
+<p class="commitment">ללכת לצידך. לא לפניך ולא במקומך.</p>
+<p class="commitment">לשאול שאלות, לא לתת תשובות מוכנות.</p>
+<p class="commitment">לאתגר אותך מתוך אהבה, לא מתוך חשש.</p>
+<p class="commitment">לראות אותך — את מי שאתה, לא רק את מה שאתה עושה.</p>
+<p class="commitment">לחגוג איתך כל צעד, גדול כקטן.</p>
+<div class="divider"></div>
+<div class="signatures">
+  <div class="sig-box"><p class="sig-name">${s.idoSig || "עידו"}</p><p class="sig-label">עידו</p></div>
+  <div class="sig-box"><p class="sig-name">${s.mom1Sig || ""}</p><p class="sig-label">אמא</p></div>
+  <div class="sig-box"><p class="sig-name">${s.mom2Sig || ""}</p><p class="sig-label">אמא</p></div>
+</div>
+<p class="date">נובמבר 2026</p>
+</body></html>`;
+    const w = window.open("", "_blank");
+    w.document.write(html); w.document.close();
+    w.onload = () => w.print();
+  }
+
   return (
     <div>
-      <Intro emoji="🕯️" title="טקס פתיחה"
-        desc="היום מתחיל המסע. טקס קצר עם המשפחה — כדי לסמן שמשהו חדש מתחיל. קראו את אמנת ההתבגרות המשפחתית יחד, ואז ענה על השאלות הבאות." />
-      <Card>
-        <Label>מילה אחת שמתארת איך אתה מרגיש עכשיו</Label>
-        <ChipSelect options={["מרגש", "מפחיד", "מוכן", "סקרן", "שמח", "לא בטוח", "נלהב"]}
-          value={s.feeling} onChange={v => onChange({ ...s, feeling: v })} />
-      </Card>
-      <Card style={{ marginTop: 12 }}>
-        <Label>הבטחה אחת שאתה נותן לעצמך לשנה הזו</Label>
-        <TextInput multiline value={s.promise} onChange={v => onChange({ ...s, promise: v })}
-          placeholder="אני מבטיח לעצמי שהשנה אני..." />
-      </Card>
-      <Card style={{ marginTop: 12 }}>
-        <Label>מילה אחת שאתה רוצה שתגדיר אותך בסוף השנה</Label>
-        <TextInput value={s.word} onChange={v => onChange({ ...s, word: v })}
-          placeholder="לדוגמה: אמיץ, עצמאי, אחראי..." />
-      </Card>
+      <Intro emoji="🕯️" title="טקס פתיחה — אמנת המסע"
+        desc="היום מתחיל המסע. קראו את האמנה יחד בקול, ואז כל אחד חותם." />
+
+      {/* Tabs */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+        {[["read","📜 האמנה"], ["sign","✍️ חתימות"], ["feeling","💭 איך אני מרגיש"]].map(([p, l]) => (
+          <button key={p} onClick={() => { setPhase(p); onChange({ ...s, phase: p }); }} style={{ flex: 1, padding: "9px 6px", borderRadius: 10, fontSize: 13, cursor: "pointer", background: phase === p ? "rgba(124,58,237,0.1)" : "#f9fafb", border: phase === p ? "1.5px solid #7c3aed" : "1px solid #e5e7eb", color: phase === p ? "#7c3aed" : "#6b7280", fontWeight: phase === p ? 600 : 400 }}>{l}</button>
+        ))}
+      </div>
+
+      {/* READ phase */}
+      {phase === "read" && (
+        <div>
+          <Card style={{ marginBottom: 16, border: "1.5px solid rgba(124,58,237,0.2)", background: "rgba(124,58,237,0.03)" }}>
+            <p style={{ color: "#7c3aed", fontWeight: 700, fontSize: 13, margin: "0 0 14px", textTransform: "uppercase", letterSpacing: 1 }}>אני, עידו, מתחייב:</p>
+            {["לצאת למסע הזה בכוונה אמיתית, לא כי אני חייב, אלא כי בחרתי.", "לנסות, גם כשקשה. להכשל, לעבד ולקום.", "לדבר אמת עם עצמי ועם אנשים שאוהבים אותי.", "לקחת אחריות על המילים, המעשים והבחירות שלי.", "להגיע ליום בר המצווה כאדם שמכיר את עצמו טוב יותר."].map((t, i) => <CovenantLine key={i} text={t} />)}
+          </Card>
+          <Card style={{ marginBottom: 16, border: "1.5px solid rgba(16,185,129,0.2)", background: "rgba(16,185,129,0.03)" }}>
+            <p style={{ color: "#059669", fontWeight: 700, fontSize: 13, margin: "0 0 14px", textTransform: "uppercase", letterSpacing: 1 }}>אנחנו, אמא ואמא, מתחייבות:</p>
+            {["ללכת לצידך. לא לפניך ולא במקומך.", "לשאול שאלות, לא לתת תשובות מוכנות.", "לאתגר אותך מתוך אהבה, לא מתוך חשש.", "לראות אותך — את מי שאתה, לא רק את מה שאתה עושה.", "לחגוג איתך כל צעד, גדול כקטן."].map((t, i) => <CovenantLine key={i} text={t} />)}
+          </Card>
+          <button onClick={() => { setPhase("sign"); onChange({ ...s, phase: "sign" }); }} style={{ width: "100%", padding: "13px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>קראנו יחד — עכשיו נחתום ✍️</button>
+        </div>
+      )}
+
+      {/* SIGN phase */}
+      {phase === "sign" && (
+        <div>
+          <Card style={{ marginBottom: 16 }}>
+            <p style={{ color: "#1e1b4b", fontWeight: 600, fontSize: 14, margin: "0 0 18px" }}>✍️ חתימות — כתבו את שמכם</p>
+            <SignatureField label="עידו" value={s.idoSig} onChange={v => onChange({ ...s, idoSig: v })} placeholder="חתימת עידו..." />
+            <SignatureField label="אמא" value={s.mom1Sig} onChange={v => onChange({ ...s, mom1Sig: v })} placeholder="חתימה..." />
+            <SignatureField label="אמא" value={s.mom2Sig} onChange={v => onChange({ ...s, mom2Sig: v })} placeholder="חתימה..." />
+          </Card>
+
+          {allSigned && (
+            <div>
+              <div style={{ padding: 16, borderRadius: 14, background: "rgba(16,185,129,0.08)", border: "1.5px solid rgba(16,185,129,0.3)", marginBottom: 12, textAlign: "center" }}>
+                <p style={{ fontSize: 28, margin: "0 0 6px" }}>🎉</p>
+                <p style={{ color: "#059669", fontWeight: 700, fontSize: 15, margin: "0 0 4px" }}>האמנה נחתמה!</p>
+                <p style={{ color: "#6b7280", fontSize: 13, margin: 0 }}>המסע מתחיל רשמית</p>
+              </div>
+              <button onClick={printCovenant} style={{ width: "100%", padding: "12px", borderRadius: 12, background: "#fff", border: "1.5px solid #7c3aed", color: "#7c3aed", fontSize: 14, fontWeight: 600, cursor: "pointer", marginBottom: 10 }}>🖨️ הדפס את האמנה</button>
+            </div>
+          )}
+
+          {allSigned && (
+            <button onClick={() => { setPhase("feeling"); onChange({ ...s, phase: "feeling" }); }} style={{ width: "100%", padding: "12px", borderRadius: 12, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>המשך ←</button>
+          )}
+        </div>
+      )}
+
+      {/* FEELING phase */}
+      {phase === "feeling" && (
+        <div>
+          <Card style={{ marginBottom: 12 }}>
+            <Label>מילה אחת שמתארת איך אתה מרגיש עכשיו</Label>
+            <ChipSelect options={["מרגש", "מוכן", "סקרן", "שמח", "נלהב", "קצת מפחיד", "לא בטוח"]}
+              value={s.feeling} onChange={v => onChange({ ...s, feeling: v })} />
+          </Card>
+          <Card style={{ marginBottom: 12 }}>
+            <Label>הבטחה אחת שאתה נותן לעצמך לשנה הזו</Label>
+            <TextInput multiline value={s.promise || ""} onChange={v => onChange({ ...s, promise: v })}
+              placeholder="אני מבטיח לעצמי שהשנה אני..." />
+          </Card>
+          <Card>
+            <Label>מילה אחת שאתה רוצה שתגדיר אותך בסוף השנה</Label>
+            <TextInput value={s.word || ""} onChange={v => onChange({ ...s, word: v })}
+              placeholder="לדוגמה: אמיץ, עצמאי, אחראי..." />
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
