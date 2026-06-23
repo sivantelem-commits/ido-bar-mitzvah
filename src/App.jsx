@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { TaskModal, ClimaxModal, MonthlyQuiz, MONTH_QUIZZES, MONTH_QUIZZES_CH2, MONTH_QUIZZES_CH3, MONTH_QUIZZES_CH4 } from "./TaskActivity.jsx";
+import { PhotoUpload, GalleryView, ShareView, PDFView, PHOTO_TASKS } from "./Features.jsx";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -331,7 +332,9 @@ function TasksView({ data, save, isParent }) {
           chapter={activeTask.chapter}
           data={data} save={save}
           isParent={isParent}
-          onClose={() => setActiveTask(null)} />
+          onClose={() => setActiveTask(null)}
+          PhotoUploadComponent={PHOTO_TASKS[activeTask.task.id] ? PhotoUpload : null}
+        />
       )}
       {activeClimax && (
         <ClimaxModal
@@ -1950,13 +1953,17 @@ function YearCalendarView({ data }) {
 function JourneyBookView({ data }) {
   const [chapter, setChapter] = useState("intro");
   const totalDone = ALL_TASKS.filter(t => data.completed[t.id]).length;
-  const bookChapters = [{ id: "intro", label: "פתיחה", icon: "📖" }, { id: "values", label: "ערכים", icon: "⭐" }, { id: "journal", label: "יומן", icon: "📝" }, { id: "insights", label: "תובנות", icon: "💡" }, { id: "letter", label: "מכתב", icon: "✉️" }];
+  const bookChapters = [{ id: "intro", label: "פתיחה", icon: "📖" }, { id: "values", label: "ערכים", icon: "⭐" }, { id: "journal", label: "יומן", icon: "📝" }, { id: "insights", label: "תובנות", icon: "💡" }, { id: "letter", label: "מכתב", icon: "✉️" }, { id: "pdf", label: "PDF", icon: "📄" }, { id: "share", label: "שתף", icon: "🔗" }];
   return (
     <div>
       <div style={{ background: "linear-gradient(135deg, #7c3aed, #a855f7)", borderRadius: 20, padding: "24px 20px", marginBottom: 20, color: "#fff", textAlign: "center" }}>
         <p style={{ fontSize: 40, margin: "0 0 8px" }}>📚</p>
         <h2 style={{ fontSize: 20, fontWeight: 700, margin: "0 0 6px", color: "#fff" }}>ספר המסע של עידו</h2>
-        <p style={{ fontSize: 13, opacity: 0.85, margin: 0, color: "#fff" }}>{totalDone} משימות · שנת בר מצווה 2026–2027</p>
+        <p style={{ fontSize: 13, opacity: 0.85, margin: "0 0 16px", color: "#fff" }}>{totalDone} משימות · שנת בר מצווה 2026–2027</p>
+        <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+          <button onClick={() => setChapter("pdf")} style={{ padding: "8px 18px", borderRadius: 10, background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>📄 PDF</button>
+          <button onClick={() => setChapter("share")} style={{ padding: "8px 18px", borderRadius: 10, background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>🔗 שתף</button>
+        </div>
       </div>
       <div style={{ display: "flex", gap: 8, marginBottom: 20, overflowX: "auto", paddingBottom: 4 }}>
         {bookChapters.map(bc => (
@@ -2005,6 +2012,8 @@ function JourneyBookView({ data }) {
           : <p style={{ color: "#9ca3af", fontSize: 14 }}>המכתב יופיע אחרי משימה t40</p>}
         </div>
       )}
+      {chapter === "pdf" && <PDFView data={data} />}
+      {chapter === "share" && <ShareView data={data} />}
     </div>
   );
 }
@@ -2013,14 +2022,14 @@ function JourneyBookView({ data }) {
 const NAV_IDO = [
   { id: "home",     label: "בית",      icon: "🏠" },
   { id: "tasks",    label: "משימות",   icon: "✓" },
-  { id: "calendar", label: "לוח שנה", icon: "📅" },
-  { id: "journal",  label: "יומן",     icon: "📝" },
+  { id: "gallery",  label: "גלריה",    icon: "📸" },
   { id: "book",     label: "ספר המסע",icon: "📚" },
+  { id: "journal",  label: "יומן",     icon: "📝" },
 ];
 const NAV_PARENT = [
   { id: "home",     label: "בית",      icon: "🏠" },
   { id: "tasks",    label: "משימות",   icon: "✓" },
-  { id: "progress", label: "התקדמות", icon: "📊" },
+  { id: "gallery",  label: "גלריה",    icon: "📸" },
   { id: "calendar", label: "לוח שנה", icon: "📅" },
   { id: "journal",  label: "הערות",   icon: "📝" },
 ];
@@ -2106,10 +2115,13 @@ export default function App() {
         {tab === "tasks"    && <TasksView data={data} save={save} isParent={isParent} />}
         {tab === "progress" && <ProgressView data={data} />}
         {tab === "calendar" && <YearCalendarView data={data} />}
+        {tab === "gallery"  && <GalleryView data={data} />}
         {tab === "journal"  && <JournalView data={data} save={save} isParent={isParent} />}
         {tab === "map"      && <ValuesMapView data={data} save={save} />}
         {tab === "manifesto"&& <ManifestoView />}
         {tab === "book"     && <JourneyBookView data={data} />}
+        {tab === "share"    && <ShareView data={data} />}
+        {tab === "pdf"      && <PDFView data={data} />}
       </main>
     </div>
   );
