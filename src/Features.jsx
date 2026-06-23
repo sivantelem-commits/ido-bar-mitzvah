@@ -308,7 +308,9 @@ export function PDFView({ data }) {
     const journal = [...(data.journal || [])].reverse().slice(0, 10);
     const letter = data.taskData?.t40?.letter || "";
     const values = data.values || [];
-    const speech = data.taskData?.t38;
+    const speech = data.taskData?.t38 || null;
+
+    const hasSpeech = !!(speech?.opening);
 
     const html = `
 <!DOCTYPE html>
@@ -388,7 +390,7 @@ export function PDFView({ data }) {
   ${values.length > 0 ? `<h2>⭐ הערכים שלי</h2><p>${values.map(v => `<span class="value-tag">${v}</span>`).join("")}</p>` : ""}
 </div>
 
-${speech?.opening ? `
+${hasSpeech ? `
 <!-- SPEECH -->
 <div class="page">
   <h2>🎤 הנאום שלי</h2>
