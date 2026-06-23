@@ -298,30 +298,9 @@ function TasksView({ data, save, isParent }) {
   const totalDone = ALL_TASKS.filter(t => data.completed[t.id]).length;
   const overallPct = Math.round((totalDone / TOTAL_TASKS) * 100);
 
-  // A month is unlocked when all tasks in all previous months are done
-  function isMonthUnlocked(chapterIdx, monthIdx) {
-    if (isParent) return true;
-    for (let ci = 0; ci <= chapterIdx; ci++) {
-      const ch = CHAPTERS[ci];
-      const mEnd = ci === chapterIdx ? monthIdx : ch.months.length;
-      for (let mi = 0; mi < mEnd; mi++) {
-        if (!ch.months[mi].tasks.every(t => data.completed[t.id])) return false;
-      }
-    }
-    return true;
-  }
-
-  function isClimaxUnlocked(ch) {
-    if (isParent) return true;
-    return ch.months.flatMap(m => m.tasks).every(t => data.completed[t.id]);
-  }
-
-  function isChapterUnlocked(chIdx) {
-    if (isParent) return true;
-    if (chIdx === 0) return true;
-    const prevCh = CHAPTERS[chIdx - 1];
-    return !!(data.climaxData || {})[prevCh.id]?.parentApproved;
-  }
+  function isMonthUnlocked(chapterIdx, monthIdx) { return true; }
+  function isClimaxUnlocked(ch) { return true; }
+  function isChapterUnlocked(chIdx) { return true; }
 
   return (
     <div>
@@ -570,34 +549,33 @@ function TasksView({ data, save, isParent }) {
                 })}
 
                 {/* Climax */}
-                <div onClick={() => (climaxUnlocked || isParent) && setActiveClimax(ch.id)} style={{
-                  marginTop: 12, padding: "14px 16px", borderRadius: 14,
+                <div onClick={() => setActiveClimax(ch.id)} style={{
+                  marginTop: 12, padding: "16px 18px", borderRadius: 14,
                   background: climaxApproved
-                    ? "rgba(16,185,129,0.1)"
-                    : climaxUnlocked
-                    ? "rgba(234,179,8,0.1)"
-                    : "#fafafa",
+                    ? "rgba(16,185,129,0.08)"
+                    : isParent
+                    ? "rgba(124,58,237,0.08)"
+                    : "rgba(234,179,8,0.08)",
                   border: climaxApproved
-                    ? "1px solid rgba(16,185,129,0.3)"
-                    : climaxUnlocked
-                    ? "1px solid rgba(234,179,8,0.3)"
-                    : "1px solid #f3f4f6",
-                  cursor: (climaxUnlocked || isParent) ? "pointer" : "default",
-                  opacity: !climaxUnlocked && !isParent ? 0.4 : 1,
+                    ? "2px solid rgba(16,185,129,0.4)"
+                    : isParent
+                    ? "2px solid rgba(124,58,237,0.4)"
+                    : "1.5px solid rgba(234,179,8,0.3)",
+                  cursor: "pointer",
                   display: "flex", alignItems: "center", gap: 12
                 }}>
-                  <span style={{ fontSize: 20 }}>
-                    {climaxApproved ? "✅" : climaxUnlocked ? "🎯" : "🔒"}
+                  <span style={{ fontSize: 24 }}>
+                    {climaxApproved ? "✅" : "🎯"}
                   </span>
                   <div style={{ flex: 1 }}>
-                    <p style={{ color: climaxApproved ? "#6ee7b7" : climaxUnlocked ? "#fbbf24" : "rgba(255,255,255,0.4)", fontSize: 14, fontWeight: 600, margin: "0 0 2px" }}>
-                      אירוע שיא
+                    <p style={{ color: climaxApproved ? "#059669" : isParent ? "#7c3aed" : "#d97706", fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>
+                      {climaxApproved ? "אירוע שיא — הושלם ✓" : isParent ? "⬅️ לחצי כאן לאישור אירוע השיא" : "🎯 אירוע שיא"}
                     </p>
                     <p style={{ color: "#6b7280", fontSize: 12, margin: 0 }}>
-                      {climaxApproved ? "הושלם ואושר ✓" : climaxUnlocked ? ch.climax : "יפתח כשכל המשימות יושלמו"}
+                      {climaxApproved ? ch.climax : isParent ? `לאחר האירוע — אשרי כאן לפתוח את הפרק הבא` : ch.climax}
                     </p>
                   </div>
-                  {(climaxUnlocked || isParent) && <span style={{ color: "#d1d5db", fontSize: 18 }}>›</span>}
+                  <span style={{ color: isParent && !climaxApproved ? "#7c3aed" : "#d1d5db", fontSize: 20, fontWeight: 700 }}>›</span>
                 </div>
               </div>
             )}
