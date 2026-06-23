@@ -1322,7 +1322,7 @@ export const MONTH_QUIZZES_CH4 = {
 
 // ─── Task modal wrapper ───────────────────────────────────────────────────────
 
-export function TaskModal({ task, chapter, data, save, isParent, onClose }) {
+export function TaskModal({ task, chapter, data, save, isParent, onClose, PhotoUploadComponent }) {
   const ActivityComponent = TASK_ACTIVITIES[task.id];
   const activityData = (data.taskData || {})[task.id] || {};
   const isCompleted = !!data.completed?.[task.id];
@@ -1345,11 +1345,11 @@ export function TaskModal({ task, chapter, data, save, isParent, onClose }) {
     }}>
       {/* Header */}
       <div style={{
-        background: "#f8f7ff", borderBottom: "1px solid #e5e7eb",
+        background: "#ffffff", borderBottom: "1px solid #e5e7eb",
         padding: "14px 20px", display: "flex", alignItems: "center", gap: 14, flexShrink: 0
       }}>
         <button onClick={onClose} style={{
-          background: "#e5e7eb", border: "none", color: "#1e1b4b",
+          background: "#f3f4f6", border: "1px solid #e5e7eb", color: "#6b7280",
           width: 34, height: 34, borderRadius: "50%", cursor: "pointer", fontSize: 18,
           display: "flex", alignItems: "center", justifyContent: "center"
         }}>←</button>
@@ -1360,7 +1360,7 @@ export function TaskModal({ task, chapter, data, save, isParent, onClose }) {
         {isCompleted && (
           <span style={{
             padding: "4px 12px", borderRadius: 20, fontSize: 12,
-            background: "rgba(16,185,129,0.2)", color: "#059669",
+            background: "rgba(16,185,129,0.1)", color: "#059669",
             border: "1px solid rgba(16,185,129,0.3)"
           }}>✓ הושלם</span>
         )}
@@ -1372,19 +1372,22 @@ export function TaskModal({ task, chapter, data, save, isParent, onClose }) {
           ? <ActivityComponent state={activityData} onChange={saveActivity} isParent={isParent} data={data} save={save} />
           : <p style={{ color: "#6b7280", textAlign: "center", padding: 40 }}>הפעילות בדרך...</p>
         }
+        {/* Photo upload if available */}
+        {PhotoUploadComponent && !isParent && (
+          <PhotoUploadComponent taskId={task.id} taskName={task.text} data={data} save={save} />
+        )}
       </div>
 
       {/* Footer */}
       {!isParent && !isCompleted && ActivityComponent && (
         <div style={{
           position: "absolute", bottom: 0, left: 0, right: 0,
-          padding: "16px", background: "rgba(10,10,26,0.95)", backdropFilter: "blur(10px)",
-          borderTop: "1px solid rgba(255,255,255,0.07)"
+          padding: "16px", background: "#ffffff", borderTop: "1px solid #e5e7eb"
         }}>
           <button onClick={markComplete} style={{
             width: "100%", padding: "14px", borderRadius: 14,
             background: "linear-gradient(135deg, #7c3aed, #a855f7)",
-            border: "none", color: "#1e1b4b", fontSize: 16, fontWeight: 700, cursor: "pointer"
+            border: "none", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer"
           }}>
             ✓ סיימתי את המשימה הזו
           </button>
