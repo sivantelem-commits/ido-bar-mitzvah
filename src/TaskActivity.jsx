@@ -1322,7 +1322,7 @@ export const MONTH_QUIZZES_CH4 = {
 
 // ─── Task modal wrapper ───────────────────────────────────────────────────────
 
-export function TaskModal({ task, chapter, data, save, isParent, onClose, PhotoUploadComponent }) {
+export function TaskModal({ task, chapter, data, save, isParent, onClose, PhotoUploadComponent, TaskCommentsComponent }) {
   const ActivityComponent = TASK_ACTIVITIES[task.id];
   const activityData = (data.taskData || {})[task.id] || {};
   const isCompleted = !!data.completed?.[task.id];
@@ -1375,6 +1375,10 @@ export function TaskModal({ task, chapter, data, save, isParent, onClose, PhotoU
         {/* Photo upload if available */}
         {PhotoUploadComponent && !isParent && (
           <PhotoUploadComponent taskId={task.id} taskName={task.text} data={data} save={save} />
+        )}
+        {/* Task comments */}
+        {TaskCommentsComponent && (
+          <TaskCommentsComponent taskId={task.id} taskText={task.text} data={data} save={save} isParent={isParent} />
         )}
       </div>
 
