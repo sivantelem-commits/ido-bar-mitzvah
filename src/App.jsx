@@ -313,6 +313,7 @@ function TasksView({ data, save, isParent }) {
           isParent={isParent}
           onClose={() => setActiveTask(null)}
           PhotoUploadComponent={PHOTO_TASKS[activeTask.task.id] ? PhotoUpload : null}
+          TaskCommentsComponent={TaskComments}
         />
       )}
       {activeClimax && (
@@ -1871,6 +1872,16 @@ function DashboardView({ data, isParent, onNavigate }) {
           ))}
         </div>
       )}
+
+      {/* Half year report button */}
+      <button onClick={() => onNavigate("halfyear")} style={{ width: "100%", marginTop: 14, padding: "14px 16px", borderRadius: 16, background: "#fff", border: "1.5px solid rgba(124,58,237,0.2)", cursor: "pointer", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 1px 4px rgba(124,58,237,0.06)" }}>
+        <span style={{ fontSize: 28 }}>🎖️</span>
+        <div style={{ textAlign: "right" }}>
+          <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 14, margin: "0 0 2px" }}>דוח חצי שנה</p>
+          <p style={{ color: "#9ca3af", fontSize: 12, margin: 0 }}>סיכום פרק 1 — שורשים וזהות</p>
+        </div>
+        <span style={{ color: "#d1d5db", fontSize: 18, marginRight: "auto" }}>›</span>
+      </button>
     </div>
   );
 }
@@ -2005,11 +2016,11 @@ const NAV_IDO = [
   { id: "journal",  label: "יומן",     icon: "📝" },
 ];
 const NAV_PARENT = [
-  { id: "home",     label: "בית",      icon: "🏠" },
-  { id: "tasks",    label: "משימות",   icon: "✓" },
-  { id: "gallery",  label: "גלריה",    icon: "📸" },
-  { id: "calendar", label: "לוח שנה", icon: "📅" },
-  { id: "journal",  label: "הערות",   icon: "📝" },
+  { id: "parent-home", label: "בית",      icon: "🏠" },
+  { id: "tasks",       label: "משימות",   icon: "✓" },
+  { id: "gallery",     label: "גלריה",    icon: "📸" },
+  { id: "calendar",    label: "לוח שנה", icon: "📅" },
+  { id: "journal",     label: "הערות",   icon: "📝" },
 ];
 
 export default function App() {
@@ -2126,17 +2137,20 @@ export default function App() {
 
       {/* Content */}
       <main className="main-content" style={{ maxWidth: 900, margin: "0 auto", padding: "24px 16px 80px" }}>
-        {tab === "home"     && <DashboardView data={data} save={save} isParent={isParent} onNavigate={setTab} />}
-        {tab === "tasks"    && <TasksView data={data} save={save} isParent={isParent} />}
-        {tab === "progress" && <ProgressView data={data} />}
-        {tab === "calendar" && <YearCalendarView data={data} />}
-        {tab === "gallery"  && <GalleryView data={data} />}
-        {tab === "journal"  && <JournalView data={data} save={save} isParent={isParent} />}
-        {tab === "map"      && <ValuesMapView data={data} save={save} />}
-        {tab === "manifesto"&& <ManifestoView />}
-        {tab === "book"     && <JourneyBookView data={data} />}
-        {tab === "share"    && <ShareView data={data} />}
-        {tab === "pdf"      && <PDFView data={data} />}
+        {tab === "home"        && !isParent && <DashboardView data={data} save={save} isParent={false} onNavigate={setTab} />}
+        {tab === "parent-home" && isParent  && <ParentDashboard data={data} save={save} onNavigate={setTab} />}
+        {tab === "home"        && isParent  && <ParentDashboard data={data} save={save} onNavigate={setTab} />}
+        {tab === "tasks"       && <TasksView data={data} save={save} isParent={isParent} />}
+        {tab === "progress"    && <ProgressView data={data} />}
+        {tab === "calendar"    && <YearCalendarView data={data} />}
+        {tab === "gallery"     && <GalleryView data={data} />}
+        {tab === "journal"     && <JournalView data={data} save={save} isParent={isParent} />}
+        {tab === "map"         && <ValuesMapView data={data} save={save} />}
+        {tab === "manifesto"   && <ManifestoView />}
+        {tab === "book"        && <JourneyBookView data={data} />}
+        {tab === "share"       && <ShareView data={data} />}
+        {tab === "pdf"         && <PDFView data={data} />}
+        {tab === "halfyear"    && <HalfYearReport data={data} />}
       </main>
 
       {/* Mobile bottom nav */}
@@ -2149,6 +2163,361 @@ export default function App() {
           </button>
         ))}
       </nav>
+    </div>
+  );
+}
+
+// ─── Parent Dashboard ─────────────────────────────────────────────────────────
+function ParentDashboard({ data, save, onNavigate }) {
+  const totalDone = ALL_TASKS.filter(t => data.completed[t.id]).length;
+  const overallPct = Math.round((totalDone / TOTAL_TASKS) * 100);
+  const lastActivity = data.lastActivity || null;
+  const daysSince = lastActivity
+    ? Math.floor((Date.now() - lastActivity) / (1000 * 60 * 60 * 24))
+    : null;
+
+  // Tasks completed this week
+  const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const completedThisWeek = Object.entries(data.completedAt || {})
+    .filter(([, ts]) => ts > oneWeekAgo).length;
+
+  // Journal this week
+  const journalThisWeek = (data.journal || []).filter(e => {
+    const parts = e.date?.split(".").reverse();
+    if (!parts || parts.length < 3) return false;
+    try {
+      const d = new Date(`${parts[0]}-${parts[1]}-${parts[2]}`);
+      return d.getTime() > oneWeekAgo;
+    } catch { return false; }
+  }).length;
+
+  // Current chapter
+  const currentChapter = CHAPTERS.find(ch =>
+    ch.months.flatMap(m => m.tasks).some(t => !data.completed[t.id])
+  ) || CHAPTERS[CHAPTERS.length - 1];
+
+  // Incomplete tasks in current month
+  const currentMonth = currentChapter?.months.find(m =>
+    m.tasks.some(t => !data.completed[t.id])
+  );
+  const pendingTasks = currentMonth?.tasks.filter(t => !data.completed[t.id]) || [];
+
+  // Parent notes count
+  const parentNotesCount = (data.parentNotes || []).length;
+
+  const statusColor = daysSince === null ? "#9ca3af"
+    : daysSince === 0 ? "#10b981"
+    : daysSince <= 3 ? "#f59e0b"
+    : "#ef4444";
+
+  const statusText = daysSince === null ? "טרם נכנס"
+    : daysSince === 0 ? "נכנס היום"
+    : daysSince === 1 ? "נכנס אתמול"
+    : `לא נכנס ${daysSince} ימים`;
+
+  return (
+    <div>
+      {/* Status bar */}
+      <div style={{ background: "#fff", borderRadius: 20, padding: 20, marginBottom: 16, border: `2px solid ${statusColor}30`, boxShadow: "0 1px 4px rgba(124,58,237,0.06)", display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ width: 48, height: 48, borderRadius: "50%", background: `${statusColor}15`, border: `2px solid ${statusColor}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>
+          {daysSince === 0 ? "🟢" : daysSince <= 3 ? "🟡" : "🔴"}
+        </div>
+        <div>
+          <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 16, margin: "0 0 3px" }}>עידו — {statusText}</p>
+          <p style={{ color: "#6b7280", fontSize: 13, margin: 0 }}>
+            {completedThisWeek > 0 ? `${completedThisWeek} משימות הושלמו השבוע` : "אין משימות השבוע עדיין"}
+          </p>
+        </div>
+      </div>
+
+      {/* Stats grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 16 }}>
+        {[
+          { icon: "✅", value: `${overallPct}%`, label: "הושלם", color: "#7c3aed" },
+          { icon: "📝", value: journalThisWeek.toString(), label: "יומן השבוע", color: "#10b981" },
+          { icon: "💬", value: parentNotesCount.toString(), label: "הערות שלנו", color: "#f59e0b" },
+        ].map(s => (
+          <div key={s.label} style={{ background: "#fff", borderRadius: 14, padding: "14px 10px", border: "1px solid #e5e7eb", textAlign: "center" }}>
+            <p style={{ fontSize: 20, margin: "0 0 4px" }}>{s.icon}</p>
+            <p style={{ color: s.color, fontWeight: 700, fontSize: 20, margin: "0 0 2px" }}>{s.value}</p>
+            <p style={{ color: "#9ca3af", fontSize: 10, margin: 0 }}>{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Current chapter */}
+      <div style={{ background: "#fff", borderRadius: 16, padding: 18, marginBottom: 16, border: "1px solid #e5e7eb" }}>
+        <p style={{ color: "#7c3aed", fontWeight: 700, fontSize: 14, margin: "0 0 12px" }}>📍 איפה עידו עכשיו</p>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+          <span style={{ fontSize: 24 }}>{currentChapter?.emoji}</span>
+          <div>
+            <p style={{ color: "#1e1b4b", fontWeight: 600, fontSize: 14, margin: "0 0 2px" }}>{currentChapter?.title}</p>
+            <p style={{ color: "#6b7280", fontSize: 12, margin: 0 }}>{currentMonth?.month} — {currentMonth?.title}</p>
+          </div>
+        </div>
+        {pendingTasks.length > 0 && (
+          <div>
+            <p style={{ color: "#9ca3af", fontSize: 12, margin: "0 0 8px" }}>משימות שממתינות:</p>
+            {pendingTasks.slice(0, 3).map(t => (
+              <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", borderRadius: 8, background: "#f9fafb", marginBottom: 5 }}>
+                <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#e5e7eb", flexShrink: 0 }} />
+                <span style={{ color: "#4b5563", fontSize: 13 }}>{t.text}</span>
+              </div>
+            ))}
+            {pendingTasks.length > 3 && <p style={{ color: "#9ca3af", fontSize: 12, margin: "6px 0 0" }}>ועוד {pendingTasks.length - 3}...</p>}
+          </div>
+        )}
+      </div>
+
+      {/* Quick actions */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
+        {[
+          { icon: "✓", label: "כל המשימות", tab: "tasks" },
+          { icon: "📝", label: "הוסף הערה", tab: "journal" },
+          { icon: "📸", label: "גלריה", tab: "gallery" },
+          { icon: "📅", label: "לוח שנה", tab: "calendar" },
+        ].map(a => (
+          <button key={a.tab} onClick={() => onNavigate(a.tab)} style={{ padding: "14px", borderRadius: 14, background: "#fff", border: "1.5px solid #e5e7eb", cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 22 }}>{a.icon}</span>
+            <span style={{ color: "#1e1b4b", fontWeight: 600, fontSize: 14 }}>{a.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Recent journal from Ido */}
+      {(data.journal || []).length > 0 && (
+        <div style={{ background: "#fff", borderRadius: 16, padding: 18, border: "1px solid #e5e7eb" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <p style={{ color: "#7c3aed", fontWeight: 700, fontSize: 14, margin: 0 }}>📓 מהיומן של עידו</p>
+            <button onClick={() => onNavigate("journal")} style={{ color: "#7c3aed", fontSize: 12, background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>הכל ›</button>
+          </div>
+          {[...(data.journal || [])].reverse().slice(0, 2).map(e => (
+            <div key={e.id} style={{ padding: "10px 12px", borderRadius: 10, background: "rgba(124,58,237,0.04)", border: "1px solid rgba(124,58,237,0.1)", marginBottom: 8 }}>
+              <p style={{ color: "#9ca3af", fontSize: 11, margin: "0 0 4px" }}>{e.date}</p>
+              <p style={{ color: "#1e1b4b", fontSize: 13, margin: 0, lineHeight: 1.5, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>{e.text}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Half-Year Report ─────────────────────────────────────────────────────────
+function HalfYearReport({ data }) {
+  const ch1Tasks = CHAPTERS[0].months.flatMap(m => m.tasks);
+  const ch1Done = ch1Tasks.filter(t => data.completed[t.id]).length;
+  const ch1Pct = Math.round((ch1Done / ch1Tasks.length) * 100);
+  const totalDone = ALL_TASKS.filter(t => data.completed[t.id]).length;
+  const journalCount = (data.journal || []).length;
+  const values = data.values || [];
+
+  const isHalfway = ch1Pct === 100;
+
+  if (!isHalfway) return (
+    <div style={{ textAlign: "center", padding: "60px 20px" }}>
+      <p style={{ fontSize: 48, margin: "0 0 12px" }}>📊</p>
+      <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 18, margin: "0 0 8px" }}>הדוח יפתח בסוף פרק 1</p>
+      <p style={{ color: "#9ca3af", fontSize: 14 }}>לאחר השלמת כל משימות "שורשים וזהות"</p>
+      <div style={{ marginTop: 20, padding: "14px 18px", borderRadius: 14, background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.15)" }}>
+        <p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 14, margin: "0 0 6px" }}>התקדמות פרק 1</p>
+        <div style={{ height: 8, borderRadius: 4, background: "#e5e7eb" }}>
+          <div style={{ height: "100%", borderRadius: 4, background: "#7c3aed", width: `${ch1Pct}%`, transition: "width 0.5s" }} />
+        </div>
+        <p style={{ color: "#9ca3af", fontSize: 12, margin: "6px 0 0" }}>{ch1Done}/{ch1Tasks.length} משימות</p>
+      </div>
+    </div>
+  );
+
+  return (
+    <div>
+      <div style={{ background: "linear-gradient(135deg, #7c3aed, #a855f7)", borderRadius: 20, padding: "28px 20px", marginBottom: 20, textAlign: "center", color: "#fff" }}>
+        <p style={{ fontSize: 48, margin: "0 0 10px" }}>🎖️</p>
+        <h2 style={{ fontSize: 22, fontWeight: 700, margin: "0 0 6px", color: "#fff" }}>דוח חצי שנה</h2>
+        <p style={{ fontSize: 14, opacity: 0.85, margin: 0, color: "#fff" }}>סיימת את הפרק הראשון — הנה הסיכום</p>
+      </div>
+
+      {/* Stats */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 16 }}>
+        {[
+          { value: ch1Done.toString(), label: "משימות הושלמו", icon: "✅" },
+          { value: journalCount.toString(), label: "כניסות יומן", icon: "📝" },
+          { value: values.length.toString(), label: "ערכים נבחרו", icon: "⭐" },
+        ].map(s => (
+          <div key={s.label} style={{ background: "#fff", borderRadius: 14, padding: 14, border: "1px solid #e5e7eb", textAlign: "center" }}>
+            <p style={{ fontSize: 22, margin: "0 0 4px" }}>{s.icon}</p>
+            <p style={{ color: "#7c3aed", fontWeight: 700, fontSize: 22, margin: "0 0 2px" }}>{s.value}</p>
+            <p style={{ color: "#9ca3af", fontSize: 10, margin: 0, lineHeight: 1.3 }}>{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Values */}
+      {values.length > 0 && (
+        <div style={{ background: "#fff", borderRadius: 16, padding: 18, marginBottom: 14, border: "1px solid #e5e7eb" }}>
+          <p style={{ color: "#7c3aed", fontWeight: 700, fontSize: 14, margin: "0 0 12px" }}>⭐ הערכים שבחרתי</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {values.map(v => (
+              <span key={v} style={{ padding: "8px 16px", borderRadius: 20, background: "rgba(124,58,237,0.1)", color: "#7c3aed", fontWeight: 600, fontSize: 13, border: "1.5px solid rgba(124,58,237,0.2)" }}>{v}</span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Strengths from T2 */}
+      {data.taskData?.t2?.strengths?.length > 0 && (
+        <div style={{ background: "#fff", borderRadius: 16, padding: 18, marginBottom: 14, border: "1px solid #e5e7eb" }}>
+          <p style={{ color: "#7c3aed", fontWeight: 700, fontSize: 14, margin: "0 0 12px" }}>💪 החוזקות שלי</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {(data.taskData.t2.strengths || []).map(s => (
+              <span key={s} style={{ padding: "7px 14px", borderRadius: 20, background: "rgba(16,185,129,0.08)", color: "#059669", fontSize: 13, border: "1px solid rgba(16,185,129,0.25)" }}>{s}</span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Opening promise */}
+      {data.taskData?.t1?.promise && (
+        <div style={{ background: "rgba(124,58,237,0.05)", borderRadius: 16, padding: 18, marginBottom: 14, border: "1.5px solid rgba(124,58,237,0.15)" }}>
+          <p style={{ color: "#7c3aed", fontWeight: 700, fontSize: 14, margin: "0 0 8px" }}>🕯️ ההבטחה שנתתי לעצמי</p>
+          <p style={{ color: "#1e1b4b", fontSize: 14, lineHeight: 1.7, margin: "0 0 12px", fontStyle: "italic" }}>"{data.taskData.t1.promise}"</p>
+          <p style={{ color: "#9ca3af", fontSize: 12, margin: 0 }}>בדוק: האם שמרת על ההבטחה עד כה?</p>
+        </div>
+      )}
+
+      {/* Monthly feedback summary */}
+      {data.taskData?.t6?.whatWorked && (
+        <div style={{ background: "#fff", borderRadius: 16, padding: 18, border: "1px solid #e5e7eb", marginBottom: 14 }}>
+          <p style={{ color: "#7c3aed", fontWeight: 700, fontSize: 14, margin: "0 0 12px" }}>🗣️ מהמשוב החודשי</p>
+          <div style={{ padding: "12px 14px", borderRadius: 10, background: "#f9fafb", marginBottom: 8 }}>
+            <p style={{ color: "#9ca3af", fontSize: 11, margin: "0 0 4px" }}>מה עבד טוב</p>
+            <p style={{ color: "#1e1b4b", fontSize: 13, margin: 0, lineHeight: 1.5 }}>{data.taskData.t6.whatWorked}</p>
+          </div>
+          {data.taskData.t6.nextMonth && (
+            <div style={{ padding: "12px 14px", borderRadius: 10, background: "#f9fafb" }}>
+              <p style={{ color: "#9ca3af", fontSize: 11, margin: "0 0 4px" }}>מטרה לחודש הבא</p>
+              <p style={{ color: "#1e1b4b", fontSize: 13, margin: 0, lineHeight: 1.5 }}>{data.taskData.t6.nextMonth}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div style={{ background: "rgba(234,179,8,0.07)", borderRadius: 16, padding: 18, border: "1.5px solid rgba(234,179,8,0.25)", textAlign: "center" }}>
+        <p style={{ fontSize: 32, margin: "0 0 8px" }}>🚀</p>
+        <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 15, margin: "0 0 6px" }}>הפרק הבא מחכה</p>
+        <p style={{ color: "#6b7280", fontSize: 13, margin: 0 }}>אחריות ועצמאות בעולם — מרץ 2027</p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Task Comments (parent notes on specific tasks) ───────────────────────────
+function TaskComments({ taskId, taskText, data, save, isParent }) {
+  const [text, setText] = useState("");
+  const comments = (data.taskComments || {})[taskId] || [];
+
+  function addComment() {
+    if (!text.trim()) return;
+    const comment = {
+      id: Date.now(),
+      text: text.trim(),
+      author: isParent ? "ההורים" : "עידו",
+      date: new Date().toLocaleDateString("he-IL"),
+    };
+    const newComments = { ...(data.taskComments || {}), [taskId]: [...comments, comment] };
+    save({ ...data, taskComments: newComments });
+    setText("");
+  }
+
+  if (comments.length === 0 && !isParent) return null;
+
+  return (
+    <div style={{ marginTop: 20, borderTop: "1px solid #e5e7eb", paddingTop: 16 }}>
+      <p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 13, margin: "0 0 12px" }}>
+        💬 {isParent ? "הערות שלנו למשימה הזו" : "מה ההורים אמרו"}
+      </p>
+      {comments.map(c => (
+        <div key={c.id} style={{ padding: "10px 14px", borderRadius: 12, marginBottom: 8, background: c.author === "ההורים" ? "rgba(16,185,129,0.06)" : "rgba(124,58,237,0.06)", border: c.author === "ההורים" ? "1px solid rgba(16,185,129,0.2)" : "1px solid rgba(124,58,237,0.15)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+            <span style={{ color: c.author === "ההורים" ? "#059669" : "#7c3aed", fontSize: 11, fontWeight: 600 }}>{c.author}</span>
+            <span style={{ color: "#9ca3af", fontSize: 11 }}>{c.date}</span>
+          </div>
+          <p style={{ color: "#1e1b4b", fontSize: 14, margin: 0, lineHeight: 1.6 }}>{c.text}</p>
+        </div>
+      ))}
+      {isParent && (
+        <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+          <input value={text} onChange={e => setText(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && addComment()}
+            placeholder="כתבי הערה על המשימה הזו..."
+            style={{ flex: 1, padding: "10px 14px", borderRadius: 10, background: "#f9fafb", border: "1.5px solid #e5e7eb", color: "#1e1b4b", fontSize: 13, outline: "none", direction: "rtl" }} />
+          <button onClick={addComment} style={{ padding: "10px 16px", borderRadius: 10, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", flexShrink: 0 }}>שלח</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Public Share Landing Page ────────────────────────────────────────────────
+function ShareLanding({ data }) {
+  const totalDone = ALL_TASKS.filter(t => data.completed[t.id]).length;
+  const overallPct = Math.round((totalDone / TOTAL_TASKS) * 100);
+  const values = data.values || [];
+
+  return (
+    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #f4f2ff 0%, #ede9fe 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px 16px", direction: "rtl", fontFamily: "'Segoe UI', Tahoma, sans-serif" }}>
+      <div style={{ width: "100%", maxWidth: 440 }}>
+        {/* Hero */}
+        <div style={{ background: "linear-gradient(135deg, #7c3aed, #a855f7)", borderRadius: 24, padding: "32px 24px", textAlign: "center", marginBottom: 16, boxShadow: "0 12px 40px rgba(124,58,237,0.3)" }}>
+          <p style={{ fontSize: 56, margin: "0 0 12px" }}>🧭</p>
+          <h1 style={{ color: "#fff", fontSize: 26, fontWeight: 900, margin: "0 0 6px" }}>עידו במסע</h1>
+          <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 15, margin: "0 0 20px" }}>שנת בר מצווה 2026–2027</p>
+          <div style={{ background: "rgba(255,255,255,0.15)", borderRadius: 16, padding: "16px 20px", backdropFilter: "blur(10px)" }}>
+            <p style={{ color: "#fff", fontSize: 42, fontWeight: 900, margin: "0 0 4px" }}>{overallPct}%</p>
+            <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 14, margin: 0 }}>{totalDone} מתוך 42 משימות הושלמו</p>
+          </div>
+        </div>
+
+        {/* Chapter progress */}
+        <div style={{ background: "#fff", borderRadius: 20, padding: 20, marginBottom: 14, boxShadow: "0 2px 12px rgba(124,58,237,0.08)" }}>
+          <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 15, margin: "0 0 14px" }}>המסע לפי פרקים</p>
+          {CHAPTERS.map((ch, i) => {
+            const tasks = ch.months.flatMap(m => m.tasks);
+            const done = tasks.filter(t => data.completed[t.id]).length;
+            const pct = Math.round((done / tasks.length) * 100);
+            return (
+              <div key={ch.id} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+                <span style={{ fontSize: 20, width: 26 }}>{ch.emoji}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                    <span style={{ color: "#1e1b4b", fontSize: 13, fontWeight: 500 }}>{ch.title}</span>
+                    <span style={{ color: ["#7c3aed","#0ea5e9","#f59e0b","#10b981"][i], fontSize: 12, fontWeight: 700 }}>{pct}%</span>
+                  </div>
+                  <div style={{ height: 6, borderRadius: 3, background: "#f3f4f6" }}>
+                    <div style={{ height: "100%", borderRadius: 3, background: ["#7c3aed","#0ea5e9","#f59e0b","#10b981"][i], width: `${pct}%`, transition: "width 0.5s" }} />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Values */}
+        {values.length > 0 && (
+          <div style={{ background: "#fff", borderRadius: 20, padding: 20, marginBottom: 14, boxShadow: "0 2px 12px rgba(124,58,237,0.08)" }}>
+            <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 15, margin: "0 0 12px" }}>⭐ הערכים שעידו בחר</p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {values.map(v => (
+                <span key={v} style={{ padding: "8px 16px", borderRadius: 20, background: "rgba(124,58,237,0.08)", color: "#7c3aed", fontSize: 13, fontWeight: 600, border: "1.5px solid rgba(124,58,237,0.2)" }}>{v}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <p style={{ color: "#9ca3af", fontSize: 12, textAlign: "center", lineHeight: 1.6 }}>
+          עמוד זה מציג את המסע של עידו לקראת בר המצווה שלו
+        </p>
+      </div>
     </div>
   );
 }
