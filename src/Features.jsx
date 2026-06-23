@@ -394,11 +394,11 @@ ${hasSpeech ? `
 <!-- SPEECH -->
 <div class="page">
   <h2>🎤 הנאום שלי</h2>
-  ${speech.opening ? `<div class="speech-section"><p class="speech-label">פתיחה</p><p>${speech.opening}</p></div>` : ""}
-  ${speech.journey ? `<div class="speech-section"><p class="speech-label">המסע</p><p>${speech.journey}</p></div>` : ""}
-  ${speech.insight ? `<div class="speech-section"><p class="speech-label">תובנה</p><p>${speech.insight}</p></div>` : ""}
-  ${speech.gratitude ? `<div class="speech-section"><p class="speech-label">תודה</p><p>${speech.gratitude}</p></div>` : ""}
-  ${speech.future ? `<div class="speech-section"><p class="speech-label">להמשך</p><p>${speech.future}</p></div>` : ""}
+  ${speech?.opening ? `<div class="speech-section"><p class="speech-label">פתיחה</p><p>${speech.opening}</p></div>` : ""}
+  ${speech?.journey ? `<div class="speech-section"><p class="speech-label">המסע</p><p>${speech.journey}</p></div>` : ""}
+  ${speech?.insight ? `<div class="speech-section"><p class="speech-label">תובנה</p><p>${speech.insight}</p></div>` : ""}
+  ${speech?.gratitude ? `<div class="speech-section"><p class="speech-label">תודה</p><p>${speech.gratitude}</p></div>` : ""}
+  ${speech?.future ? `<div class="speech-section"><p class="speech-label">להמשך</p><p>${speech.future}</p></div>` : ""}
 </div>
 ` : ""}
 
@@ -471,7 +471,7 @@ ${letter ? `
           ["📊", "עמוד שער + סטטיסטיקות"],
           ["📈", "התקדמות לפי פרקים"],
           ["⭐", "הערכים שנבחרו"],
-          speech?.opening && ["🎤", "הנאום האישי"],
+          data.taskData?.t38?.opening && ["🎤", "הנאום האישי"],
           (data.taskData?.t39?.insights || []).filter(i => i?.text).length > 0 && ["💡", "5 תובנות מהשנה"],
           (data.journal || []).length > 0 && ["📝", "עשרת כניסות היומן האחרונות"],
           data.taskData?.t40?.letter && ["✉️", "המכתב לעצמי"],
