@@ -318,9 +318,29 @@ function TasksView({ data, save, isParent }) {
   const totalDone = ALL_TASKS.filter(t => data.completed[t.id]).length;
   const overallPct = Math.round((totalDone / TOTAL_TASKS) * 100);
 
-  function isMonthUnlocked(chapterIdx, monthIdx) { return true; }
-  function isClimaxUnlocked(ch) { return true; }
-  function isChapterUnlocked(chIdx) { return true; }
+  function isMonthUnlocked(chapterIdx, monthIdx) {
+    if (isParent) return true;
+    for (let ci = 0; ci <= chapterIdx; ci++) {
+      const ch = CHAPTERS[ci];
+      const mEnd = ci === chapterIdx ? monthIdx : ch.months.length;
+      for (let mi = 0; mi < mEnd; mi++) {
+        if (!ch.months[mi].tasks.every(t => data.completed[t.id])) return false;
+      }
+    }
+    return true;
+  }
+
+  function isClimaxUnlocked(ch) {
+    if (isParent) return true;
+    return ch.months.flatMap(m => m.tasks).every(t => data.completed[t.id]);
+  }
+
+  function isChapterUnlocked(chIdx) {
+    if (isParent) return true;
+    if (chIdx === 0) return true;
+    const prevCh = CHAPTERS[chIdx - 1];
+    return !!(data.climaxData || {})[prevCh.id]?.parentApproved;
+  }
 
   return (
     <div>
@@ -2225,10 +2245,17 @@ function JourneyBookView({ data, onPresent }) {
         <p style={{ fontSize: 40, margin: "0 0 8px" }}>📚</p>
         <h2 style={{ fontSize: 20, fontWeight: 700, margin: "0 0 6px", color: "#fff" }}>ספר המסע של עידו</h2>
         <p style={{ fontSize: 13, opacity: 0.85, margin: "0 0 16px", color: "#fff" }}>{totalDone} משימות · שנת בר מצווה 2026–2027</p>
-        <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+        <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
           <button onClick={() => setChapter("pdf")} style={{ padding: "8px 18px", borderRadius: 10, background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>📄 PDF</button>
           <button onClick={() => setChapter("share")} style={{ padding: "8px 18px", borderRadius: 10, background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>🔗 שתף</button>
           {onPresent && <button onClick={onPresent} style={{ padding: "8px 18px", borderRadius: 10, background: "rgba(255,255,255,0.25)", border: "1px solid rgba(255,255,255,0.4)", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>🎬 הצגה</button>}
+          <button onClick={() => {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a"); a.href = url;
+            a.download = `ido-journey-backup-${new Date().toLocaleDateString("he-IL").replace(/\./g,"-")}.json`;
+            a.click(); URL.revokeObjectURL(url);
+          }} style={{ padding: "8px 18px", borderRadius: 10, background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.25)", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>💾 גיבוי</button>
         </div>
       </div>
       <div style={{ display: "flex", gap: 8, marginBottom: 20, overflowX: "auto", paddingBottom: 4 }}>
@@ -2589,6 +2616,21 @@ function ParentDashboard({ data, save, onNavigate }) {
           </button>
         ))}
       </div>
+      {/* Backup button */}
+      <button onClick={() => {
+        const blob = new Blob([JSON.stringify(save, null, 2)], { type: "application/json" });
+        const dataBlob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(dataBlob);
+        const a = document.createElement("a"); a.href = url;
+        a.download = `ido-journey-backup-${new Date().toLocaleDateString("he-IL").replace(/\./g,"-")}.json`;
+        a.click(); URL.revokeObjectURL(url);
+      }} style={{ width: "100%", padding: "12px 16px", borderRadius: 14, background: "#fff", border: "1.5px solid #e5e7eb", cursor: "pointer", display: "flex", alignItems: "center", gap: 12, marginBottom: 16, boxShadow: "0 1px 4px rgba(124,58,237,0.04)" }}>
+        <span style={{ fontSize: 22 }}>💾</span>
+        <div style={{ textAlign: "right" }}>
+          <p style={{ color: "#1e1b4b", fontWeight: 600, fontSize: 14, margin: 0 }}>גיבוי נתונים</p>
+          <p style={{ color: "#9ca3af", fontSize: 12, margin: 0 }}>הורד את כל הנתונים כJSON</p>
+        </div>
+      </button>
 
       {/* Recent journal from Ido */}
       {(data.journal || []).length > 0 && (
