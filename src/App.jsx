@@ -173,7 +173,27 @@ const CHAPTERS = [
   },
 ];
 
-const ALL_TASKS = CHAPTERS.flatMap(c => c.months.flatMap(m => m.tasks));
+const BAR_MITZVAH_DATE = new Date("2027-11-06");
+
+const TASK_ICONS = {
+  t1: "🕯️", t2: "🗺️", t3: "⭐",
+  t4: "🏠", t5: "📋", t6: "🗣️",
+  t7: "💰", t8: "📊", t9: "🤔",
+  t10: "🍳", t11: "👕", t12: "📅",
+  t13: "🌊", t14: "💬",
+  t15: "🤝", t16: "📅",
+  t17: "🎯", t18: "📋", t19: "🏆",
+  t20: "🗺️", t21: "🚌", t22: "💸", t23: "📝",
+  t24: "🔧", t25: "🧰",
+  t26: "☀️", t27: "⏱️",
+  t28: "🔥", t29: "⛺", t30: "🌙", t31: "🎒",
+  t32: "🗺️", t33: "✨", t34: "🎯",
+  t35: "🚀", t36: "📊", t37: "⚡",
+  t38: "🎤", t39: "💡", t40: "✉️",
+  t41: "🌟", t42: "📜",
+};
+
+
 const TOTAL_TASKS = ALL_TASKS.length;
 const EMPTY_DATA = { completed: {}, journal: [], parentNotes: [], values: [], valueSnapshots: [], taskData: {}, climaxData: {} };
 
@@ -487,28 +507,21 @@ function TasksView({ data, save, isParent }) {
                         const taskUnlocked = mUnlocked;
                         return (
                           <div key={task.id} onClick={() => taskUnlocked && setActiveTask({ task, chapter: ch })} style={{
-                            display: "flex", alignItems: "center", gap: 12, padding: "14px 14px",
-                            borderRadius: 12, marginBottom: 8,
+                            display: "flex", alignItems: "center", gap: 12, padding: "12px 14px",
+                            borderRadius: 14, marginBottom: 8,
                             cursor: taskUnlocked ? "pointer" : "not-allowed",
-                            background: done ? "rgba(124,58,237,0.1)" : taskUnlocked ? "#ffffff" : "rgba(255,255,255,0.01)",
-                            border: done ? "1px solid rgba(124,58,237,0.25)" : "1px solid #e9ecef",
+                            background: done ? "rgba(124,58,237,0.06)" : taskUnlocked ? "#ffffff" : "#fafafa",
+                            border: done ? "1.5px solid rgba(124,58,237,0.15)" : taskUnlocked ? "1px solid #e5e7eb" : "1px solid #f3f4f6",
+                            boxShadow: taskUnlocked && !done ? "0 1px 6px rgba(0,0,0,0.05)" : "none",
                             transition: "all 0.2s"
                           }}>
-                            <div style={{
-                              width: 22, height: 22, borderRadius: 6, flexShrink: 0,
-                              border: done ? "none" : "1.5px solid #d1d5db",
-                              background: done ? "#7c3aed" : "transparent",
-                              display: "flex", alignItems: "center", justifyContent: "center"
-                            }}>
-                              {done && <span style={{ color: "#1e1b4b", fontSize: 13 }}>✓</span>}
+                            <div style={{ width: 38, height: 38, borderRadius: 11, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: done ? 16 : 20, background: done ? "rgba(124,58,237,0.12)" : "rgba(124,58,237,0.06)", border: done ? "none" : "1px solid rgba(124,58,237,0.1)" }}>
+                              {done ? "✓" : (TASK_ICONS[task.id] || "📌")}
                             </div>
-                            <span style={{
-                              color: done ? "#9ca3af" : "#1e1b4b", fontSize: 14, flex: 1,
-                              textDecoration: done ? "line-through" : "none"
-                            }}>{task.text}</span>
-                            {taskUnlocked && !done && (
-                              <span style={{ color: "#d1d5db", fontSize: 18 }}>›</span>
-                            )}
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <span style={{ color: done ? "#9ca3af" : "#1e1b4b", fontSize: 14, fontWeight: done ? 400 : 500, textDecoration: done ? "line-through" : "none", display: "block" }}>{task.text}</span>
+                            </div>
+                            {taskUnlocked && !done && <span style={{ color: "#c4b5fd", fontSize: 16 }}>›</span>}
                           </div>
                         );
                       })}
@@ -2049,7 +2062,27 @@ function DashboardView({ data, isParent, onNavigate }) {
         <div style={{ position: "absolute", bottom: -30, right: -10, width: 160, height: 160, borderRadius: "50%", background: "rgba(255,255,255,0.05)" }} />
         <p style={{ fontSize: 13, opacity: 0.8, margin: "0 0 4px", position: "relative" }}>{new Date().toLocaleDateString("he-IL", { weekday: "long", day: "numeric", month: "long" })}</p>
         <h1 style={{ fontSize: 20, fontWeight: 700, margin: "0 0 6px", position: "relative", color: "#fff" }}>שלום {isParent ? "ההורים" : "עידו"} 👋</h1>
-        <p style={{ fontSize: 14, opacity: 0.85, margin: 0, position: "relative", color: "#fff" }}>{overallPct === 100 ? "השלמתם את כל המסע! 🏆" : `${totalDone} מתוך ${TOTAL_TASKS} משימות הושלמו`}</p>
+        <p style={{ fontSize: 14, opacity: 0.85, margin: "0 0 16px", position: "relative", color: "#fff" }}>{overallPct === 100 ? "השלמתם את כל המסע! 🏆" : `${totalDone} מתוך ${TOTAL_TASKS} משימות הושלמו`}</p>
+        {(() => {
+          const today = new Date();
+          const diff = Math.ceil((BAR_MITZVAH_DATE - today) / (1000 * 60 * 60 * 24));
+          if (diff <= 0) return (
+            <div style={{ background: "rgba(255,255,255,0.2)", borderRadius: 12, padding: "10px 16px", position: "relative", display: "inline-flex", alignItems: "center", gap: 8 }}>
+              <span>🎉</span><span style={{ color: "#fff", fontWeight: 700, fontSize: 15 }}>יום הבר מצווה הגיע!</span>
+            </div>
+          );
+          return (
+            <div style={{ background: "rgba(255,255,255,0.15)", borderRadius: 14, padding: "12px 16px", position: "relative", display: "inline-flex", alignItems: "center", gap: 12 }}>
+              <span style={{ fontSize: 20 }}>📅</span>
+              <div>
+                <p style={{ color: "#fff", fontWeight: 900, fontSize: 24, margin: 0, lineHeight: 1 }}>{diff}</p>
+                <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 11, margin: 0 }}>ימים לבר מצווה</p>
+              </div>
+              <div style={{ width: 1, height: 32, background: "rgba(255,255,255,0.25)" }} />
+              <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 12, margin: 0 }}>6.11.2027</p>
+            </div>
+          );
+        })()}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 20 }}>
         {[{ label: "הושלם", value: `${overallPct}%`, color: "#7c3aed" }, { label: "משימות", value: `${totalDone}/${TOTAL_TASKS}`, color: "#10b981" }, { label: "פרק", value: currentChapter?.emoji, color: "#f59e0b", sub: currentChapter?.title }].map(s => (
