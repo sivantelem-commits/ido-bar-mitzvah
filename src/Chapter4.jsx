@@ -402,49 +402,117 @@ export function T41_PresentJourney({ state, onChange }) {
 // ─── T42: חתימה על אמנה ─────────────────────────────────────────────────────
 export function T42_SignManifesto({ state, onChange }) {
   const s = state || {};
-  const commitments = [
-    "אני לוקח אחריות מלאה על חיי — לא מחכה שמישהו יחליט בשבילי",
-    "אני מדבר אמת, גם כשזה קשה",
-    "אני עומד לצד אנשים שחשובים לי",
-    "אני ממשיך ללמוד ולגדול — גם כשנוח להישאר במקום",
-    "אני תורם לעולם יותר ממה שאני לוקח ממנו",
-  ];
+
+  const allFilled = s.value && s.changed && s.insight && s.commitment && s.signatureName;
+
+  function printManifesto() {
+    const html = `<!DOCTYPE html>
+<html dir="rtl" lang="he"><head>
+<meta charset="UTF-8"><title>אמנת הבגרות — עידו</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Heebo', Arial, sans-serif; direction: rtl; color: #1e1b4b; background: #fff; }
+@page { size: A4; margin: 25mm 20mm; }
+.wrap { max-width: 600px; margin: 0 auto; padding: 40px; }
+.header { text-align: center; margin-bottom: 36px; }
+h1 { font-size: 32pt; font-weight: 900; color: #1e1b4b; margin-bottom: 6px; }
+.sub { font-size: 12pt; color: #9ca3af; }
+.divider { height: 2px; background: linear-gradient(90deg, transparent, #7c3aed, transparent); margin: 24px 0; }
+.opener { font-size: 14pt; line-height: 1.9; color: #1e1b4b; margin-bottom: 24px; font-style: italic; }
+.field-label { font-size: 9pt; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+.field-value { font-size: 13pt; line-height: 1.8; color: #1e1b4b; padding: 10px 14px; border-right: 3px solid #7c3aed; background: rgba(124,58,237,0.04); border-radius: 0 8px 8px 0; margin-bottom: 18px; }
+.closer { font-size: 12pt; line-height: 1.9; color: #374151; margin: 24px 0; }
+.sig-area { margin-top: 32px; display: flex; align-items: flex-end; justify-content: space-between; }
+.sig-line { border-top: 1.5px solid #1e1b4b; padding-top: 8px; min-width: 200px; text-align: center; }
+.sig-name { font-size: 18pt; font-family: Georgia, serif; font-style: italic; color: #7c3aed; }
+.sig-label { font-size: 9pt; color: #9ca3af; margin-top: 4px; }
+.date { font-size: 10pt; color: #9ca3af; }
+-webkit-print-color-adjust: exact; print-color-adjust: exact;
+</style></head><body><div class="wrap">
+<div class="header">
+  <p style="font-size:36pt;margin-bottom:10px">📜</p>
+  <h1>אמנת הבגרות</h1>
+  <p class="sub">עידו · 6 בנובמבר 2027</p>
+</div>
+<div class="divider"></div>
+<p class="opener">אני, עידו, לאחר שנה שלמה של מסע, מצהיר:</p>
+<p class="field-label">הערך שהכי מנחה אותי הוא:</p>
+<p class="field-value">${s.value || ""}</p>
+<p class="field-label">הדבר שהכי השתנה בי השנה:</p>
+<p class="field-value">${s.changed || ""}</p>
+<p class="field-label">התובנה שארצה לזכור לכל החיים:</p>
+<p class="field-value">${s.insight || ""}</p>
+<p class="field-label">ההתחייבות שלי לעצמי מכאן והלאה:</p>
+<p class="field-value">${s.commitment || ""}</p>
+<div class="divider"></div>
+<p class="closer">אני לוקח אחריות על חיי, על בחירותי ועל השפעתי על העולם.<br>חתמתי על זה מרצון חופשי, ב-6 בנובמבר 2027.</p>
+<div class="sig-area">
+  <div class="sig-line">
+    <p class="sig-name">${s.signatureName || ""}</p>
+    <p class="sig-label">עידו</p>
+  </div>
+  <p class="date">6.11.2027</p>
+</div>
+</div></body></html>`;
+    const w = window.open("", "_blank");
+    w.document.write(html); w.document.close();
+    w.onload = () => w.print();
+  }
 
   return (
     <div>
-      <Intro emoji="📜" title="חתימה על אמנת הבגרות"
-        desc="הסוף הוא גם ההתחלה. אמנת הבגרות היא לא נייר — היא הבטחה שנותן לעצמך." />
+      <Intro emoji="📜" title="אמנת הבגרות"
+        desc="שנה שלמה עברת. עכשיו — לחתום. לא על נייר ריק, אלא על מה שהיית ומה שאתה הולך להיות." />
 
-      <Card style={{ border: "1.5px solid rgba(124,58,237,0.25)", marginBottom: 16 }}>
-        <p style={{ color: "#7c3aed", fontWeight: 700, fontSize: 15, margin: "0 0 16px", textAlign: "center" }}>אמנת הבגרות</p>
-        {commitments.map((c, i) => (
-          <div key={i} onClick={() => {
-            const cur = s.signed || [];
-            onChange({ ...s, signed: cur.includes(i) ? cur.filter(x => x !== i) : [...cur, i] });
-          }} style={{
-            display: "flex", alignItems: "flex-start", gap: 12, padding: "12px 14px", borderRadius: 12, marginBottom: 8, cursor: "pointer",
-            background: (s.signed || []).includes(i) ? "rgba(124,58,237,0.08)" : "#f9fafb",
-            border: (s.signed || []).includes(i) ? "1.5px solid rgba(124,58,237,0.3)" : "1px solid #e5e7eb",
-            transition: "all 0.2s"
-          }}>
-            <div style={{ width: 24, height: 24, borderRadius: 7, flexShrink: 0, background: (s.signed || []).includes(i) ? "#7c3aed" : "transparent", border: (s.signed || []).includes(i) ? "none" : "1.5px solid #d1d5db", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              {(s.signed || []).includes(i) && <span style={{ color: "#fff", fontSize: 12 }}>✓</span>}
-            </div>
-            <p style={{ color: "#1e1b4b", fontSize: 14, margin: 0, lineHeight: 1.6 }}>{c}</p>
-          </div>
-        ))}
+      {/* Fixed opener */}
+      <Card style={{ border: "1.5px solid rgba(124,58,237,0.2)", background: "rgba(124,58,237,0.03)", marginBottom: 14 }}>
+        <p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 13, margin: "0 0 10px", textTransform: "uppercase", letterSpacing: 1 }}>הצהרה</p>
+        <p style={{ color: "#1e1b4b", fontSize: 15, lineHeight: 1.9, fontStyle: "italic" }}>אני, עידו, לאחר שנה שלמה של מסע, מצהיר:</p>
       </Card>
 
-      {(s.signed || []).length === commitments.length && (
-        <Card style={{ border: "1.5px solid rgba(234,179,8,0.4)", background: "linear-gradient(135deg, rgba(234,179,8,0.08), rgba(251,191,36,0.04))", textAlign: "center" }}>
-          <p style={{ fontSize: 40, margin: "0 0 10px" }}>🎉</p>
-          <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 18, margin: "0 0 6px" }}>בר מצווה!</p>
-          <p style={{ color: "#6b7280", fontSize: 14, margin: "0 0 16px" }}>חתמת על האמנה. עכשיו — לחיות לפיה.</p>
-          <TextInput value={s.signatureName || ""} onChange={v => onChange({ ...s, signatureName: v })} placeholder="כתוב את שמך כחתימה..." />
-          {s.signatureName && (
-            <p style={{ color: "#7c3aed", fontWeight: 700, fontSize: 20, margin: "12px 0 0", fontFamily: "Georgia, serif" }}>{s.signatureName}</p>
-          )}
+      {/* Personal fills */}
+      {[
+        { key: "value", label: "הערך שהכי מנחה אותי הוא", ph: "כתוב ערך אחד..." },
+        { key: "changed", label: "הדבר שהכי השתנה בי השנה", ph: "לפני שנה הייתי... היום אני..." },
+        { key: "insight", label: "התובנה שארצה לזכור לכל החיים", ph: "למדתי ש..." },
+        { key: "commitment", label: "ההתחייבות שלי לעצמי מכאן והלאה", ph: "אני מתחייב ל..." },
+      ].map(f => (
+        <Card key={f.key} style={{ marginBottom: 12, border: s[f.key] ? "1.5px solid rgba(124,58,237,0.2)" : "1px solid #e5e7eb" }}>
+          <Label>{f.label}</Label>
+          <TextInput multiline value={s[f.key] || ""} onChange={v => onChange({ ...s, [f.key]: v })} placeholder={f.ph} />
         </Card>
+      ))}
+
+      {/* Fixed closer */}
+      <Card style={{ border: "1.5px solid rgba(124,58,237,0.15)", background: "rgba(124,58,237,0.03)", marginBottom: 14 }}>
+        <p style={{ color: "#4b5563", fontSize: 14, lineHeight: 1.9 }}>
+          אני לוקח אחריות על חיי, על בחירותי ועל השפעתי על העולם.<br />
+          <span style={{ color: "#9ca3af", fontSize: 12 }}>חתמתי על זה מרצון חופשי, ב-6 בנובמבר 2027.</span>
+        </p>
+      </Card>
+
+      {/* Signature */}
+      <Card style={{ border: "1.5px solid rgba(234,179,8,0.3)", background: "rgba(234,179,8,0.04)", marginBottom: 14 }}>
+        <Label>✍️ חתימה — כתוב את שמך</Label>
+        <input value={s.signatureName || ""} onChange={e => onChange({ ...s, signatureName: e.target.value })}
+          placeholder="חתימת עידו..."
+          style={{ width: "100%", padding: "12px 16px", borderRadius: 10, background: "#fff", border: "1.5px solid #e5e7eb", color: "#7c3aed", fontSize: 20, fontFamily: "Georgia, serif", fontStyle: "italic", outline: "none", direction: "rtl", textAlign: "center" }} />
+        {s.signatureName && <p style={{ color: "#7c3aed", fontWeight: 700, fontSize: 22, margin: "10px 0 0", fontFamily: "Georgia, serif", textAlign: "center" }}>{s.signatureName}</p>}
+      </Card>
+
+      {/* Celebration + print */}
+      {allFilled && (
+        <div>
+          <div style={{ padding: 20, borderRadius: 16, background: "linear-gradient(135deg, rgba(234,179,8,0.1), rgba(124,58,237,0.08))", border: "1.5px solid rgba(234,179,8,0.3)", textAlign: "center", marginBottom: 12 }}>
+            <p style={{ fontSize: 36, margin: "0 0 8px" }}>🏆</p>
+            <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 18, margin: "0 0 4px" }}>ברוך הבא לבגרות, עידו!</p>
+            <p style={{ color: "#6b7280", fontSize: 14 }}>האמנה נחתמה — עכשיו לחיות לפיה</p>
+          </div>
+          <button onClick={printManifesto} style={{ width: "100%", padding: "13px", borderRadius: 14, background: "#fff", border: "1.5px solid #7c3aed", color: "#7c3aed", fontSize: 15, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+            <span>🖨️</span> הדפס את אמנת הבגרות
+          </button>
+        </div>
       )}
     </div>
   );
