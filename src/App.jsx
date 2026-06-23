@@ -193,7 +193,7 @@ const TASK_ICONS = {
   t41: "🌟", t42: "📜",
 };
 
-
+const ALL_TASKS = CHAPTERS.flatMap(c => c.months.flatMap(m => m.tasks));
 const TOTAL_TASKS = ALL_TASKS.length;
 const EMPTY_DATA = { completed: {}, journal: [], parentNotes: [], values: [], valueSnapshots: [], taskData: {}, climaxData: {} };
 
