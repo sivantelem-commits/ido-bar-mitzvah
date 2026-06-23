@@ -1827,7 +1827,7 @@ function OnboardingTour({ onDone }) {
             <button onClick={() => setStep(step - 1)} style={{ padding: "13px 20px", borderRadius: 14, background: "#f3f4f6", border: "none", color: "#6b7280", fontSize: 15, cursor: "pointer", fontWeight: 500 }}>← חזרה</button>
           )}
           <button onClick={() => step < steps.length - 1 ? setStep(step + 1) : onDone()} style={{ flex: 1, padding: "14px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
-            {step < steps.length - 1 ? "הבא ←" : "יאללה, מתחילים! 🚀"}
+            {step < steps.length - 1 ? "הבא ←" : "הבנתי, תודה! 🚀"}
           </button>
         </div>
       </div>
@@ -2281,9 +2281,9 @@ export default function App() {
 
   const session = role === "kid" ? { name: "עידו", role: "kid" } : { name: "ההורים", role: "parent" };
 
-  // Show onboarding on first visit
+  // Show onboarding every time until user explicitly clicks "הבנתי"
   const [showOnboarding, setShowOnboarding] = useState(() => {
-    try { return !localStorage.getItem("ido_onboarded"); } catch { return false; }
+    try { return !localStorage.getItem("ido_onboarded"); } catch { return true; }
   });
   function finishOnboarding() {
     try { localStorage.setItem("ido_onboarded", "1"); } catch {}
