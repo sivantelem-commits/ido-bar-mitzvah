@@ -486,8 +486,8 @@ function TasksView({ data, save, isParent }) {
                         const taskUnlocked = mUnlocked;
                         return (
                           <div key={task.id} onClick={() => taskUnlocked && setActiveTask({ task, chapter: ch })} style={{
-                            display: "flex", alignItems: "center", gap: 12, padding: "12px 14px",
-                            borderRadius: 12, marginBottom: 6,
+                            display: "flex", alignItems: "center", gap: 12, padding: "14px 14px",
+                            borderRadius: 12, marginBottom: 8,
                             cursor: taskUnlocked ? "pointer" : "not-allowed",
                             background: done ? "rgba(124,58,237,0.1)" : taskUnlocked ? "#ffffff" : "rgba(255,255,255,0.01)",
                             border: done ? "1px solid rgba(124,58,237,0.25)" : "1px solid #e9ecef",
@@ -521,8 +521,8 @@ function TasksView({ data, save, isParent }) {
                         const quizUnlocked = isParent || (mUnlocked && allTasksDone);
                         return (
                           <div onClick={() => quizUnlocked && setActiveQuiz({ monthId: m.id })} style={{
-                            display: "flex", alignItems: "center", gap: 12, padding: "12px 14px",
-                            borderRadius: 12, marginBottom: 6,
+                            display: "flex", alignItems: "center", gap: 12, padding: "14px 14px",
+                            borderRadius: 12, marginBottom: 8,
                             cursor: quizUnlocked ? "pointer" : "not-allowed",
                             background: quizDone ? "rgba(234,179,8,0.1)" : quizUnlocked ? "#ffffff" : "rgba(255,255,255,0.01)",
                             border: quizDone ? "1px solid rgba(234,179,8,0.3)" : quizUnlocked ? "1px solid #e5e7eb" : "1px solid rgba(255,255,255,0.04)",
@@ -1763,8 +1763,8 @@ function PinModal({ onSuccess, onCancel }) {
     else if (p.length === 4) { setError(true); setTimeout(() => { setError(false); setPin(""); }, 1000); }
   }
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ background: "#fff", borderRadius: 24, padding: "36px 32px", width: 320, textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.15)" }}>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 1000, display: "flex", alignItems: "flex-end", justifyContent: "center", padding: "0" }}>
+      <div style={{ background: "#fff", borderRadius: "24px 24px 0 0", padding: "28px 24px 32px", width: "100%", maxWidth: 420, textAlign: "center", boxShadow: "0 -8px 40px rgba(0,0,0,0.15)" }}>
         <p style={{ fontSize: 40, margin: "0 0 8px" }}>👩‍👩‍👦</p>
         <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 18, margin: "0 0 6px" }}>כניסת הורים</p>
         <p style={{ color: "#9ca3af", fontSize: 13, margin: "0 0 24px" }}>הזינו את קוד הגישה</p>
@@ -1804,10 +1804,10 @@ function DashboardView({ data, isParent, onNavigate }) {
         <div style={{ position: "absolute", top: -20, left: -20, width: 120, height: 120, borderRadius: "50%", background: "rgba(255,255,255,0.08)" }} />
         <div style={{ position: "absolute", bottom: -30, right: -10, width: 160, height: 160, borderRadius: "50%", background: "rgba(255,255,255,0.05)" }} />
         <p style={{ fontSize: 13, opacity: 0.8, margin: "0 0 4px", position: "relative" }}>{new Date().toLocaleDateString("he-IL", { weekday: "long", day: "numeric", month: "long" })}</p>
-        <h1 style={{ fontSize: 24, fontWeight: 700, margin: "0 0 6px", position: "relative", color: "#fff" }}>שלום {isParent ? "ההורים" : "עידו"} 👋</h1>
+        <h1 style={{ fontSize: 20, fontWeight: 700, margin: "0 0 6px", position: "relative", color: "#fff" }}>שלום {isParent ? "ההורים" : "עידו"} 👋</h1>
         <p style={{ fontSize: 14, opacity: 0.85, margin: 0, position: "relative", color: "#fff" }}>{overallPct === 100 ? "השלמתם את כל המסע! 🏆" : `${totalDone} מתוך ${TOTAL_TASKS} משימות הושלמו`}</p>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 20 }}>
         {[{ label: "הושלם", value: `${overallPct}%`, color: "#7c3aed" }, { label: "משימות", value: `${totalDone}/${TOTAL_TASKS}`, color: "#10b981" }, { label: "פרק", value: currentChapter?.emoji, color: "#f59e0b", sub: currentChapter?.title }].map(s => (
           <div key={s.label} style={{ background: "#fff", borderRadius: 16, padding: "16px 12px", border: "1px solid #e5e7eb", textAlign: "center", boxShadow: "0 1px 4px rgba(124,58,237,0.06)" }}>
             <p style={{ fontSize: s.sub ? 28 : 18, fontWeight: 700, color: s.color, margin: "0 0 4px" }}>{s.value}</p>
@@ -2051,44 +2051,81 @@ export default function App() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#f4f2ff", fontFamily: "'Segoe UI', Tahoma, sans-serif", direction: "rtl" }}>
-      <style>{`@keyframes spin { to { transform: rotate(360deg) } } * { box-sizing: border-box; } button { font-family: inherit; } textarea, input, select { font-family: inherit; } ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #f4f2ff; } ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 3px; }`}</style>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg) } }
+        @keyframes toastIn { from { opacity:0; transform: translateX(-50%) translateY(20px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+        * { box-sizing: border-box; }
+        button { font-family: inherit; }
+        textarea, input, select { font-family: inherit; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #f4f2ff; }
+        ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 3px; }
+        /* Mobile overrides */
+        @media (max-width: 640px) {
+          .desktop-nav { display: none !important; }
+          .mobile-nav { display: flex !important; }
+          .desktop-logo-text { display: none !important; }
+          .main-content { padding: 14px 12px 76px !important; }
+          /* Inputs full width */
+          input[type="range"] { width: 100%; }
+          /* Prevent horizontal scroll */
+          body { overflow-x: hidden; }
+          /* Smaller cards on mobile */
+          .card-grid-2 { grid-template-columns: 1fr !important; }
+        }
+        @media (min-width: 641px) {
+          .mobile-nav { display: none !important; }
+        }
+        /* Touch targets */
+        button { min-height: 36px; }
+        /* Safe area for iPhone notch */
+        .mobile-nav { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+      `}</style>
 
       {showPin && <PinModal onSuccess={() => { setRole("parent"); setShowPin(false); setTab("home"); }} onCancel={() => setShowPin(false)} />}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       {confetti && <Confetti onDone={() => setConfetti(false)} />}
 
       {allDone && (
-        <div style={{ background: "linear-gradient(90deg, #7c3aed, #a855f7, #f59e0b)", padding: "10px 20px", textAlign: "center", color: "#fff", fontWeight: 700, fontSize: 15 }}>
-          🎉 מזל טוב עידו! השלמת את כל מסע שנת הבר מצווה! 🏆
+        <div style={{ background: "linear-gradient(90deg, #7c3aed, #a855f7, #f59e0b)", padding: "10px 16px", textAlign: "center", color: "#fff", fontWeight: 700, fontSize: 14 }}>
+          🎉 מזל טוב עידו! השלמת את כל המסע! 🏆
         </div>
       )}
 
+      {/* Header */}
       <header style={{ background: "#fff", borderBottom: "1px solid #e5e7eb", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 1px 8px rgba(124,58,237,0.08)" }}>
         <div style={{ height: 3, background: "#f3f4f6" }}>
           <div style={{ height: "100%", background: "linear-gradient(90deg, #7c3aed, #a855f7)", width: `${overallPct}%`, transition: "width 0.6s ease" }} />
         </div>
-        <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 20px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 60 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #7c3aed, #a855f7)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🧭</div>
-            <div>
+        <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 16px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 56 }}>
+          {/* Logo */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+            <div style={{ width: 34, height: 34, borderRadius: 9, background: "linear-gradient(135deg, #7c3aed, #a855f7)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17 }}>🧭</div>
+            <div className="desktop-logo-text">
               <p style={{ color: "#1e1b4b", fontWeight: 700, margin: 0, fontSize: 14, lineHeight: 1.2 }}>שנת בר מצווה</p>
               <p style={{ color: "#9ca3af", fontSize: 11, margin: 0 }}>{overallPct}% הושלם</p>
             </div>
           </div>
-          <nav style={{ display: "flex", gap: 2 }}>
+
+          {/* Desktop nav */}
+          <nav className="desktop-nav" style={{ display: "flex", gap: 2 }}>
             {nav.map(n => (
-              <button key={n.id} onClick={() => setTab(n.id)} style={{ padding: "8px 14px", borderRadius: 8, fontSize: 13, cursor: "pointer", background: tab === n.id ? "rgba(124,58,237,0.1)" : "transparent", border: "none", color: tab === n.id ? "#7c3aed" : "#6b7280", fontWeight: tab === n.id ? 600 : 400, display: "flex", alignItems: "center", gap: 6, transition: "all 0.15s" }}>
+              <button key={n.id} onClick={() => setTab(n.id)} style={{ padding: "7px 12px", borderRadius: 8, fontSize: 13, cursor: "pointer", background: tab === n.id ? "rgba(124,58,237,0.1)" : "transparent", border: "none", color: tab === n.id ? "#7c3aed" : "#6b7280", fontWeight: tab === n.id ? 600 : 400, display: "flex", alignItems: "center", gap: 5, transition: "all 0.15s" }}>
                 <span style={{ fontSize: 15 }}>{n.icon}</span><span>{n.label}</span>
               </button>
             ))}
           </nav>
-          <button onClick={() => role === "kid" ? setShowPin(true) : (setRole("kid"), setTab("home"))} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12, cursor: "pointer", background: "rgba(124,58,237,0.08)", border: "1.5px solid rgba(124,58,237,0.2)", color: "#7c3aed", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-            {role === "kid" ? "👩‍👩‍👦 הורים" : "👦 עידו"}
+
+          {/* Role switcher */}
+          <button onClick={() => role === "kid" ? setShowPin(true) : (setRole("kid"), setTab("home"))} style={{ padding: "6px 12px", borderRadius: 20, fontSize: 12, cursor: "pointer", background: "rgba(124,58,237,0.08)", border: "1.5px solid rgba(124,58,237,0.2)", color: "#7c3aed", fontWeight: 600, display: "flex", alignItems: "center", gap: 5, flexShrink: 0 }}>
+            {role === "kid" ? "👩‍👩‍👦" : "👦"}
+            <span className="desktop-logo-text" style={{ display: "inline" }}>{role === "kid" ? "הורים" : "עידו"}</span>
           </button>
         </div>
       </header>
 
-      <main style={{ maxWidth: 900, margin: "0 auto", padding: "28px 20px 60px" }}>
+      {/* Content */}
+      <main className="main-content" style={{ maxWidth: 900, margin: "0 auto", padding: "24px 16px 80px" }}>
         {tab === "home"     && <DashboardView data={data} save={save} isParent={isParent} onNavigate={setTab} />}
         {tab === "tasks"    && <TasksView data={data} save={save} isParent={isParent} />}
         {tab === "progress" && <ProgressView data={data} />}
@@ -2101,6 +2138,17 @@ export default function App() {
         {tab === "share"    && <ShareView data={data} />}
         {tab === "pdf"      && <PDFView data={data} />}
       </main>
+
+      {/* Mobile bottom nav */}
+      <nav className="mobile-nav" style={{ display: "none", position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #e5e7eb", zIndex: 100, padding: "8px 0 max(8px, env(safe-area-inset-bottom))", boxShadow: "0 -2px 12px rgba(124,58,237,0.08)" }}>
+        {nav.map(n => (
+          <button key={n.id} onClick={() => setTab(n.id)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 2px", background: "none", border: "none", cursor: "pointer", minWidth: 0 }}>
+            <span style={{ fontSize: 20, lineHeight: 1 }}>{n.icon}</span>
+            <span style={{ fontSize: 9, color: tab === n.id ? "#7c3aed" : "#9ca3af", fontWeight: tab === n.id ? 700 : 400, lineHeight: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" }}>{n.label}</span>
+            {tab === n.id && <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#7c3aed" }} />}
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }
