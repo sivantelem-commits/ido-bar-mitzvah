@@ -309,145 +309,124 @@ export function PDFView({ data }) {
     const letter = data.taskData?.t40?.letter || "";
     const values = data.values || [];
     const speech = data.taskData?.t38 || null;
-
     const hasSpeech = !!(speech?.opening);
+    const totalDone = Object.values(data.completed || {}).filter(Boolean).length;
+    const overallPct = Math.round((totalDone / 42) * 100);
 
-    const html = `
-<!DOCTYPE html>
-<html dir="rtl" lang="he">
-<head>
+    const chapters = [
+      { emoji: "🌿", title: "שורשים וזהות", period: "נובמבר 2026 – פברואר 2027", ids: ["t1","t2","t3","t4","t5","t6","t7","t8","t9","t10","t11","t12"], color: "#7c3aed" },
+      { emoji: "🧭", title: "אחריות ועצמאות", period: "מרץ – יוני 2027", ids: ["t13","t14","t15","t16","t17","t18","t19","t20","t21","t22","t23"], color: "#0ea5e9" },
+      { emoji: "🔥", title: "מסע והתנסות", period: "יולי – אוקטובר 2027", ids: ["t24","t25","t26","t27","t28","t29","t30","t31","t32","t33","t34"], color: "#f59e0b" },
+      { emoji: "🚀", title: "חזון והובלה", period: "נובמבר 2027", ids: ["t35","t36","t37","t38","t39","t40","t41","t42"], color: "#10b981" },
+    ];
+
+    const html = `<!DOCTYPE html>
+<html dir="rtl" lang="he"><head>
 <meta charset="UTF-8">
-<title>ספר המסע של עידו</title>
+<title>ספר המסע של עידו — בר מצווה 2027</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;900&display=swap');
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Heebo', Arial, sans-serif; direction: rtl; color: #1e1b4b; background: #fff; }
-  .page { width: 210mm; min-height: 297mm; padding: 20mm; page-break-after: always; }
-  .page:last-child { page-break-after: avoid; }
-  h1 { font-size: 36pt; font-weight: 900; color: #7c3aed; margin-bottom: 8px; }
-  h2 { font-size: 20pt; font-weight: 700; color: #7c3aed; margin: 24px 0 12px; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
-  h3 { font-size: 14pt; font-weight: 600; color: #1e1b4b; margin: 16px 0 8px; }
-  p { font-size: 11pt; line-height: 1.8; color: #374151; margin-bottom: 8px; }
-  .cover { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 297mm; background: linear-gradient(135deg, #f4f2ff 0%, #ede9fe 100%); }
-  .cover h1 { font-size: 48pt; margin-bottom: 12px; }
-  .cover .subtitle { font-size: 16pt; color: #7c3aed; margin-bottom: 32px; }
-  .cover .year { font-size: 13pt; color: #9ca3af; }
-  .stat-box { display: inline-block; padding: 16px 28px; border-radius: 12px; background: #fff; border: 2px solid #e5e7eb; margin: 8px; text-align: center; vertical-align: top; }
-  .stat-value { font-size: 28pt; font-weight: 900; color: #7c3aed; display: block; }
-  .stat-label { font-size: 10pt; color: #9ca3af; display: block; margin-top: 4px; }
-  .value-tag { display: inline-block; padding: 6px 16px; border-radius: 20px; background: rgba(124,58,237,0.1); color: #7c3aed; font-weight: 600; font-size: 12pt; margin: 4px; }
-  .journal-entry { border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
-  .journal-date { font-size: 9pt; color: #9ca3af; margin-bottom: 6px; }
-  .chapter-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
-  .chapter-emoji { font-size: 24pt; width: 40px; }
-  .chapter-info { flex: 1; }
-  .chapter-bar { height: 8px; border-radius: 4px; background: #f3f4f6; margin-top: 6px; }
-  .chapter-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #7c3aed, #a855f7); }
-  .insight-item { padding: 14px; border-right: 3px solid #7c3aed; padding-right: 16px; margin-bottom: 12px; background: rgba(124,58,237,0.03); border-radius: 0 8px 8px 0; }
-  .letter-box { border: 2px solid rgba(124,58,237,0.2); border-radius: 14px; padding: 24px; background: #fdf8ff; white-space: pre-wrap; line-height: 2; font-size: 12pt; }
-  .speech-section { margin-bottom: 20px; }
-  .speech-label { font-size: 9pt; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
-</style>
-</head>
-<body>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Heebo','Arial Hebrew',Arial,sans-serif; direction: rtl; color: #1e1b4b; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+@page { size: A4; margin: 0; }
+.page { width: 210mm; min-height: 297mm; position: relative; page-break-after: always; overflow: hidden; }
+.page:last-child { page-break-after: avoid; }
+.cover { background: linear-gradient(160deg,#1e1b4b 0%,#4c1d95 40%,#7c3aed 100%); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 60px 40px; }
+.cover-decoration { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.05); }
+.cp { padding: 18mm 16mm; }
+.ph { display: flex; align-items: center; gap: 12px; padding-bottom: 14px; border-bottom: 2px solid #f3f4f6; margin-bottom: 22px; }
+.ph-e { font-size: 26pt; }
+.ph-t { font-size: 18pt; font-weight: 700; color: #1e1b4b; }
+.ph-s { font-size: 9pt; color: #9ca3af; margin-top: 3px; }
+.pn { position: absolute; bottom: 14mm; left: 16mm; font-size: 9pt; color: #d1d5db; }
+.cc { margin-bottom: 14px; padding: 14px 16px; border-radius: 12px; border: 1px solid #e5e7eb; }
+.cr { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.pt { height: 8px; border-radius: 4px; background: #f3f4f6; }
+.pf { height: 100%; border-radius: 4px; }
+.vg { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.vb { padding: 7px 18px; border-radius: 22px; font-size: 12pt; font-weight: 600; background: rgba(124,58,237,0.08); color: #7c3aed; border: 1.5px solid rgba(124,58,237,0.2); }
+.qb { background: linear-gradient(135deg,#f4f2ff,#ede9fe); border-radius: 12px; padding: 18px 20px; margin: 14px 0; border-right: 4px solid #7c3aed; }
+.ql { font-size: 9pt; color: #7c3aed; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 7px; }
+.qt { font-size: 12pt; line-height: 1.8; color: #1e1b4b; font-style: italic; }
+.ss { margin-bottom: 16px; }
+.sl { font-size: 9pt; color: #7c3aed; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+.st { font-size: 11pt; line-height: 1.9; color: #374151; }
+.ii { display: flex; gap: 12px; margin-bottom: 13px; align-items: flex-start; }
+.in { width: 30px; height: 30px; border-radius: 50%; background: rgba(124,58,237,0.1); border: 1.5px solid #7c3aed; color: #7c3aed; font-weight: 700; font-size: 11pt; text-align: center; line-height: 30px; flex-shrink: 0; }
+.it { font-size: 11pt; line-height: 1.8; color: #374151; padding-top: 3px; }
+.ic { display: inline-block; padding: 2px 9px; border-radius: 20px; background: rgba(124,58,237,0.08); color: #7c3aed; font-size: 8pt; margin-bottom: 5px; }
+.je { padding: 12px 14px; border-radius: 10px; border: 1px solid #e5e7eb; margin-bottom: 10px; }
+.jd { font-size: 9pt; color: #9ca3af; margin-bottom: 5px; }
+.jt { font-size: 10pt; line-height: 1.8; color: #374151; white-space: pre-wrap; }
+.lb { background: #fdf8ff; border-radius: 12px; padding: 22px 24px; border: 1.5px solid rgba(124,58,237,0.2); }
+.lt { font-size: 11pt; line-height: 2; color: #1e1b4b; white-space: pre-wrap; }
+.ls { font-size: 9pt; color: #9ca3af; margin-top: 14px; text-align: left; }
+.bc { background: linear-gradient(160deg,#0f0c29,#302b63,#24243e); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 60px 40px; color: #fff; }
+@media print { body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } }
+</style></head><body>
 
-<!-- COVER -->
 <div class="page cover">
-  <p style="font-size: 64pt; margin-bottom: 20px;">🧭</p>
-  <h1>ספר המסע</h1>
-  <p class="subtitle">של עידו — שנת בר מצווה</p>
-  <p class="year">נובמבר 2026 — נובמבר 2027</p>
-  <div style="margin-top: 48px;">
-    <div class="stat-box"><span class="stat-value">${totalDone}</span><span class="stat-label">משימות הושלמו</span></div>
-    <div class="stat-box"><span class="stat-value">${overallPct}%</span><span class="stat-label">מהמסע</span></div>
-    <div class="stat-box"><span class="stat-value">${data.journal?.length || 0}</span><span class="stat-label">כניסות יומן</span></div>
+  <div class="cover-decoration" style="width:380px;height:380px;top:-100px;right:-140px;"></div>
+  <div class="cover-decoration" style="width:280px;height:280px;bottom:-80px;left:-90px;"></div>
+  <p style="font-size:72pt;margin-bottom:20px;position:relative">🧭</p>
+  <h1 style="font-size:38pt;font-weight:900;position:relative;margin-bottom:8px">ספר המסע</h1>
+  <p style="font-size:16pt;font-weight:300;opacity:0.85;position:relative;margin-bottom:36px">עידו · שנת בר מצווה 2026–2027</p>
+  <div style="width:60px;height:3px;background:rgba(255,255,255,0.35);border-radius:2px;margin:0 auto 36px;position:relative"></div>
+  <div style="display:flex;gap:28px;position:relative">
+    <div style="text-align:center"><span style="font-size:30pt;font-weight:900;display:block">${totalDone}</span><span style="font-size:9pt;opacity:0.7">משימות הושלמו</span></div>
+    <div style="text-align:center"><span style="font-size:30pt;font-weight:900;display:block">${overallPct}%</span><span style="font-size:9pt;opacity:0.7">מהמסע</span></div>
+    <div style="text-align:center"><span style="font-size:30pt;font-weight:900;display:block">${data.journal?.length || 0}</span><span style="font-size:9pt;opacity:0.7">כניסות יומן</span></div>
   </div>
+  <p style="position:absolute;bottom:36px;font-size:10pt;opacity:0.55">6 בנובמבר 2027</p>
 </div>
 
-<!-- PROGRESS -->
-<div class="page">
-  <h2>📊 התקדמות המסע</h2>
-  ${[
-    { emoji: "🌿", title: "שורשים וזהות", period: "נובמבר 2026 – פברואר 2027", ids: ["t1","t2","t3","t4","t5","t6","t7","t8","t9","t10","t11","t12"] },
-    { emoji: "🧭", title: "אחריות ועצמאות בעולם", period: "מרץ – יוני 2027", ids: ["t13","t14","t15","t16","t17","t18","t19","t20","t21","t22","t23"] },
-    { emoji: "🔥", title: "מסע והתנסות אמיתית", period: "יולי – אוקטובר 2027", ids: ["t24","t25","t26","t27","t28","t29","t30","t31","t32","t33","t34"] },
-    { emoji: "🚀", title: "חזון והובלה אישית", period: "נובמבר 2027", ids: ["t35","t36","t37","t38","t39","t40","t41","t42"] },
-  ].map(ch => {
+<div class="page cp">
+  <div class="ph"><span class="ph-e">📊</span><div><div class="ph-t">המסע לפי פרקים</div><div class="ph-s">שנה שלמה של צמיחה</div></div></div>
+  ${chapters.map(ch => {
     const done = ch.ids.filter(id => data.completed?.[id]).length;
     const pct = Math.round((done / ch.ids.length) * 100);
-    return `<div class="chapter-row">
-      <span class="chapter-emoji">${ch.emoji}</span>
-      <div class="chapter-info">
-        <strong>${ch.title}</strong><br>
-        <span style="font-size:9pt;color:#9ca3af">${ch.period}</span>
-        <div class="chapter-bar"><div class="chapter-fill" style="width:${pct}%"></div></div>
-      </div>
-      <strong style="color:#7c3aed;font-size:14pt">${pct}%</strong>
-    </div>`;
+    return `<div class="cc"><div class="cr"><span style="font-size:18pt;width:38px;text-align:center">${ch.emoji}</span><span style="font-size:12pt;font-weight:700;flex:1">${ch.title}</span><span style="font-size:13pt;font-weight:900;color:${ch.color}">${pct}%</span></div><p style="font-size:8pt;color:#9ca3af;margin-bottom:7px;padding-right:50px">${ch.period} · ${done}/${ch.ids.length} משימות</p><div class="pt"><div class="pf" style="width:${pct}%;background:${ch.color}"></div></div></div>`;
   }).join("")}
-
-  ${values.length > 0 ? `<h2>⭐ הערכים שלי</h2><p>${values.map(v => `<span class="value-tag">${v}</span>`).join("")}</p>` : ""}
+  ${values.length > 0 ? `<div style="margin-top:20px"><p style="font-size:13pt;font-weight:700;color:#1e1b4b;margin-bottom:10px">⭐ הערכים שבחרתי</p><div class="vg">${values.map(v => `<span class="vb">${v}</span>`).join("")}</div></div>` : ""}
+  <span class="pn">2</span>
 </div>
 
-${hasSpeech ? `
-<!-- SPEECH -->
-<div class="page">
-  <h2>🎤 הנאום שלי</h2>
-  ${speech?.opening ? `<div class="speech-section"><p class="speech-label">פתיחה</p><p>${speech.opening}</p></div>` : ""}
-  ${speech?.journey ? `<div class="speech-section"><p class="speech-label">המסע</p><p>${speech.journey}</p></div>` : ""}
-  ${speech?.insight ? `<div class="speech-section"><p class="speech-label">תובנה</p><p>${speech.insight}</p></div>` : ""}
-  ${speech?.gratitude ? `<div class="speech-section"><p class="speech-label">תודה</p><p>${speech.gratitude}</p></div>` : ""}
-  ${speech?.future ? `<div class="speech-section"><p class="speech-label">להמשך</p><p>${speech.future}</p></div>` : ""}
-</div>
-` : ""}
+${hasSpeech ? `<div class="page cp">
+  <div class="ph"><span class="ph-e">🎤</span><div><div class="ph-t">הנאום האישי שלי</div><div class="ph-s">נאום בר המצווה — נובמבר 2027</div></div></div>
+  ${speech?.opening ? `<div class="ss"><p class="sl">פתיחה</p><p class="st">${speech.opening}</p></div>` : ""}
+  ${speech?.journey ? `<div class="ss"><p class="sl">המסע שלי</p><p class="st">${speech.journey}</p></div>` : ""}
+  ${speech?.insight ? `<div class="qb"><p class="ql">💡 התובנה הכי גדולה שלי</p><p class="qt">"${speech.insight}"</p></div>` : ""}
+  ${speech?.gratitude ? `<div class="ss"><p class="sl">תודה</p><p class="st">${speech.gratitude}</p></div>` : ""}
+  ${speech?.future ? `<div class="ss"><p class="sl">מכאן אני לוקח איתי</p><p class="st">${speech.future}</p></div>` : ""}
+  <span class="pn">3</span>
+</div>` : ""}
 
-${insights.length > 0 ? `
-<!-- INSIGHTS -->
-<div class="page">
-  <h2>💡 5 תובנות מהשנה</h2>
-  ${insights.map((ins, i) => `
-    <div class="insight-item">
-      <strong>${i+1}. ${ins.category || ""}</strong>
-      <p>${ins.text}</p>
-    </div>
-  `).join("")}
-</div>
-` : ""}
+${insights.length > 0 ? `<div class="page cp">
+  <div class="ph"><span class="ph-e">💡</span><div><div class="ph-t">5 תובנות מהשנה</div><div class="ph-s">מה שלמדתי על עצמי</div></div></div>
+  ${insights.map((ins, i) => `<div class="ii"><div class="in">${i+1}</div><div>${ins.category ? `<span class="ic">${ins.category}</span><br>` : ""}<span class="it">${ins.text}</span></div></div>`).join("")}
+  <span class="pn">${hasSpeech ? 4 : 3}</span>
+</div>` : ""}
 
-${journal.length > 0 ? `
-<!-- JOURNAL -->
-<div class="page">
-  <h2>📝 מהיומן שלי</h2>
-  <p style="color:#9ca3af;font-size:10pt;margin-bottom:16px">10 הכניסות האחרונות</p>
-  ${journal.map(e => `
-    <div class="journal-entry">
-      <p class="journal-date">${e.date}</p>
-      <p>${e.text}</p>
-    </div>
-  `).join("")}
-</div>
-` : ""}
+${journal.length > 0 ? `<div class="page cp">
+  <div class="ph"><span class="ph-e">📝</span><div><div class="ph-t">מהיומן שלי</div><div class="ph-s">10 הכניסות האחרונות</div></div></div>
+  ${journal.map(e => `<div class="je"><p class="jd">${e.date}</p><p class="jt">${e.text}</p></div>`).join("")}
+</div>` : ""}
 
-${letter ? `
-<!-- LETTER -->
-<div class="page">
-  <h2>✉️ מכתב לעצמי</h2>
-  <p style="color:#9ca3af;font-size:11pt;margin-bottom:16px">נפתח ב${data.taskData?.t40?.openAge || "עתיד"}</p>
-  <div class="letter-box">${letter}</div>
-</div>
-` : ""}
+${letter ? `<div class="page cp">
+  <div class="ph"><span class="ph-e">✉️</span><div><div class="ph-t">מכתב לעצמי</div><div class="ph-s">נפתח ב${data.taskData?.t40?.openAge || "עתיד"}</div></div></div>
+  <div class="lb"><p class="lt">${letter}</p><p class="ls">— עידו, נובמבר 2027 🔐</p></div>
+</div>` : ""}
 
-<!-- BACK COVER -->
-<div class="page" style="background:linear-gradient(135deg,#f4f2ff,#ede9fe);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
-  <p style="font-size:48pt;margin-bottom:16px">🏆</p>
-  <h1 style="font-size:28pt">ברוך הבא לבגרות</h1>
-  <p style="font-size:14pt;color:#7c3aed;margin-top:12px">עידו, נובמבר 2027</p>
+<div class="page bc">
+  <div class="cover-decoration" style="width:320px;height:320px;top:-100px;left:-100px;"></div>
+  <p style="font-size:64pt;margin-bottom:18px;position:relative">🏆</p>
+  <h1 style="font-size:32pt;font-weight:900;color:#fff;margin-bottom:10px;position:relative">ברוך הבא לבגרות</h1>
+  <p style="font-size:14pt;color:rgba(255,255,255,0.7);margin-bottom:36px;position:relative">עידו · 6 בנובמבר 2027</p>
+  <div style="width:70px;height:3px;background:rgba(255,255,255,0.3);border-radius:2px;margin:0 auto 28px;position:relative"></div>
+  <p style="font-size:12pt;color:rgba(255,255,255,0.55);line-height:1.8;max-width:280px;position:relative">"עם כוח גדול באה אחריות גדולה"</p>
 </div>
 
-</body>
-</html>`;
-
+</body></html>`;
     const win = window.open("", "_blank");
     win.document.write(html);
     win.document.close();
