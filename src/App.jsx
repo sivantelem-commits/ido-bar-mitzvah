@@ -2064,6 +2064,95 @@ function PinModal({ onSuccess, onCancel }) {
 }
 
 // ─── Dashboard ────────────────────────────────────────────────────────────────
+const INSPIRATIONAL_FIGURES = [
+  // ספורט
+  { name: "מייקל ג'ורדן", field: "🏀 כדורסל", quote: "לא נכשלתי. מצאתי 10,000 דרכים שלא עובדות.", bio: "נדחה מנבחרת בית הספר בגיל 15. הפך לשחקן הכדורסל הגדול בכל הזמנים. זכה ב-6 אליפויות NBA. מוכיח שכישלון הוא רק תחנת עצירה, לא סוף הדרך.", years: "1963–", origin: "ארה״ב" },
+  { name: "סרינה וויליאמס", field: "🎾 טניס", quote: "אני אמנם מפסידה, אבל תמיד בחזרה.", bio: "אחת מ-7 ילדים, גדלה בשכונה קשה. אימנה בפארקים ציבוריים. הפכה לשחקנית הטניס הגדולה בהיסטוריה עם 23 תארי גרנד סלאם.", years: "1981–", origin: "ארה״ב" },
+  { name: "כריסטיאנו רונאלדו", field: "⚽ כדורגל", quote: "הכישרון ללא עבודה קשה הוא כלום.", bio: "גדל בעוני בפורטוגל. חלה בלב בגיל 15 ועבר ניתוח. הראשון להגיע לאימון, האחרון לעזוב. מוכיח שמשמעת עצמית היא הסוד.", years: "1985–", origin: "פורטוגל" },
+  { name: "מוחמד עלי", field: "🥊 אגרוף", quote: "בלתי אפשרי הוא לא עובדה — זה דעה.", bio: "אלוף העולם באגרוף, סירב לשרת בצבא מטעמי מצפון ואיבד את תוארו. חזר, זכה שוב, ונחשב לספורטאי הגדול של המאה ה-20.", years: "1942–2016", origin: "ארה״ב" },
+  { name: "אוסיין בולט", field: "🏃 אתלטיקה", quote: "לנצח זה קל — הדרך לנצחון היא הסיפור.", bio: "גדל בכפר קטן בג'מייקה. שבר שלושה שיאי עולם באולימפיאדת 2008. האדם המהיר ביותר בהיסטוריה. גרם לעולם שלם לחייך.", years: "1986–", origin: "ג'מייקה" },
+  // מדע וטכנולוגיה
+  { name: "אלברט איינשטיין", field: "🔬 פיזיקה", quote: "דמיון חשוב יותר מידע.", bio: "נכשל בבחינות קבלה לאוניברסיטה. עבד כפקיד פטנטים. בזמן הפנאי פיתח את תורת היחסות ושינה את ההבנה שלנו על היקום.", years: "1879–1955", origin: "גרמניה" },
+  { name: "סטיבן הוקינג", field: "🌌 קוסמולוגיה", quote: "כל עוד יש חיים — יש תקווה.", bio: "אובחן עם מחלה ניוונית בגיל 21 ונאמר לו שיחיה שנתיים. חי עד 76, כתב ספרים ביסטסלרים וגילה סודות של חורים שחורים — תוך שהוא משותק לחלוטין.", years: "1942–2018", origin: "בריטניה" },
+  { name: "מארי קירי", field: "⚗️ כימיה ופיזיקה", quote: "בחיים אין מה לפחד ממנו — רק מה להבין.", bio: "האישה הראשונה שזכתה בפרס נובל — ובשני תחומים שונים. לא קיבלה מינוי לאקדמיה הצרפתית כי היא אישה. המשיכה בכל זאת.", years: "1867–1934", origin: "פולין" },
+  { name: "סטיב ג'ובס", field: "💻 טכנולוגיה", quote: "עבוד קשה לשנות את העולם — זה היחיד שיש.", bio: "נשר מהאוניברסיטה, ישן על רצפות חברים. הוקד ממנו. חזר ובנה את חברת הטכנולוגיה הגדולה בהיסטוריה. האמין שעיצוב יפה יכול לשנות חיים.", years: "1955–2011", origin: "ארה״ב" },
+  { name: "אילון מאסק", field: "🚀 חלל וטכנולוגיה", quote: "כשמשהו חשוב מספיק — עושים אותו גם אם הסיכויים נגדנו.", bio: "עזב את דרום אפריקה ב-17 עם 2,000 דולר. פיתח SpaceX ו-Tesla. כמעט פשט רגל עשרות פעמים. ממשיך כי מאמין שהאנושות חייבת להגיע למאדים.", years: "1971–", origin: "דרום אפריקה" },
+  // מנהיגות ושינוי חברתי
+  { name: "נלסון מנדלה", field: "✊ מנהיגות", quote: "זה תמיד נראה בלתי אפשרי עד שזה נעשה.", bio: "בילה 27 שנה בכלא בגלל מאבקו נגד אפרטהייד. יצא ללא שנאה, הפך לנשיא דרום אפריקה. סמל עולמי לסליחה ולכוח הרוח.", years: "1918–2013", origin: "דרום אפריקה" },
+  { name: "מלאלה יוספזאי", field: "📚 חינוך וזכויות", quote: "ספר ועט אחד יכולים לשנות את העולם.", bio: "בגיל 11 כתבה בלוג נגד טליבאן. בגיל 15 נורתה בראש. שרדה, והפכה לצעירה הצעירה שזכתה בפרס נובל לשלום. לא שתקה.", years: "1997–", origin: "פקיסטן" },
+  { name: "מרטין לותר קינג", field: "🕊️ שוויון", quote: "יש לי חלום.", bio: "מנהיג תנועת זכויות האזרח בארה״ב. ניהל מאבק ענק בלי אלימות — עם מילים, נאומים ונוכחות. נרצח בגיל 39 אך שינה את פני הדמוקרטיה האמריקאית.", years: "1929–1968", origin: "ארה״ב" },
+  { name: "מהטמה גנדי", field: "☮️ שינוי ללא אלימות", quote: "היה השינוי שאתה רוצה לראות בעולם.", bio: "עורך דין שהפך למנהיג עצמאות הודו. הוביל מאות מיליון אנשים נגד שלטון בריטי — בלי נשק. הוכיח שאמת וסבלנות חזקות מצבאות.", years: "1869–1948", origin: "הודו" },
+  { name: "מלקולם X", field: "✊ זכויות אדם", quote: "עתיד שייך לאלה שמתכוננים אליו היום.", bio: "גדל בעוני, אבד את אביו, ישב בכלא. הפך לאחד הקולות החזקים של תנועת השחרור. לימד שכבוד עצמי הוא הבסיס לכל שינוי.", years: "1925–1965", origin: "ארה״ב" },
+  // אמנות ויצירה
+  { name: "פרידה קאלו", field: "🎨 ציור", quote: "ציירתי את המציאות שלי — לא את שלך.", bio: "נפגעה בתאונת אוטובוס קשה בגיל 18. נרתקה למיטה חודשים. התחילה לצייר. הפכה לאחת הצייריות הידועות בהיסטוריה, תוך שהפכה כאב לאמנות.", years: "1907–1954", origin: "מקסיקו" },
+  { name: "לאונרדו דה וינצ'י", field: "🖌️ אמנות ומדע", quote: "הלמידה לעולם לא מתיש את הנפש.", bio: "ילד לא ממזר ללא חינוך רשמי. הפך לצייר (מונה ליזה), פסל, אדריכל, מוזיקאי, מדען, ממציא. הסקרנות הייתה הדלק שלו.", years: "1452–1519", origin: "איטליה" },
+  { name: "ביטהובן", field: "🎵 מוזיקה", quote: "ברבע מהדרך — המוח קובע. בשלוש רבעים — הלב.", bio: "איבד את שמיעתו לחלוטין בשיא הקריירה. כתב את סימפוניה מספר 9 — אחד היצירות הגדולות בהיסטוריה — כאשר כבר היה חרש לגמרי.", years: "1770–1827", origin: "גרמניה" },
+  { name: "בוב מארלי", field: "🎸 מוזיקה", quote: "אמן אחד יכול להיות גשר בין עולמות.", bio: "גדל בשכונת עוני בג'מייקה. יצר מוזיקה שחצתה יבשות ותרבויות. הפך לסמל של שלום, אחדות ועמידה בפני קשיים לפני שנפטר בגיל 36.", years: "1945–1981", origin: "ג'מייקה" },
+  { name: "ג'יי קיי רולינג", field: "📖 כתיבה", quote: "הכישלון לא כל כך פחיד כמו שחשבתי.", bio: "אם חד-הורית שכתבה הארי פוטר בבתי קפה כי לא הייתה לה חשמל בבית. נדחתה על ידי 12 מו״לים. הספר שלה הפך לסדרה הנמכרת ביותר בהיסטוריה.", years: "1965–", origin: "בריטניה" },
+  // מדע וחקר
+  { name: "ניל ארמסטרונג", field: "🌙 חלל", quote: "זה קפיצה גדולה לאנושות.", bio: "הראשון לדרוך על הירח ב-1969. פיילוט מלחמה, מהנדס, אסטרונאוט. גיל 38 כשעשה את הצעד הגדול בהיסטוריה. חי בענווה שנים אחר כך.", years: "1930–2012", origin: "ארה״ב" },
+  { name: "צ'ארלס דרווין", field: "🦎 ביולוגיה", quote: "זה לא החזק שישרוד, אלא המסתגל.", bio: "עזב לימודי רפואה, הפליג 5 שנים ברחבי העולם. פיתח את תורת האבולוציה — שגרמה למהפכה בהבנה שלנו את החיים. המתין 20 שנה לפרסם כי פחד מהתגובה.", years: "1809–1882", origin: "בריטניה" },
+  { name: "ניקולה טסלה", field: "⚡ חשמל", quote: "המוח הוא רק מקלט — אנחנו קולטים אנרגיה מהיקום.", bio: "ממציא הזרם החילופי שמפעיל כל בית בעולם. חי בדלות למרות גאונותו. לא קיבל פרס נובל. מצא 300 פטנטים. אדיסון לקח לו קרדיט — ולא שתק.", years: "1856–1943", origin: "סרביה" },
+  // הומאניזם ורוח
+  { name: "אמא תרזה", field: "💛 נתינה", quote: "אם תשפוט — לא יהיה לך זמן לאהוב.", bio: "נזירה אלבנית שהחליטה לעזוב את המנזר לטפל בעניים ברחובות קלקוטה. ייסדה ארגון שמפעיל מאות בתי חולים. זכתה בנובל לשלום 1979.", years: "1910–1997", origin: "מקדוניה" },
+  { name: "אנה פרנק", field: "✍️ כתיבה ותקווה", quote: "למרות הכל — אני מאמינה שאנשים טובים בלבם.", bio: "ילדה יהודייה שנסתרה 2 שנים מהנאצים בגינה סודית באמסטרדם. כתבה יומן שהפך לאחד הספרים הנקראים ביותר בעולם. נספתה בגיל 15.", years: "1929–1945", origin: "גרמניה" },
+  { name: "מלכולם גלאדוול", field: "🧠 חשיבה", quote: "10,000 שעות של תרגול הן ההבדל בין מוסיקאי לגאון.", bio: "עיתונאי שחקר מה הופך אנשים למצוינים. גילה שגאונות היא לרוב תרגול עקשני, לא כישרון. ספריו שינו את הדרך שמיליונים חושבים על הצלחה.", years: "1963–", origin: "קנדה" },
+  // ישראל ויהדות
+  { name: "גולדה מאיר", field: "🇮🇱 מדינאות", quote: "אל תהיה צנוע — אתה לא כל כך גדול.", bio: "נולדה באוקראינה, עלתה לארץ. שרתה כשרת חוץ, שגרירה, ולבסוף ראש ממשלה. הוכיחה שאישה יכולה להוביל מדינה בזמן מלחמה.", years: "1898–1978", origin: "אוקראינה/ישראל" },
+  { name: "עמוס עוז", field: "📚 ספרות", quote: "ספר טוב הוא חלון לתוך נשמה זרה.", bio: "ילד שגדל בירושלים בצל הטרגדיה המשפחתית. הפך לסופר הישראלי הנקרא ביותר בעולם. כתב על קונפליקטים בגובה העיניים, ומאמין שהפתרון הוא הכרה הדדית.", years: "1939–2018", origin: "ישראל" },
+  { name: "יצחק רבין", field: "🕊️ שלום", quote: "די לדם ולדמעות.", bio: "מפקד צבאי שהפך לאיש שלום. חתם על הסכמי אוסלו בתקווה שאפשר לסיים את הסכסוך. נרצח ב-1995 על ידי יהודי שחשב שהוא בוגד. סמל לאומץ לבחור בדרך אחרת.", years: "1922–1995", origin: "ישראל" },
+];
+
+function DailyFigureCard() {
+  const [showBio, setShowBio] = useState(false);
+  // Pick figure based on day of year so it changes daily
+  const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  const figure = INSPIRATIONAL_FIGURES[dayOfYear % INSPIRATIONAL_FIGURES.length];
+
+  return (
+    <>
+      <div
+        onClick={() => setShowBio(true)}
+        style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.07), rgba(168,85,247,0.03))", borderRadius: 16, padding: 18, marginBottom: 20, border: "1.5px solid rgba(124,58,237,0.15)", cursor: "pointer", transition: "all 0.2s" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+          <div>
+            <p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 11, margin: "0 0 2px", textTransform: "uppercase", letterSpacing: 1 }}>💡 ציטוט היום</p>
+            <p style={{ color: "#9ca3af", fontSize: 11, margin: 0 }}>{figure.field}</p>
+          </div>
+          <span style={{ background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.2)", color: "#7c3aed", fontSize: 11, padding: "3px 9px", borderRadius: 20, fontWeight: 600, flexShrink: 0 }}>מי זה? ›</span>
+        </div>
+        <p style={{ color: "#1e1b4b", fontSize: 15, lineHeight: 1.7, margin: "0 0 10px", fontStyle: "italic" }}>"{figure.quote}"</p>
+        <p style={{ color: "#7c3aed", fontWeight: 700, fontSize: 13, margin: 0 }}>— {figure.name}</p>
+      </div>
+
+      {showBio && (
+        <div onClick={() => setShowBio(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 500, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: "24px 24px 0 0", padding: "28px 24px 36px", width: "100%", maxWidth: 480, boxShadow: "0 -8px 40px rgba(0,0,0,0.15)" }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 16 }}>
+              <div style={{ width: 52, height: 52, borderRadius: 14, background: "linear-gradient(135deg, rgba(124,58,237,0.15), rgba(168,85,247,0.08))", border: "1.5px solid rgba(124,58,237,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>
+                {figure.field.split(" ")[0]}
+              </div>
+              <div>
+                <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 18, margin: "0 0 2px" }}>{figure.name}</p>
+                <p style={{ color: "#7c3aed", fontSize: 13, margin: "0 0 2px" }}>{figure.field}</p>
+                <p style={{ color: "#9ca3af", fontSize: 12, margin: 0 }}>{figure.years} · {figure.origin}</p>
+              </div>
+            </div>
+
+            <div style={{ background: "rgba(124,58,237,0.05)", borderRadius: 12, padding: "14px 16px", marginBottom: 16 }}>
+              <p style={{ color: "#1e1b4b", fontSize: 14, lineHeight: 1.8, margin: 0, fontStyle: "italic" }}>"{figure.quote}"</p>
+            </div>
+
+            <p style={{ color: "#374151", fontSize: 14, lineHeight: 1.8, margin: "0 0 20px" }}>{figure.bio}</p>
+
+            <button onClick={() => setShowBio(false)} style={{ width: "100%", padding: "12px", borderRadius: 12, background: "rgba(124,58,237,0.1)", border: "1.5px solid rgba(124,58,237,0.2)", color: "#7c3aed", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>סגור</button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 function DashboardView({ data, isParent, onNavigate }) {
   const totalDone = ALL_TASKS.filter(t => data.completed[t.id]).length;
   const overallPct = Math.round((totalDone / TOTAL_TASKS) * 100);
@@ -2072,8 +2161,6 @@ function DashboardView({ data, isParent, onNavigate }) {
   const monthDone = currentMonth?.tasks.filter(t => data.completed[t.id]).length || 0;
   const monthTotal = currentMonth?.tasks.length || 0;
   const nextTask = currentMonth?.tasks.find(t => !data.completed[t.id]);
-  const wisdoms = ["כוח אמיתי הוא לא להפסיק אחרי כישלון אחד.", "מה שעושים כשאף אחד לא מסתכל — זה מי שאתה.", "האנשים שהכי משפיעים הם אלה שמקשיבים הכי טוב.", "כל יום הוא הזדמנות להיות קצת יותר טוב מאתמול.", "תחייב את עצמך לדברים שמפחידים אותך — שם הצמיחה.", "אחריות לא אומרת שלא טועים — אומרת שמודים ומתקנים.", "שנה של מאמץ שווה יותר מעשר שנות כוונות טובות."];
-  const todayWisdom = wisdoms[new Date().getDay()];
   const recentEntries = [...(data.journal || [])].reverse().slice(0, 2);
   return (
     <div>
@@ -2128,10 +2215,7 @@ function DashboardView({ data, isParent, onNavigate }) {
           )}
         </div>
       )}
-      <div style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.07), rgba(168,85,247,0.03))", borderRadius: 16, padding: 20, marginBottom: 20, border: "1.5px solid rgba(124,58,237,0.15)" }}>
-        <p style={{ color: "#7c3aed", fontWeight: 600, fontSize: 11, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: 1 }}>💡 מחשבה ליום</p>
-        <p style={{ color: "#1e1b4b", fontSize: 15, lineHeight: 1.7, margin: 0, fontStyle: "italic" }}>"{todayWisdom}"</p>
-      </div>
+      <DailyFigureCard />
       <div style={{ background: "#fff", borderRadius: 20, padding: 20, marginBottom: 20, border: "1px solid #e5e7eb", boxShadow: "0 1px 4px rgba(124,58,237,0.06)" }}>
         <p style={{ color: "#1e1b4b", fontWeight: 700, fontSize: 15, margin: "0 0 16px" }}>המסע שלך</p>
         {CHAPTERS.map((ch, i) => {
