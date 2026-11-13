@@ -1550,6 +1550,12 @@ export function TaskModal({ task, chapter, data, save, isParent, onClose, PhotoU
     setShowJournalPrompt(true);
   }
 
+  function unmarkComplete() {
+    const newCompleted = { ...(data.completed || {}) };
+    delete newCompleted[task.id];
+    save({ ...data, completed: newCompleted });
+  }
+
   function saveJournalAndClose(write) {
     if (write && journalText.trim()) {
       const entry = {
@@ -1607,6 +1613,15 @@ export function TaskModal({ task, chapter, data, save, isParent, onClose, PhotoU
           <TaskCommentsComponent taskId={task.id} taskText={task.text} data={data} save={save} isParent={isParent} />
         )}
       </div>
+
+      {/* Undo completion */}
+      {isCompleted && (
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "16px", background: "#ffffff", borderTop: "1px solid #e5e7eb" }}>
+          <button onClick={unmarkComplete} style={{ width: "100%", padding: "12px", borderRadius: 14, background: "#fff", border: "1.5px solid #ef4444", color: "#dc2626", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>
+            ↩️ ביטול סימון — החזר את המשימה ללא הושלמה
+          </button>
+        </div>
+      )}
 
       {/* Footer */}
       {!isParent && !isCompleted && ActivityComponent && (
