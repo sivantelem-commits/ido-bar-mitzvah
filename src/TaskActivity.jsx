@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   T13_EmotionJournal, T14_BraveConversation, T15_Volunteer, T16_Commitment,
   T17_PhysicalGoal, T18_TrainingPlan, T19_AchieveGoal,
@@ -46,8 +46,9 @@ function TextInput({ value, onChange, placeholder, multiline }) {
 }
 
 function ChipSelect({ options, value, onChange, multi }) {
+  const filled = multi ? (value || []).length > 0 : !!value;
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+    <div data-req="chip" data-filled={filled ? "1" : "0"} style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
       {options.map(opt => {
         const sel = multi ? value.includes(opt) : value === opt;
         return (
@@ -68,7 +69,7 @@ function ChipSelect({ options, value, onChange, multi }) {
 
 function Scale({ value, onChange, min = 1, max = 10, label }) {
   return (
-    <div>
+    <div data-req="scale">
       {label && <Label>{label}</Label>}
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <span style={{ color: "#9ca3af", fontSize: 12 }}>{min}</span>
@@ -1456,6 +1457,75 @@ export function TaskModal({ task, chapter, data, save, isParent, onClose, PhotoU
   const isCompleted = !!data.completed?.[task.id];
   const [showJournalPrompt, setShowJournalPrompt] = useState(false);
   const [journalText, setJournalText] = useState("");
+  const [missingMsg, setMissingMsg] = useState("");
+  const actRef = useRef(null);
+
+  // Every text field in the activity must be filled before the task can be completed
+  const REQUIRED_KEYS = {
+    t1: ["idoSig", "mom1Sig", "mom2Sig", "feeling", "promise", "word"],
+    t2: ["whoAmI", "strengths", "challenges", "proudOf"],
+    t3: ["chosenValues"],
+    t4: ["area", "why", "standard", "reflection"],
+    t5: ["commitment", "frequency", "whatIfFail"],
+    t6: ["whatWorked", "whatDidnt", "nextMonth", "parentFeedback"],
+    t7: ["amount", "savePct", "spendOn", "firstPurchase"],
+    t8: ["entries", "lesson"],
+    t9: ["examples", "decision", "insight"],
+    t10: ["menu", "difficulty", "reflection"],
+    t11: ["steps", "timeEstimate", "actualTime", "reflection"],
+    t12: ["activities", "budget", "reflection"],
+    t13: ["entries", "patterns"],
+    t14: ["topic", "emotion", "person", "fear", "opener", "reflection"],
+    t15: ["cause", "org", "what", "why", "freq", "reflection"],
+    t16: ["weeks", "reflection"],
+    t17: ["goalId", "why", "deadline"],
+    t18: ["goalName", "plan"],
+    t19: ["moment", "hardest", "helped", "proved"],
+    t20: ["destination", "legs", "plan"],
+    t21: ["challenge", "success", "reflection"],
+    t22: ["items", "review"],
+    t23: ["best", "proved", "independenceScore"],
+    t24: ["repairs", "bestTool"],
+    t25: ["toolsDone", "toolNotes", "reflection"],
+    t26: ["where", "budget", "timing", "challenge", "backup", "reflection"],
+    t27: ["expenses", "onTime", "reflection"],
+    t28: ["chosenFire", "checkedSteps", "reflection"],
+    t29: ["stepsDone", "timeToSetup", "reflection"],
+    t30: ["location", "packing", "eveningPlan", "reflection"],
+    t31: ["items", "reflection"],
+    t32: ["ratings", "reflection"],
+    t33: ["passionAreas"],
+    t34: ["goal", "why", "obstacles", "firstStep", "measure"],
+    t35: ["projectType", "title", "problem", "audience", "outcome"],
+    t36: ["mainGoal", "metrics", "deadline"],
+    t37: ["milestones", "hardestPart"],
+    t38: ["opening", "journey", "insight", "gratitude", "future"],
+    t39: ["insights", "biggestInsight"],
+    t40: ["letter", "openAge"],
+    t41: ["moments", "changed", "proud", "thanks", "commitment"],
+    t42: ["value", "changed", "insight", "commitment", "signatureName"],
+  };
+  function findEmptyFields() {
+    const root = actRef.current;
+    if (!root) return [];
+    const bad = [...root.querySelectorAll("textarea, input, select")].filter(el => {
+      const t = (el.getAttribute("type") || "text").toLowerCase();
+      if (["file", "checkbox", "radio", "button", "submit", "color", "hidden"].includes(t)) return false;
+      if (t === "range") return !el.dataset.touched;           // slider must be moved at least once
+      return !String(el.value || "").trim();
+    });
+    // chip groups with nothing chosen
+    root.querySelectorAll('[data-req="chip"][data-filled="0"]').forEach(el => bad.push(el));
+    return bad;
+  }
+  function missingKeys() {
+    return (REQUIRED_KEYS[task.id] || []).filter(k => {
+      const v = (activityData || {})[k];
+      if (Array.isArray(v)) return v.length === 0;
+      if (v && typeof v === "object") return Object.keys(v).length === 0;
+      return !String(v ?? "").trim();
+    });
+  }
 
   function saveActivity(newState) {
     const newTaskData = { ...(data.taskData || {}), [task.id]: newState };
@@ -1463,6 +1533,17 @@ export function TaskModal({ task, chapter, data, save, isParent, onClose, PhotoU
   }
 
   function markComplete() {
+    const empties = findEmptyFields();
+    const hasAnyData = Object.keys(activityData || {}).length > 0;
+    const keysMissing = missingKeys();
+    if (empties.length > 0 || !hasAnyData || keysMissing.length > 0) {
+      empties.forEach(el => { el.style.outline = "2px solid #ef4444"; el.style.outlineOffset = "1px"; el.addEventListener("input", () => { el.style.outline = ""; }, { once: true }); });
+      empties[0]?.scrollIntoView({ behavior: "smooth", block: "center" });
+      const n = Math.max(empties.length, keysMissing.length);
+      setMissingMsg(!hasAnyData && n === 0 ? "עדיין לא מילאת כלום במשימה הזו" : `חסרים ${n || "כמה"} שדות או בחירות — מלא את כולם (גם בשלבים האחרים של המשימה) כדי לסיים`);
+      return;
+    }
+    setMissingMsg("");
     const newCompleted = { ...(data.completed || {}), [task.id]: true };
     const newTaskData = { ...(data.taskData || {}), [task.id]: activityData };
     save({ ...data, completed: newCompleted, taskData: newTaskData });
@@ -1516,7 +1597,7 @@ export function TaskModal({ task, chapter, data, save, isParent, onClose, PhotoU
       {/* Body */}
       <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px 100px" }}>
         {ActivityComponent
-          ? <ActivityComponent state={activityData} onChange={saveActivity} isParent={isParent} data={data} save={save} />
+          ? <div ref={actRef} onInput={e => { if (e.target?.type === "range") e.target.dataset.touched = "1"; }} onChange={e => { if (e.target?.type === "range") e.target.dataset.touched = "1"; }}><ActivityComponent state={activityData} onChange={saveActivity} isParent={isParent} data={data} save={save} /></div>
           : <p style={{ color: "#6b7280", textAlign: "center", padding: 40 }}>הפעילות בדרך...</p>
         }
         {PhotoUploadComponent && !isParent && (
@@ -1530,6 +1611,7 @@ export function TaskModal({ task, chapter, data, save, isParent, onClose, PhotoU
       {/* Footer */}
       {!isParent && !isCompleted && ActivityComponent && (
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "16px", background: "#ffffff", borderTop: "1px solid #e5e7eb" }}>
+          {missingMsg && <p style={{ color: "#dc2626", fontSize: 13, fontWeight: 600, textAlign: "center", margin: "0 0 10px" }}>⚠️ {missingMsg}</p>}
           <button onClick={markComplete} style={{ width: "100%", padding: "14px", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
             ✓ סיימתי את המשימה הזו
           </button>

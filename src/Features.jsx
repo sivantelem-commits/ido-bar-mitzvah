@@ -200,9 +200,9 @@ export function GalleryView({ data }) {
 // ─── Share View ───────────────────────────────────────────────────────────────
 export function ShareView({ data }) {
   const [copied, setCopied] = useState(false);
-  const totalDone = Object.values(data.completed || {}).filter(Boolean).length;
+  const totalDone = Array.from({ length: 42 }, (_, i) => `t${i + 1}`).filter(id => (data.completed || {})[id]).length;
   const overallPct = Math.round((totalDone / 42) * 100);
-  const shareUrl = `${window.location.origin}?share=ido&pct=${overallPct}`;
+  const shareUrl = `${window.location.origin}?share=ido&pct=${overallPct}&done=${totalDone}`;
 
   function copyLink() {
     navigator.clipboard.writeText(shareUrl).then(() => {

@@ -195,6 +195,9 @@ const TASK_ICONS = {
 
 const ALL_TASKS = CHAPTERS.flatMap(c => c.months.flatMap(m => m.tasks));
 const TOTAL_TASKS = ALL_TASKS.length;
+// A month opens only from its calendar month (Nov 2026 start). Set VITE_DATE_LOCK=off to disable.
+const JOURNEY_START = new Date(2026, 10, 1);
+const DATE_LOCK_ENABLED = import.meta.env.VITE_DATE_LOCK !== "off";
 const EMPTY_DATA = { completed: {}, journal: [], parentNotes: [], values: [], valueSnapshots: [], taskData: {}, climaxData: {} };
 
 function useStorage() {
@@ -217,11 +220,32 @@ function useStorage() {
     load();
   }, []);
 
+  const latest = useRef(null);
+  useEffect(() => { latest.current = data; }, [data]);
+
   const save = useCallback(async (newData) => {
     setData(newData);
-    await supabase
-      .from("bar_mitzvah")
-      .upsert({ key: "ido-data", value: newData });
+    latest.current = newData;
+    try {
+      // merge with whatever is on the server so two devices don't wipe each other
+      const { data: row } = await supabase.from("bar_mitzvah").select("value").eq("key", "ido-data").maybeSingle();
+      const remote = row?.value || {};
+      const byId = (a, b) => { const m = new Map(); [...(a || []), ...(b || [])].forEach(e => m.set(e.id ?? JSON.stringify(e), e)); return [...m.values()]; };
+      const merged = {
+        ...remote, ...newData,
+        completed: { ...(remote.completed || {}), ...(newData.completed || {}) },
+        taskData: { ...(remote.taskData || {}), ...(newData.taskData || {}) },
+        climaxData: { ...(remote.climaxData || {}), ...(newData.climaxData || {}) },
+        photos: { ...(remote.photos || {}), ...(newData.photos || {}) },
+        taskComments: { ...(remote.taskComments || {}), ...(newData.taskComments || {}) },
+        journal: byId(remote.journal, newData.journal).filter(e => !(newData.deletedJournal || []).includes(e.id)),
+        parentNotes: byId(remote.parentNotes, newData.parentNotes),
+      };
+      // explicit un-completions (resets) in newData must win
+      Object.keys(remote.completed || {}).forEach(k => { if (!(k in (newData.completed || {}))) delete merged.completed[k]; });
+      Object.keys(remote.taskData || {}).forEach(k => { if (!(k in (newData.taskData || {}))) delete merged.taskData[k]; });
+      await supabase.from("bar_mitzvah").upsert({ key: "ido-data", value: merged, updated_at: new Date().toISOString() });
+    } catch (e) { console.error("save failed", e); }
   }, []);
 
   return [data, save];
@@ -320,6 +344,12 @@ function TasksView({ data, save, isParent }) {
 
   function isMonthUnlocked(chapterIdx, monthIdx) {
     if (isParent) return true;
+    if (DATE_LOCK_ENABLED) {
+      const idx = CHAPTERS.slice(0, chapterIdx).reduce((n, c) => n + c.months.length, 0) + monthIdx;
+      const now = new Date();
+      const monthsSinceStart = (now.getFullYear() - JOURNEY_START.getFullYear()) * 12 + (now.getMonth() - JOURNEY_START.getMonth());
+      if (idx > monthsSinceStart) return false;
+    }
     for (let ci = 0; ci <= chapterIdx; ci++) {
       const ch = CHAPTERS[ci];
       const mEnd = ci === chapterIdx ? monthIdx : ch.months.length;
@@ -2031,7 +2061,7 @@ function PresentationMode({ data, onClose }) {
 }
 
 // ─── PIN Modal ────────────────────────────────────────────────────────────────
-const PARENT_PIN = "2027";
+const PARENT_PIN = String(import.meta.env.VITE_PARENT_PIN || "2027");
 function PinModal({ onSuccess, onCancel }) {
   const [pin, setPin] = useState("");
   const [error, setError] = useState(false);
@@ -2065,34 +2095,61 @@ function PinModal({ onSuccess, onCancel }) {
 
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 const INSPIRATIONAL_FIGURES = [
-  { name: "מייקל ג'ורדן", field: "🏀 כדורסל", quote: "I've missed more than 9,000 shots in my career. I've lost almost 300 games. I've failed over and over again in my life — and that is why I succeed.", bio: "נדחה מנבחרת בית הספר בגיל 15. הפך לשחקן הכדורסל הגדול בכל הזמנים. זכה ב-6 אליפויות NBA ב-6 ניסיונות. הוכיח שכישלון הוא חלק הכרחי מהדרך להצלחה.", years: "1963–", origin: "ארה״ב" },
-  { name: "סרינה וויליאמס", field: "🎾 טניס", quote: "I really think a champion is defined not by their wins but by how they can recover when they fall.", bio: "גדלה בשכונה קשה בקומפטון ואימנה בפארקים ציבוריים. זכתה ב-23 תארי גרנד סלאם — יותר מכל שחקנית בעידן הפתוח. אחת הספורטאיות הגדולות בהיסטוריה.", years: "1981–", origin: "ארה״ב" },
-  { name: "מוחמד עלי", field: "🥊 אגרוף", quote: "I hated every minute of training, but I said: don't quit. Suffer now and live the rest of your life as a champion.", bio: "אלוף עולם באגרוף ונחשב לספורטאי המשפיע ביותר של המאה ה-20. סירב לשרת בצבא מטעמי מצפון ואיבד את תוארו. חזר, זכה שוב. לחם גם מחוץ לזירה.", years: "1942–2016", origin: "ארה״ב" },
-  { name: "נלסון מנדלה", field: "✊ מנהיגות", quote: "It always seems impossible until it's done.", bio: "בילה 27 שנה בכלא בגלל מאבקו נגד אפרטהייד. יצא ב-1990 ללא שנאה, הפך לנשיא הראשון שנבחר דמוקרטית בדרום אפריקה. סמל עולמי לסליחה ועוצמת הרוח.", years: "1918–2013", origin: "דרום אפריקה" },
-  { name: "מלאלה יוספזאי", field: "📚 חינוך וזכויות", quote: "One child, one teacher, one book, one pen can change the world.", bio: "בגיל 11 כתבה בלוג נגד טליבאן שאסרו על בנות ללמוד. בגיל 15 נורתה בראשה ושרדה. הפכה לצעירה הצעירה שזכתה בפרס נובל לשלום, בגיל 17.", years: "1997–", origin: "פקיסטן" },
-  { name: "אלברט איינשטיין", field: "🔬 פיזיקה", quote: "Imagination is more important than knowledge.", bio: "נכשל בבחינות קבלה לפוליטכניון בזוריך. עבד כפקיד פטנטים. בשעות הפנאי פיתח את תורת היחסות הפרטית. זכה בפרס נובל לפיזיקה ב-1921.", years: "1879–1955", origin: "גרמניה" },
-  { name: "סטיבן הוקינג", field: "🌌 קוסמולוגיה", quote: "However difficult life may seem, there is always something you can do and succeed at.", bio: "אובחן עם מחלה ניוונית בגיל 21 ונאמר לו שיחיה שנתיים. חי עד 76, כתב את 'קיצור תולדות הזמן' שנמכר ב-10 מיליון עותקים, וגילה את קרינת הוקינג.", years: "1942–2018", origin: "בריטניה" },
-  { name: "מארי קירי", field: "⚗️ כימיה ופיזיקה", quote: "Nothing in life is to be feared, it is only to be understood.", bio: "האישה הראשונה שזכתה בפרס נובל — ובשני תחומים שונים. נולדה בפולין ולמדה בסתר כי נשים לא הורשו ללמוד. גילתה את הרדיום והפולוניום.", years: "1867–1934", origin: "פולין" },
-  { name: "סטיב ג'ובס", field: "💻 טכנולוגיה", quote: "Stay hungry, stay foolish.", bio: "נשר מהאוניברסיטה אחרי סמסטר אחד. הוקד מאפל שייסד. חזר והפך אותה לחברה השווה ביותר בעולם. ייסד גם את פיקסאר. האמין שפשטות ועיצוב יכולים לשנות חיים.", years: "1955–2011", origin: "ארה״ב" },
-  { name: "מרטין לותר קינג", field: "🕊️ שוויון", quote: "Darkness cannot drive out darkness; only light can do that. Hate cannot drive out hate; only love can do that.", bio: "מנהיג תנועת זכויות האזרח בארה״ב. ניהל מאבק ענק ללא אלימות. נאומו 'יש לי חלום' ב-1963 נחשב לאחד הנאומים הגדולים בהיסטוריה.", years: "1929–1968", origin: "ארה״ב" },
-  { name: "מהטמה גנדי", field: "☮️ שינוי ללא אלימות", quote: "Be the change you wish to see in the world.", bio: "עורך דין שהפך למנהיג עצמאות הודו. הוביל מאות מיליון אנשים נגד השלטון הבריטי ללא נשק — עם צומות, מצעדים וסרבנות אזרחית. הודו קיבלה עצמאות ב-1947.", years: "1869–1948", origin: "הודו" },
-  { name: "פרידה קאלו", field: "🎨 ציור", quote: "I paint my own reality.", bio: "נפגעה בתאונת אוטובוס קשה בגיל 18 ונרתקה למיטה. במהלך ההחלמה התחילה לצייר. יצרה יצירות אוטוביוגרפיות עוצמתיות על כאב, זהות ותרבות מקסיקנית.", years: "1907–1954", origin: "מקסיקו" },
-  { name: "ג'יי קיי רולינג", field: "📖 כתיבה", quote: "It is impossible to live without failing at something, unless you live so cautiously that you might as well not have lived at all.", bio: "אם חד-הורית שכתבה את הארי פוטר הראשון בבתי קפה בסקוטלנד. נדחתה על ידי 12 מו״לים. הספר פורסם ב-1997 והפך לסדרת הספרים הנמכרת ביותר בהיסטוריה.", years: "1965–", origin: "בריטניה" },
-  { name: "לאונרדו דה וינצ'י", field: "🖌️ אמנות ומדע", quote: "Learning never exhausts the mind.", bio: "גדל מחוץ לנישואים, ללא חינוך אוניברסיטאי. הפך לצייר (מונה ליזה, הסעודה האחרונה), פסל, אדריכל, מוזיקאי, מדען וממציא. הסקרנות הייתה הדלק שלו.", years: "1452–1519", origin: "איטליה" },
-  { name: "ביטהובן", field: "🎵 מוזיקה", quote: "Music is a higher revelation than all wisdom and philosophy.", bio: "התחיל לאבד את שמיעתו בגיל 26 — טרגדיה בלתי נתפסת לאמן מוזיקה. כתב את סימפוניה מספר 9, אחת היצירות הגדולות שנכתבו אי פעם, כשהיה חרש לחלוטין.", years: "1770–1827", origin: "גרמניה" },
-  { name: "ניל ארמסטרונג", field: "🌙 חלל", quote: "That's one small step for man, one giant leap for mankind.", bio: "הראשון לדרוך על הירח ב-21 ביולי 1969. פיילוט מלחמה ומהנדס שהפך לאסטרונאוט. לאחר ההיסטוריה חזר לחיות בענווה בפארם באוהיו ולימד הנדסה.", years: "1930–2012", origin: "ארה״ב" },
-  { name: "אמא תרזה", field: "💛 נתינה", quote: "If you judge people, you have no time to love them.", bio: "נזירה שעזבה את המנזר לטפל בעניים ברחובות קלקוטה. ייסדה את 'מיסיונרי של האהבה' שפועל ב-139 מדינות. זכתה בפרס נובל לשלום ב-1979.", years: "1910–1997", origin: "מקדוניה" },
-  { name: "אנה פרנק", field: "✍️ כתיבה ותקווה", quote: "Despite everything, I believe that people are really good at heart.", bio: "ילדה יהודייה שנסתרה עם משפחתה שנתיים מהנאצים בגינה סודית באמסטרדם. כתבה יומן שתורגם ל-70 שפות. נספתה בברגן-בלזן בגיל 15.", years: "1929–1945", origin: "גרמניה" },
-  { name: "צ'ארלס דרווין", field: "🦎 ביולוגיה", quote: "It is not the strongest of the species that survive, nor the most intelligent, but the one most responsive to change.", bio: "עזב לימודי רפואה ותאולוגיה. הפליג 5 שנים על HMS Beagle. פיתח את תורת האבולוציה שחוללה מהפכה בהבנת החיים. המתין 20 שנה לפרסם.", years: "1809–1882", origin: "בריטניה" },
-  { name: "ניקולה טסלה", field: "⚡ חשמל", quote: "The present is theirs; the future, for which I really worked, is mine.", bio: "ממציא הזרם החילופי שמפעיל כיום כל בית בעולם. רשם מעל 300 פטנטים. חי בדלות למרות גאונותו. ביצע ניסויים מהפכניים בתקשורת אלחוטית עשרות שנים לפני זמנם.", years: "1856–1943", origin: "סרביה" },
-  { name: "בוב מארלי", field: "🎸 מוזיקה", quote: "One good thing about music, when it hits you, you feel no pain.", bio: "גדל בשכונת עוני בקינגסטון, ג'מייקה. יצר מוזיקת רגאי שחצתה יבשות ותרבויות. הפך לסמל של שלום ואחדות. נפטר בגיל 36 אך השפעתו על המוזיקה העולמית נותרת.", years: "1945–1981", origin: "ג'מייקה" },
-  { name: "אוסיין בולט", field: "🏃 אתלטיקה", quote: "I trained 4 years to run 9 seconds, and people give up when they don't see results in 2 months.", bio: "גדל בכפר קטן בטרלוני, ג'מייקה. שבר שלושה שיאי עולם באולימפיאדת בייג'ינג 2008. שיאו — 9.58 שניות ל-100 מטר — עדיין עומד כשיא עולם.", years: "1986–", origin: "ג'מייקה" },
-  { name: "מלקולם X", field: "✊ זכויות אדם", quote: "Education is the passport to the future, for tomorrow belongs to those who prepare for it today.", bio: "גדל בעוני, ישב בכלא שם חינך את עצמו מאפס. הפך לאחד הנואמים והמנהיגים החשובים של תנועת השחרור האפרו-אמריקאית בשנות ה-60.", years: "1925–1965", origin: "ארה״ב" },
-  { name: "וינסטון צ'רצ'יל", field: "🏛️ מנהיגות", quote: "Success is not final, failure is not fatal: it is the courage to continue that counts.", bio: "נכשל בבחינות הצבאיות פעמיים. הפך לראש ממשלת בריטניה ב-1940 בשיא הסכנה הנאצית. הוביל את הברית לניצחון במלחמת העולם השנייה. זכה בפרס נובל לספרות.", years: "1874–1965", origin: "בריטניה" },
-  { name: "ברק אובמה", field: "🏛️ מדינאות", quote: "Change will not come if we wait for some other person or some other time. We are the ones we've been waiting for.", bio: "גדל בהוואי עם אמו לבנה ובלעדי אביו הקניאני. ב-2008 נבחר לנשיא ה-44 של ארה״ב — הראשון ממוצא אפריקאי. זכה בפרס נובל לשלום ב-2009.", years: "1961–", origin: "ארה״ב" },
-  { name: "גולדה מאיר", field: "🇮🇱 מדינאות", quote: "Trust yourself. Create the kind of self that you will be happy to live with all your life.", bio: "נולדה בקייב, גדלה במילווקי, עלתה לארץ ישראל ב-1921. שרתה כשרת עבודה, שרת חוץ ושגרירה במוסקבה. ב-1969 הפכה לראש הממשלה הרביעית של ישראל.", years: "1898–1978", origin: "אוקראינה / ישראל" },
-  { name: "עמוס עוז", field: "📚 ספרות", quote: "הפנטזיה היא מחלה, אבל הדמיון הוא תרופה.", bio: "גדל בירושלים ועבר לקיבוץ חולדה בגיל 15. הפך לאחד הסופרים הישראלים הנקראים ביותר בעולם — ספריו תורגמו ל-45 שפות. נאבק כל חייו לפתרון שתי המדינות.", years: "1939–2018", origin: "ישראל" },
-  { name: "יצחק רבין", field: "🕊️ שלום", quote: "אפשר לחיות בלי שלום, אבל לא שווה לחיות בלי שלום.", bio: "מפקד צבאי שהוביל את ישראל במלחמת ששת הימים. הפך לאיש שלום שחתם על הסכמי אוסלו ב-1993 וזכה בפרס נובל לשלום. נרצח ב-4 בנובמבר 1995.", years: "1922–1995", origin: "ישראל" },
+  { name: "מייקל ג'ורדן", source: "פרסומת Nike ‏'Failure', 1997", field: "🏀 כדורסל", quote: "I've missed more than 9,000 shots in my career. I've lost almost 300 games. I've failed over and over and over again in my life. And that is why I succeed.", bio: "נדחה מנבחרת בית הספר בגיל 15. הפך לשחקן הכדורסל הגדול בכל הזמנים. זכה ב-6 אליפויות NBA ב-6 ניסיונות. הוכיח שכישלון הוא חלק הכרחי מהדרך להצלחה.", years: "1963–", origin: "ארה״ב" },
+  { name: "מלאלה יוספזאי", source: "נאום באו״ם, 12.7.2013", field: "📚 חינוך וזכויות", quote: "One child, one teacher, one book, one pen can change the world.", bio: "בגיל 11 כתבה בלוג נגד טליבאן שאסרו על בנות ללמוד. בגיל 15 נורתה בראשה ושרדה. הפכה לצעירה הצעירה שזכתה בפרס נובל לשלום, בגיל 17.", years: "1997–", origin: "פקיסטן" },
+  { name: "אלברט איינשטיין", source: "ראיון ב-Saturday Evening Post, 1929", field: "🔬 פיזיקה", quote: "Imagination is more important than knowledge.", bio: "נכשל בבחינות קבלה לפוליטכניון בזוריך. עבד כפקיד פטנטים. בשעות הפנאי פיתח את תורת היחסות הפרטית. זכה בפרס נובל לפיזיקה ב-1921.", years: "1879–1955", origin: "גרמניה" },
+  { name: "סטיבן הוקינג", source: "נאום פתיחת הפראלימפיאדה, לונדון 2012", field: "🌌 קוסמולוגיה", quote: "However difficult life may seem, there is always something you can do and succeed at.", bio: "אובחן עם מחלה ניוונית בגיל 21 ונאמר לו שיחיה שנתיים. חי עד 76, כתב את 'קיצור תולדות הזמן' שנמכר ב-10 מיליון עותקים, וגילה את קרינת הוקינג.", years: "1942–2018", origin: "בריטניה" },
+  { name: "סטיב ג'ובס", source: "נאום הסיום בסטנפורד, 2005", field: "💻 טכנולוגיה", quote: "Stay hungry, stay foolish.", bio: "נשר מהאוניברסיטה אחרי סמסטר אחד. הוקד מאפל שייסד. חזר והפך אותה לחברה השווה ביותר בעולם. ייסד גם את פיקסאר. האמין שפשטות ועיצוב יכולים לשנות חיים.", years: "1955–2011", origin: "ארה״ב" },
+  { name: "מרטין לותר קינג", source: "הספר Strength to Love, 1963", field: "🕊️ שוויון", quote: "Darkness cannot drive out darkness; only light can do that. Hate cannot drive out hate; only love can do that.", bio: "מנהיג תנועת זכויות האזרח בארה״ב. ניהל מאבק ענק ללא אלימות. נאומו 'יש לי חלום' ב-1963 נחשב לאחד הנאומים הגדולים בהיסטוריה.", years: "1929–1968", origin: "ארה״ב" },
+  { name: "פרידה קאלו", source: "מצוטטת בכתבי התקופה (ראו ביוגרפיות)", field: "🎨 ציור", quote: "I paint my own reality.", bio: "נפגעה בתאונת אוטובוס קשה בגיל 18 ונרתקה למיטה. במהלך ההחלמה התחילה לצייר. יצרה יצירות אוטוביוגרפיות עוצמתיות על כאב, זהות ותרבות מקסיקנית.", years: "1907–1954", origin: "מקסיקו" },
+  { name: "ג'יי קיי רולינג", source: "נאום הסיום בהרווארד, 2008", field: "📖 כתיבה", quote: "It is impossible to live without failing at something, unless you live so cautiously that you might as well not have lived at all.", bio: "אם חד-הורית שכתבה את הארי פוטר הראשון בבתי קפה בסקוטלנד. נדחתה על ידי 12 מו״לים. הספר פורסם ב-1997 והפך לסדרת הספרים הנמכרת ביותר בהיסטוריה.", years: "1965–", origin: "בריטניה" },
+  { name: "ניל ארמסטרונג", source: "הנחיתה על הירח, 20.7.1969", field: "🌙 חלל", quote: "That's one small step for man, one giant leap for mankind.", bio: "הראשון לדרוך על הירח ב-21 ביולי 1969. פיילוט מלחמה ומהנדס שהפך לאסטרונאוט. לאחר ההיסטוריה חזר לחיות בענווה בפארם באוהיו ולימד הנדסה.", years: "1930–2012", origin: "ארה״ב" },
+  { name: "אנה פרנק", source: "יומנה, 15.7.1944", field: "✍️ כתיבה ותקווה", quote: "Despite everything, I believe that people are really good at heart.", bio: "ילדה יהודייה שנסתרה עם משפחתה שנתיים מהנאצים בגינה סודית באמסטרדם. כתבה יומן שתורגם ל-70 שפות. נספתה בברגן-בלזן בגיל 15.", years: "1929–1945", origin: "גרמניה" },
+  { name: "מלקולם X", source: "נאום, מרץ 1964", field: "✊ זכויות אדם", quote: "Education is the passport to the future, for tomorrow belongs to those who prepare for it today.", bio: "גדל בעוני, ישב בכלא שם חינך את עצמו מאפס. הפך לאחד הנואמים והמנהיגים החשובים של תנועת השחרור האפרו-אמריקאית בשנות ה-60.", years: "1925–1965", origin: "ארה״ב" },
+  { name: "ברק אובמה", source: "נאום ‏Super Tuesday, 5.2.2008", field: "🏛️ מדינאות", quote: "Change will not come if we wait for some other person or some other time. We are the ones we've been waiting for.", bio: "גדל בהוואי עם אמו לבנה ובלעדי אביו הקניאני. ב-2008 נבחר לנשיא ה-44 של ארה״ב — הראשון ממוצא אפריקאי. זכה בפרס נובל לשלום ב-2009.", years: "1961–", origin: "ארה״ב" },
+  { name: "פרנקלין ד׳ רוזוולט", source: "נאום ההשבעה, 4.3.1933", note: "הציטוט במקור באנגלית", field: "🏛️ מדינאות", quote: "The only thing we have to fear is fear itself.", bio: "נשיא ארה״ב ה-32 והיחיד שנבחר ארבע פעמים. בגיל 39 לקה בשיתוק ילדים ואיבד את היכולת ללכת, וחזר לפוליטיקה. הוביל את ארה״ב במשבר הכלכלי הגדול ובמלחמת העולם השנייה.", years: "1882–1945", origin: "ארה״ב" },
+  { name: "ג׳ון קנדי", source: "נאום ההשבעה, 20.1.1961", note: "הציטוט במקור באנגלית", field: "🏛️ מדינאות", quote: "Ask not what your country can do for you — ask what you can do for your country.", bio: "נשיא ארה״ב ה-35 והצעיר ביותר שנבחר לתפקיד, בגיל 43. שירת בצי במלחמת העולם השנייה. בתקופתו הוקם חיל השלום ויצאה לדרך תוכנית הנחיתה על הירח. נרצח ב-1963.", years: "1917–1963", origin: "ארה״ב" },
+  { name: "תיאודור רוזוולט", source: "הנאום 'Citizenship in a Republic', סורבון, 23.4.1910", note: "הציטוט במקור באנגלית", field: "🏛️ מנהיגות", quote: "The credit belongs to the man who is actually in the arena, whose face is marred by dust and sweat and blood; who strives valiantly; who errs, who comes short again and again.", bio: "ילד חולני שסבל מאסתמה וחיזק את גופו באימונים. נשיא ארה״ב ה-26, וזכה בנובל לשלום ב-1906 על תיווך בין רוסיה ליפן. הקים פארקים לאומיים ושמורות טבע רבות.", years: "1858–1919", origin: "ארה״ב" },
+  { name: "אלינור רוזוולט", source: "הספר You Learn by Living, 1960", note: "הציטוט במקור באנגלית", field: "✊ זכויות אדם", quote: "You must do the thing you think you cannot do.", bio: "התייתמה בילדותה וגדלה ביישנית. כאשת הנשיא רוזוולט שינתה את תפקיד ׳הגברת הראשונה׳. עמדה בראש הוועדה שניסחה את ההצהרה האוניברסלית לזכויות אדם של האו״ם ב-1948.", years: "1884–1962", origin: "ארה״ב" },
+  { name: "אברהם לינקולן", source: "נאום גטיסבורג, 19.11.1863", note: "הציטוט במקור באנגלית", field: "🏛️ מדינאות", quote: "...that government of the people, by the people, for the people, shall not perish from the earth.", bio: "גדל בעוני בבקתת עץ ולמד בעיקר לבד, מספרים שהשאיל. עורך דין שנבחר לנשיא ארה״ב ה-16. הוביל את האיחוד במלחמת האזרחים, והכרזת השחרור שלו ב-1863 סללה את הדרך לביטול העבדות. נרצח ב-1865.", years: "1809–1865", origin: "ארה״ב" },
+  { name: "תיאודור הרצל", source: "הרומן 'אלטנוילנד', 1902 (תרגום עברי)", note: "תרגום עברי מגרמנית", field: "🇮🇱 חזון", quote: "אם תרצו – אין זו אגדה.", bio: "עיתונאי וסופר יהודי מווינה. בעקבות משפט דרייפוס בפריז הקדיש את חייו לרעיון של בית לאומי לעם היהודי. כתב את 'מדינת היהודים' ב-1896 וכינס את הקונגרס הציוני הראשון בבזל ב-1897. נפטר בגיל 44, וב-1949 הועבר ארונו להר הרצל בירושלים.", years: "1860–1904", origin: "וינה" },
+  { name: "הלל הזקן", source: "פרקי אבות, א׳ י״ד", note: "מקורות חז״ל", field: "📜 חכמי ישראל", quote: "אם אין אני לי – מי לי? וכשאני לעצמי – מה אני? ואם לא עכשיו – אימתי?", bio: "נולד בבבל ועלה לארץ ישראל, ולפי המסורת למד תורה מתוך עוני גדול. היה מראשי העם בסוף ימי בית שני ומייסד ׳בית הלל׳. נודע בענוותו ובסבלנותו. כשנתבקש ללמד את התורה ׳על רגל אחת׳ אמר: ׳מה ששנוא עליך אל תעשה לחברך׳.", years: "המאה ה-1 לפנה״ס", origin: "בבל וארץ ישראל" },
+  { name: "רבי טרפון", source: "פרקי אבות, ב׳ ט״ז", note: "מקורות חז״ל", field: "📜 חכמי ישראל", quote: "לא עליך המלאכה לגמור, ולא אתה בן חורין להיבטל ממנה.", bio: "מחכמי המשנה, מבני הדור שאחרי חורבן בית שני. היה כהן שנודע בנדיבותו ופעל בלוד. דבריו וסיפורים עליו נשמרו בהרבה מקומות במשנה ובתלמוד.", years: "המאות ה-1–2 לספירה", origin: "ארץ ישראל" },
+  { name: "בן זומא", source: "פרקי אבות, ד׳ א׳", note: "מקורות חז״ל", field: "📜 חכמי ישראל", quote: "איזהו חכם? הלומד מכל אדם. איזהו גיבור? הכובש את יצרו. איזהו עשיר? השמח בחלקו. איזהו מכובד? המכבד את הבריות.", bio: "מחכמי המשנה בתקופת יבנה, בן דורם של רבי עקיבא ורבי יהושע. נודע בחריפותו ובבקיאותו בדרש. עליו נאמר במשנה: ׳משמת בן זומא – בטלו הדרשנים׳.", years: "המאה ה-2 לספירה", origin: "ארץ ישראל" },
+  { name: "שמאי הזקן", source: "פרקי אבות, א׳ ט״ו", note: "מקורות חז״ל", field: "📜 חכמי ישראל", quote: "אמור מעט ועשה הרבה, והוי מקבל את כל האדם בסבר פנים יפות.", bio: "בן דורו של הלל וראש ׳בית שמאי׳, אסכולה שנודעה בהקפדתה. לפי התלמוד היה בנאי במקצועו. המחלוקות בין בית שמאי לבית הלל הן מהיסודות של התורה שבעל פה.", years: "המאה ה-1 לפנה״ס", origin: "ארץ ישראל" },
+  { name: "רבי עקיבא", source: "פרקי אבות, ג׳ י״ד", note: "מקורות חז״ל", field: "📜 חכמי ישראל", quote: "חביב אדם שנברא בצלם, חיבה יתרה נודעת לו שנברא בצלם.", bio: "לפי המסורת היה רועה צאן שהחל ללמוד תורה רק בגיל מבוגר. הפך לגדול חכמי דורו והעמיד אלפי תלמידים. תמך במרד בר כוכבא ונהרג בידי הרומאים. נחשב לאחד מעמודי התווך של המשנה.", years: "כ-50–135 לספירה", origin: "ארץ ישראל" },
+  { name: "רבי נחמן מברסלב", source: "ליקוטי מוהר״ן, מהדורה תנינא, סימן מ״ח", note: "מקורות חסידיים", field: "📜 חסידות", quote: "כל העולם כולו גשר צר מאוד, והעיקר – לא לפחד כלל.", bio: "מייסד חסידות ברסלב, ונינו של הבעל שם טוב. ב-1798 יצא למסע לארץ ישראל, ביקר בצפת ובטבריה וחזר. הרבה לספר סיפורים עם מסרים עמוקים. נפטר באומן שבאוקראינה.", years: "1772–1810", origin: "אוקראינה" },
+  { name: "חנה סנש", source: "השיר 'הליכה לקיסריה', 1942", note: "שיר בעברית", field: "🇮🇱 שירה וגבורה", quote: "אלי, אלי, שלא יגמר לעולם – החול והים, רשרוש של המים, ברק השמיים, תפילת האדם.", bio: "נולדה בבודפשט ועלתה לארץ ישראל בגיל 18 ולמדה בבית הספר החקלאי בנהלל, ואחר כך הצטרפה לקיבוץ שדות ים. ב-1944 צנחה בשטח הכבוש כדי לסייע ליהודי הונגריה, נתפסה, עונתה ונורתה בנובמבר 1944 בבודפשט.", years: "1921–1944", origin: "הונגריה" },
+  { name: "נלסון מנדלה", source: "האוטוביוגרפיה Long Walk to Freedom, 1994", note: "הציטוט במקור באנגלית", field: "✊ מנהיגות", quote: "I learned that courage was not the absence of fear, but the triumph over it. The brave man is not he who does not feel afraid, but he who conquers that fear.", bio: "בילה 27 שנה בכלא בגלל מאבקו באפרטהייד. יצא ב-1990 וב-1994 נבחר לנשיא הראשון של דרום אפריקה בבחירות דמוקרטיות לכל האזרחים. זכה בפרס נובל לשלום ב-1993.", years: "1918–2013", origin: "דרום אפריקה" },
+  { name: "וינסטון צ׳רצ׳יל", source: "נאום בבית הספר הארו, 29.10.1941", note: "הציטוט במקור באנגלית", field: "🏛️ מנהיגות", quote: "Never give in, never give in, never, never, never, never — in nothing, great or small, large or petty — never give in, except to convictions of honour and good sense.", bio: "נכשל פעמיים בבחינות הכניסה לאקדמיה הצבאית סנדהרסט ועבר בניסיון השלישי. ראש ממשלת בריטניה בימי מלחמת העולם השנייה ושוב בשנים 1951–1955. זכה בנובל לספרות ב-1953.", years: "1874–1965", origin: "בריטניה" },
+  { name: "רוזה פארקס", source: "הספר Quiet Strength, 1994", note: "הציטוט במקור באנגלית", field: "✊ זכויות האזרח", quote: "I have learned over the years that when one's mind is made up, this diminishes fear.", bio: "ב-1.12.1955 במונטגומרי שבאלבמה סירבה לפנות את מושבה באוטובוס לנוסע לבן, ונעצרה. מעצרה הצית חרם אוטובוסים שנמשך כשנה והוביל גם מרטין לותר קינג. נחשבת ׳אם תנועת זכויות האזרח׳.", years: "1913–2005", origin: "ארה״ב" },
+  { name: "הלן קלר", source: "הספר Let Us Have Faith, 1940", note: "הציטוט במקור באנגלית", field: "📖 כתיבה וחינוך", quote: "Life is either a daring adventure or nothing.", bio: "בגיל שנה וחצי בערך איבדה את הראייה והשמיעה. בעזרת המורה אן סאליבן למדה לתקשר, ואחר כך סיימה לימודי תואר ראשון. הפכה לסופרת, מרצה ופעילה לזכויות אנשים עם מוגבלויות.", years: "1880–1968", origin: "ארה״ב" },
+  { name: "אנה פרנק", source: "יומנה, מרץ 1944", note: "הציטוט במקור באנגלית", field: "✍️ כתיבה ותקווה", quote: "How wonderful it is that nobody need wait a single moment before starting to improve the world.", bio: "ילדה יהודייה שהסתתרה עם משפחתה בבית ברובע אמסטרדם יותר משנתיים. במחבוא כתבה יומן. נתפסה ב-1944 ונספתה במחנה ברגן-בלזן. אביה אוטו, ששרד, פרסם את היומן.", years: "1929–1945", origin: "הולנד" },
+  { name: "ויקטור פרנקל", source: "הספר Man's Search for Meaning, 1946", note: "מהמהדורה האנגלית", field: "🧠 פסיכולוגיה", quote: "Everything can be taken from a man but one thing: the last of the human freedoms — to choose one's attitude in any given set of circumstances, to choose one's own way.", bio: "פסיכיאטר יהודי מווינה ששרד כמה מחנות ריכוז, ביניהם אושוויץ. אחרי המלחמה פיתח את הלוגותרפיה, גישה טיפולית שמתמקדת בחיפוש משמעות. ספרו נחשב לאחד המשפיעים במאה ה-20.", years: "1905–1997", origin: "אוסטריה" },
+  { name: "אלי ויזל", source: "נאום קבלת פרס נובל לשלום, 10.12.1986", note: "הציטוט במקור באנגלית", field: "✍️ ספרות וזיכרון", quote: "We must always take sides. Neutrality helps the oppressor, never the victim. Silence encourages the tormentor, never the tormented.", bio: "נולד בסיגט שברומניה. שרד את אושוויץ ואת בוכנוולד. כתב את 'הלילה' על חוויותיו, ולימים הפך לסופר ולפעיל למען זכרון השואה ולמניעת רצח עם. זכה בפרס נובל לשלום ב-1986.", years: "1928–2016", origin: "רומניה" },
+  { name: "אייזק ניוטון", source: "מכתב לרוברט הוק, 1675", note: "הציטוט במקור באנגלית", field: "🔬 פיזיקה", quote: "If I have seen further, it is by standing on the shoulders of giants.", bio: "נולד פג ואביו נפטר לפני לידתו. גילה את חוקי התנועה ואת חוק הכבידה, פיתח את החשבון האינפיניטסימלי וחקר את האור. ספרו 'עקרונות' (1687) נחשב לאחד החשובים בתולדות המדע.", years: "1643–1727", origin: "אנגליה" },
+  { name: "קרל סייגן", source: "הספר Pale Blue Dot, 1994", note: "הציטוט במקור באנגלית", field: "🌌 אסטרונומיה", quote: "Look again at that dot. That's here. That's home. That's us.", bio: "אסטרונום ומדען, ומגיש הסדרה 'קוסמוס'. עבד עם נאס״א על חלליות וויאג׳ר. ב-1990 ביקש שוויאג׳ר 1 יצלם את כדור הארץ מרחוק, ותמונת ׳הנקודה הכחולה החיוורת׳ מבוססת על כך.", years: "1934–1996", origin: "ארה״ב" },
+  { name: "ריצ׳רד פיינמן", source: "נאום הסיום בקאלטק, 1974", note: "הציטוט במקור באנגלית", field: "🔬 פיזיקה", quote: "The first principle is that you must not fool yourself — and you are the easiest person to fool.", bio: "פיזיקאי שזכה בנובל ב-1965. השתתף בפרויקט מנהטן ואחר כך לימד בקאלטק בסגנון חי ומשעשע. ב-1986 השתתף בוועדה שחקרה את אסון מעבורת החלל צ׳לנג׳ר.", years: "1918–1988", origin: "ארה״ב" },
+  { name: "אלן טיורינג", source: "המאמר 'Computing Machinery and Intelligence', 1950", note: "הציטוט במקור באנגלית", field: "💻 מדעי המחשב", quote: "We can only see a short distance ahead, but we can see plenty there that needs to be done.", bio: "מתמטיקאי בריטי. ב-1936 הגדיר את הרעיון של ׳מכונת טיורינג׳, ביסוד מדעי המחשב. במלחמת העולם השנייה עבד בבלצ׳לי פארק על פיצוח צופן האניגמה. ב-1950 הציע את ׳מבחן טיורינג׳ לבינה מלאכותית.", years: "1912–1954", origin: "בריטניה" },
+  { name: "סוקרטס", source: "אפולוגיה לאפלטון, 38a", note: "תרגום חופשי מיוונית", field: "🏺 פילוסופיה", quote: "החיים ללא חקר אינם ראויים לחיים.", bio: "פילוסוף יווני מאתונה, שלא כתב דבר בעצמו. תלמידיו, ובראשם אפלטון, תיעדו את שיטתו: שאלות מתמשכות שמבקשות לבדוק מה אנחנו באמת יודעים. ב-399 לפנה״ס נשפט למוות באתונה.", years: "470–399 לפנה״ס", origin: "יוון" },
+  { name: "וויליאם שייקספיר", source: "המלט, מערכה א׳ תמונה 3", note: "הציטוט במקור באנגלית", field: "🎭 תיאטרון", quote: "To thine own self be true.", bio: "מחזאי ומשורר אנגלי שכתב כ-37 מחזות, בהם 'המלט', 'רומאו ויוליה' ו'מקבת'. היה שותף בתיאטרון הגלוב בלונדון. הביטויים שיצר נשארו בשפה האנגלית עד היום.", years: "1564–1616", origin: "אנגליה" },
+  { name: "רוברט פרוסט", source: "השיר The Road Not Taken, 1916", note: "הציטוט במקור באנגלית", field: "📖 שירה", quote: "Two roads diverged in a wood, and I — I took the one less traveled by, and that has made all the difference.", bio: "משורר אמריקאי שזכה בארבעה פרסי פוליצר. שיריו עוסקים בנוף כפרי ובבחירות שאנשים עושים בחייהם. 'הדרך שלא נלקחה' הוא אחד השירים המוכרים ביותר בשפה האנגלית.", years: "1874–1963", origin: "ארה״ב" },
+  { name: "אלברט איינשטיין", source: "ראיון במגזין Life, 2.5.1955", note: "הציטוט במקור באנגלית", field: "🔬 פיזיקה", quote: "The important thing is not to stop questioning. Curiosity has its own reason for existing.", bio: "פיזיקאי יהודי שפיתח את תורת היחסות. זכה בנובל ב-1921 על הסבר האפקט הפוטואלקטרי. ב-1952 הוצע לו להיות נשיא ישראל, והוא סירב.", years: "1879–1955", origin: "גרמניה וארה״ב" },
+  { name: "יורי גגארין", source: "שיגור וסטוק 1, 12.4.1961", note: "מהרוסית", field: "🚀 חלל", quote: "Поехали! (Poyekhali!) — ׳יוצאים לדרך!׳", bio: "הראשון שיצא לחלל. ב-12.4.1961 הקיף את כדור הארץ פעם אחת בטיסה שנמשכה כ-108 דקות. בנו של נגר ממשפחת איכרים, ולימים טייס קרב.", years: "1934–1968", origin: "ברית המועצות" },
+  { name: "אליוד קיפצ׳וגה", source: "הסיסמה שלו, מרוץ אינאוס 1:59, וינה 2019", note: "הציטוט במקור באנגלית", field: "🏃 ריצה", quote: "No human is limited.", bio: "רץ קנייתי, אולי רץ המרתון הגדול בכל הזמנים. ב-12.10.2019 בווינה רץ מרתון בפחות משעתיים (1:59:40) בתנאים מיוחדים, ולכן הזמן לא נחשב שיא רשמי. זכה פעמיים באולימפיאדה במרתון.", years: "1984–", origin: "קניה" },
+  { name: "ג׳ון טולקין", source: "שר הטבעות: אחוות הטבעת, 1954 (גנדלף)", note: "הציטוט במקור באנגלית", field: "📖 ספרות", quote: "All we have to decide is what to do with the time that is given us.", bio: "פרופסור לשפה האנגלית באוקספורד ומחבר 'ההוביט' ו'שר הטבעות'. המציא שפות שלמות לעולמותיו. נולד בדרום אפריקה וגדל באנגליה.", years: "1892–1973", origin: "אנגליה" },
+  { name: "בנג׳מין פרנקלין", source: "Poor Richard's Almanack, 1737", note: "הציטוט במקור באנגלית", field: "💡 המצאות ומדינאות", quote: "Well done is better than well said.", bio: "הפסיק את לימודיו בגיל 10 ולימד את עצמו בעזרת ספרים. מדפיס, סופר, מדען ודיפלומט. המציא את מוט הברקים ועדשות דו-מוקדיות, וחתם על מגילת העצמאות ועל החוקה של ארה״ב.", years: "1706–1790", origin: "ארה״ב" },
+  { name: "ואצלב האוול", source: "ספר הראיונות Disturbing the Peace, 1986", note: "הציטוט במקור באנגלית", field: "🏛️ הגות ומדינאות", quote: "Hope is not the conviction that something will turn out well, but the certainty that something makes sense, regardless of how it turns out.", bio: "מחזאי צ׳כי ומתנגד למשטר הקומוניסטי, ישב בכלא בשל פעילותו. אחרי המהפכה ב-1989 נבחר לנשיא צ׳כוסלובקיה, ואחר כך לנשיא הראשון של הרפובליקה הצ׳כית.", years: "1936–2011", origin: "צ׳כוסלובקיה" },
+  { name: "אוסקר וויילד", source: "המחזה Lady Windermere's Fan, 1892", note: "הציטוט במקור באנגלית", field: "🎭 ספרות ותיאטרון", quote: "We are all in the gutter, but some of us are looking at the stars.", bio: "סופר ומחזאי אירי שכתב את 'דוריאן גריי' (1890) וקומדיות שנונות. ב-1895 נשפט ונכלא שנתיים בשל נטייתו המינית, בחוק שהיה אז בבריטניה. כיום זוכרים אותו בזכות כתיבתו.", years: "1854–1900", origin: "אירלנד" },
+  { name: "מארק טוויין", source: "הספר Pudd'nhead Wilson, 1894", note: "הציטוט במקור באנגלית", field: "📖 ספרות", quote: "Courage is resistance to fear, mastery of fear — not absence of fear.", bio: "שמו האמיתי סמואל קלמנס. עבד כנווט ספינות קיטור על נהר המיסיסיפי, ושם העט שלו הוא קריאה של נווטים. כתב את 'הרפתקאות טום סוייר' (1876) ו'הרפתקאות האקלברי פין'.", years: "1835–1910", origin: "ארה״ב" },
+  { name: "בילי ג׳ין קינג", source: "שם ספרה, 2008", note: "הציטוט במקור באנגלית", field: "🎾 טניס", quote: "Pressure is a privilege.", bio: "טניסאית אמריקאית שזכתה ב-39 תארי גראנד סלאם בסינגל, זוגות ומעורב. ב-1973 ניצחה את בובי ריגס ב׳קרב המינים׳. הקימה את ארגון הטניסאיות WTA ונאבקה לשוויון פרסים לנשים בספורט.", years: "1943–", origin: "ארה״ב" },
+  { name: "לואי פסטר", source: "הרצאה באוניברסיטת ליל, 1854", note: "תרגום מצרפתית", field: "🧪 כימיה וביולוגיה", quote: "In the fields of observation chance favors only the prepared mind.", bio: "כימאי צרפתי ממשפחה צנועה. פיתח שיטת פיסטור לשימור מזון ומשקאות. הראה שחיידקים גורמים למחלות, ופיתח חיסון נגד כלבת ב-1885.", years: "1822–1895", origin: "צרפת" },
+  { name: "היפוקרטס", source: "האפוריזמים של היפוקרטס, משפט הפתיחה", note: "תרגום חופשי מיוונית (׳האמנות׳ = הרפואה)", field: "⚕️ רפואה", quote: "החיים קצרים, האמנות ארוכה.", bio: "רופא יווני מהאי קוס, ונחשב ׳אבי הרפואה׳. הכתבים המיוחסים לו מדגישים התבוננות בחולה ורישום מדויק. ׳שבועת היפוקרטס׳ עדיין מעוררת השראה לרופאים.", years: "כ-460–370 לפנה״ס", origin: "יוון" },
+  { name: "פרידריך שילר", source: "'אודה לשמחה', 1785", note: "תרגום חופשי מגרמנית", field: "🎭 שירה ומחזאות", quote: "כל בני האדם יהיו לאחים.", bio: "משורר ומחזאי גרמני, חבר קרוב של גתה. כתב את המחזה 'הבוזזים' (1781). ב-1824 לחן בטהובן את השיר שלו בסימפוניה התשיעית, והוא הפך להמנון האיחוד האירופי.", years: "1759–1805", origin: "גרמניה" },
+  { name: "לאו דזה", source: "דאו דה ג׳ינג, פרק 64", note: "תרגום חופשי מסינית", field: "🏺 פילוסופיה", quote: "מסע של אלף מייל מתחיל בצעד אחד.", bio: "דמות עתיקה שחצי אגדה עוטפת אותה. לפי המסורת חי בסין במאה ה-6 לפנה״ס, ומיוחס לו ׳דאו דה ג׳ינג׳, יסוד הדאואיזם. יש חוקרים הסבורים שהספר נערך על ידי כמה אנשים.", years: "המאה ה-6 לפנה״ס (מסורת)", origin: "סין" },
+  { name: "קונפוציוס", source: "האנאלקטים, ספר ב׳ 15", note: "תרגום חופשי מסינית", field: "🏺 פילוסופיה", quote: "הלמידה ללא מחשבה – לשווא; המחשבה ללא למידה – מסוכנת.", bio: "מורה ופילוסוף סיני שנולד במדינת לו. ביקש לבנות חברה טובה על לימוד, כבוד ואחריות. תלמידיו ערכו את דבריו בספר ׳האנאלקטים׳, שהשפיע על סין ועל מזרח אסיה אלפי שנים.", years: "551–479 לפנה״ס", origin: "סין" },
+  { name: "לודוויג ויטגנשטיין", source: "Tractatus Logico-Philosophicus, 1921, סעיף 5.6", note: "מהמהדורה האנגלית", field: "🏺 פילוסופיה", quote: "The limits of my language mean the limits of my world.", bio: "פילוסוף אוסטרי-בריטי שנולד בווינה למשפחה עשירה. שירת בצבא האוסטרי במלחמת העולם הראשונה וכתב את ה׳טרקטטוס׳. עסק בקשר בין שפה, חשיבה ומציאות.", years: "1889–1951", origin: "אוסטריה" },
+  { name: "עמנואל קאנט", source: "המאמר 'מהי הארה?', 1784", note: "תרגום לאנגלית; המקור בגרמנית", field: "🏺 פילוסופיה", quote: "Sapere aude! Have courage to use your own understanding!", bio: "פילוסוף גרמני שחי כמעט כל חייו בקניגסברג. כתב את 'ביקורת התבונה הטהורה'. טען שהארה היא יציאת האדם מחוסר בגרותו שהוא עצמו אחראי לה.", years: "1724–1804", origin: "פרוסיה" },
 ];
 
 function DailyFigureCard() {
@@ -2115,6 +2172,7 @@ function DailyFigureCard() {
         </div>
         <p style={{ color: "#1e1b4b", fontSize: 15, lineHeight: 1.7, margin: "0 0 10px", fontStyle: "italic" }}>"{figure.quote}"</p>
         <p style={{ color: "#7c3aed", fontWeight: 700, fontSize: 13, margin: 0 }}>— {figure.name}</p>
+        <p style={{ color: "#9ca3af", fontSize: 11, margin: "4px 0 0" }}>מקור: {figure.source} · {figure.note || "הציטוט במקור באנגלית"}</p>
       </div>
 
       {showBio && (
@@ -2435,7 +2493,7 @@ const NAV_PARENT = [
   { id: "journal",     label: "הערות",   icon: "📝" },
 ];
 
-export default function App() {
+function MainApp() {
   const [role, setRole] = useState("kid");
   const [showPin, setShowPin] = useState(false);
   const [tab, setTab] = useState("home");
@@ -2980,4 +3038,37 @@ function ShareLanding({ data }) {
       </div>
     </div>
   );
+}
+
+
+
+// ─── Public share landing (no data loaded, no journal) ───────────────────────
+function PublicShare({ pct, done }) {
+  return (
+    <div dir="rtl" style={{ minHeight: "100vh", background: "linear-gradient(135deg,#f4f2ff,#ede9fe)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, fontFamily: "'Segoe UI', Tahoma, sans-serif" }}>
+      <div style={{ background: "#fff", borderRadius: 24, padding: "36px 28px", maxWidth: 420, width: "100%", textAlign: "center", boxShadow: "0 10px 40px rgba(124,58,237,0.15)" }}>
+        <div style={{ fontSize: 56 }}>🧭</div>
+        <h1 style={{ color: "#1e1b4b", fontSize: 26, margin: "8px 0" }}>עידו בדרך לבר מצווה</h1>
+        <p style={{ color: "#6b7280", margin: "0 0 20px" }}>שנת מסע של זהות, ערכים והתבגרות</p>
+        <div style={{ background: "#f4f2ff", borderRadius: 16, padding: 18 }}>
+          <div style={{ fontSize: 40, fontWeight: 800, color: "#7c3aed" }}>{pct}%</div>
+          <div style={{ color: "#4b5563", fontSize: 14 }}>{done} מתוך {TOTAL_TASKS} משימות הושלמו</div>
+          <div style={{ height: 8, background: "#e5e7eb", borderRadius: 8, marginTop: 12, overflow: "hidden" }}>
+            <div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg,#7c3aed,#a855f7)" }} />
+          </div>
+        </div>
+        <p style={{ color: "#9ca3af", fontSize: 12, marginTop: 18 }}>הדף הזה מציג רק את אחוז ההתקדמות.</p>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  const q = new URLSearchParams(window.location.search);
+  if (q.has("share")) {
+    const pct = Math.max(0, Math.min(100, parseInt(q.get("pct") || "0", 10) || 0));
+    const done = Math.max(0, Math.min(TOTAL_TASKS, parseInt(q.get("done") || "0", 10) || 0));
+    return <PublicShare pct={pct} done={done} />;
+  }
+  return <MainApp />;
 }
