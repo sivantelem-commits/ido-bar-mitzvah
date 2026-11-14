@@ -572,7 +572,7 @@ function T3_ChooseValues({ state, onChange, data, save }) {
       <p style={{ color: "#6b7280", fontSize: 13, margin: "0 0 10px" }}>
         בחר עד 5 ערכים — לחץ על ערך לתיאור:
       </p>
-      <input value={search} onChange={e => setSearch(e.target.value)} placeholder="חפש ערך..."
+      <input data-optional="1" value={search} onChange={e => setSearch(e.target.value)} placeholder="חפש ערך..."
         style={{ width: "100%", padding: "9px 14px", borderRadius: 10, boxSizing: "border-box", background: "#f3f4f6", border: "1px solid #e5e7eb", color: "#1e1b4b", fontSize: 13, outline: "none", direction: "rtl", marginBottom: 12 }} />
       <ValuePickerInline values={filtered} chosen={chosen} onToggle={toggleValue} />
 
@@ -1515,6 +1515,7 @@ export function TaskModal({ task, chapter, data, save, isParent, onClose, PhotoU
     const bad = [...root.querySelectorAll("textarea, input, select")].filter(el => {
       const t = (el.getAttribute("type") || "text").toLowerCase();
       if (["file", "checkbox", "radio", "button", "submit", "color", "hidden"].includes(t)) return false;
+      if (el.dataset.optional) return false;                    // e.g. search boxes
       if (t === "range") return !el.dataset.touched;           // slider must be moved at least once
       return !String(el.value || "").trim();
     });
