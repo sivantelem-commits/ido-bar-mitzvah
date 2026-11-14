@@ -427,7 +427,7 @@ function HeroCardMini({ hero, isSelected, isDisabled, onToggle }) {
                 flex: 1, padding: "7px", borderRadius: 8, fontSize: 12, cursor: "pointer",
                 background: isSelected ? "rgba(239,68,68,0.2)" : "rgba(124,58,237,0.5)",
                 border: isSelected ? "1px solid rgba(239,68,68,0.4)" : "none",
-                color: isSelected ? "#fca5a5" : "#fff", fontWeight: 600
+                color: isSelected ? "#dc2626" : "#1e1b4b", fontWeight: 600
               }}>{isSelected ? "הסר" : "הוסף ➕"}</button>
             )}
             <button onClick={() => setShowBio(false)} style={{ padding: "7px 10px", borderRadius: 8, fontSize: 12, background: "#f9fafb", border: "none", color: "#6b7280", cursor: "pointer" }}>✕</button>
@@ -467,18 +467,22 @@ function T3_ChooseValues({ state, onChange, data, save }) {
       suggestedValues: suggested,
       chosenValues: [],
     };
+    const nextState = { ...s, phase: "result", suggestedValues: suggested };
     if (save && data) {
-      save({ ...data, valueSnapshots: [...(data.valueSnapshots || []), snapshot] });
+      // one single save, so the second write doesn't overwrite the first with stale data
+      save({ ...data, valueSnapshots: [...(data.valueSnapshots || []), snapshot], taskData: { ...(data.taskData || {}), t3: nextState } });
+    } else {
+      onChange(nextState);
     }
-    onChange({ ...s, phase: "result", suggestedValues: suggested });
   }
 
   function toggleValue(name) {
     const cur = s.chosenValues || [];
     const next = cur.includes(name) ? cur.filter(v => v !== name) : cur.length < 5 ? [...cur, name] : cur;
-    onChange({ ...s, chosenValues: next });
-    // Also save to global values
-    if (save && data) save({ ...data, values: next });
+    const nextState = { ...s, chosenValues: next };
+    // one single save (task data + global values), so nothing is overwritten by stale data
+    if (save && data) save({ ...data, values: next, taskData: { ...(data.taskData || {}), t3: nextState } });
+    else onChange(nextState);
   }
 
   const chosen = s.chosenValues || [];
@@ -491,7 +495,7 @@ function T3_ChooseValues({ state, onChange, data, save }) {
       <div>
         <Intro emoji="🏆" title="בנה את הצוות שלך"
           desc="בחר 3 דמויות שהיית רוצה שיהיו לצידך במסע. הבחירות שלך יגלו את הערכים שמנחים אותך." />
-        <p style={{ color: heroSelected.length === 3 ? "#a855f7" : "rgba(255,255,255,0.4)", fontSize: 13, fontWeight: 600, textAlign: "center", margin: "0 0 16px" }}>
+        <p style={{ color: heroSelected.length === 3 ? "#a855f7" : "#6b7280", fontSize: 13, fontWeight: 600, textAlign: "center", margin: "0 0 16px" }}>
           {heroSelected.length}/3 נבחרו
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 20 }}>
@@ -507,7 +511,7 @@ function T3_ChooseValues({ state, onChange, data, save }) {
           <button onClick={goToResult} style={{
             width: "100%", padding: "14px", borderRadius: 14,
             background: "linear-gradient(135deg, #7c3aed, #a855f7)",
-            border: "none", color: "#1e1b4b", fontSize: 16, fontWeight: 700, cursor: "pointer"
+            border: "none", color: "#ffffff", fontSize: 16, fontWeight: 700, cursor: "pointer"
           }}>גלה מה הצוות שלך אומר עליך ←</button>
         )}
       </div>
@@ -539,7 +543,7 @@ function T3_ChooseValues({ state, onChange, data, save }) {
               padding: "6px 14px", borderRadius: 30, fontSize: 13,
               background: i < 3 ? "rgba(124,58,237,0.15)" : "#f3f4f6",
               border: i < 3 ? "1px solid rgba(124,58,237,0.5)" : "1px solid #e5e7eb",
-              color: i < 3 ? "#e9d5ff" : "rgba(255,255,255,0.6)"
+              color: i < 3 ? "#6d28d9" : "#6b7280"
             }}>
               {i < 3 ? "⭐ " : ""}{v}
             </span>
@@ -550,7 +554,7 @@ function T3_ChooseValues({ state, onChange, data, save }) {
       {/* Chosen */}
       {chosen.length > 0 && (
         <Card style={{ marginBottom: 16, background: chosen.length === 5 ? "rgba(234,179,8,0.07)" : "rgba(124,58,237,0.06)", border: chosen.length === 5 ? "1px solid rgba(234,179,8,0.3)" : "1px solid rgba(124,58,237,0.2)" }}>
-          <p style={{ color: chosen.length === 5 ? "#fbbf24" : "#c4b5fd", fontWeight: 600, fontSize: 14, margin: "0 0 10px" }}>
+          <p style={{ color: chosen.length === 5 ? "#b45309" : "#6d28d9", fontWeight: 600, fontSize: 14, margin: "0 0 10px" }}>
             {chosen.length === 5 ? "✨ המצפן שלך לשנה הזו" : `בחרת ${chosen.length}/5 ערכים`}
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
@@ -594,7 +598,7 @@ function ValuePickerInline({ values, chosen, onToggle }) {
               padding: "7px 13px", borderRadius: 9, fontSize: 13, cursor: isDisabled ? "not-allowed" : "pointer",
               background: isSel ? "rgba(124,58,237,0.15)" : "#f9fafb",
               border: isSel ? "1.5px solid #7c3aed" : "1px solid #e5e7eb",
-              color: isSel ? "#e9d5ff" : isDisabled ? "rgba(255,255,255,0.2)" : "#fff",
+              color: isSel ? "#6d28d9" : isDisabled ? "#9ca3af" : "#1e1b4b",
             }}>
               {isSel && "✓ "}{v.name}
             </button>
@@ -612,7 +616,7 @@ function ValuePickerInline({ values, chosen, onToggle }) {
                     flex: 1, padding: "7px", borderRadius: 7, fontSize: 12, cursor: isDisabled && !isSel ? "not-allowed" : "pointer",
                     background: isSel ? "rgba(239,68,68,0.15)" : "rgba(124,58,237,0.4)",
                     border: isSel ? "1px solid rgba(239,68,68,0.3)" : "none",
-                    color: isSel ? "#fca5a5" : "#fff"
+                    color: isSel ? "#dc2626" : "#fff"
                   }}>{isSel ? "הסר" : isDisabled ? "כבר 5 ✓" : "בחר ➕"}</button>
                   <button onClick={() => setExpanded(null)} style={{ padding: "7px 10px", borderRadius: 7, fontSize: 12, background: "#f9fafb", border: "none", color: "#9ca3af", cursor: "pointer" }}>✕</button>
                 </div>
@@ -835,7 +839,7 @@ function T9_NeedsWants({ state, onChange }) {
                     padding: "5px 14px", borderRadius: 8, fontSize: 12, cursor: "pointer",
                     background: sel ? "rgba(124,58,237,0.4)" : "#f9fafb",
                     border: sel ? "1px solid #7c3aed" : "1px solid #e5e7eb",
-                    color: sel ? "#e9d5ff" : "rgba(255,255,255,0.5)"
+                    color: sel ? "#6d28d9" : "#6b7280"
                   }}>{type}</button>
                 );
               })}
@@ -926,7 +930,7 @@ function T11_Laundry({ state, onChange }) {
                 border: done ? "none" : "1.5px solid #d1d5db",
                 display: "flex", alignItems: "center", justifyContent: "center"
               }}>{done && <span style={{ color: "#1e1b4b", fontSize: 12 }}>✓</span>}</div>
-              <span style={{ color: done ? "rgba(255,255,255,0.6)" : "#fff", fontSize: 14 }}>{step}</span>
+              <span style={{ color: done ? "#6b7280" : "#1e1b4b", fontSize: 14 }}>{step}</span>
             </div>
           );
         })}
@@ -1304,7 +1308,7 @@ export function MonthlyQuiz({ monthId, state, onChange }) {
                 padding: "14px 16px", borderRadius: 12, textAlign: "right",
                 background: isSel ? "rgba(124,58,237,0.25)" : "#ffffff",
                 border: isSel ? "1.5px solid #7c3aed" : "1px solid #e5e7eb",
-                color: isSel ? "#e9d5ff" : "#fff", fontSize: 14, cursor: answered ? "default" : "pointer",
+                color: isSel ? "#6d28d9" : "#1e1b4b", fontSize: 14, cursor: answered ? "default" : "pointer",
                 lineHeight: 1.5
               }}>{opt.text}</button>
             );
@@ -1347,10 +1351,10 @@ export function MonthlyQuiz({ monthId, state, onChange }) {
                 const isCorrect = oi === q.correct;
                 let bg = "#ffffff";
                 let border = "1px solid #e5e7eb";
-                let color = "#fff";
+                let color = "#1e1b4b";
                 if (ans !== undefined) {
-                  if (isCorrect) { bg = "rgba(16,185,129,0.15)"; border = "1px solid rgba(16,185,129,0.4)"; color = "#6ee7b7"; }
-                  else if (isSel) { bg = "rgba(239,68,68,0.12)"; border = "1px solid rgba(239,68,68,0.3)"; color = "#fca5a5"; }
+                  if (isCorrect) { bg = "rgba(16,185,129,0.15)"; border = "1px solid rgba(16,185,129,0.4)"; color = "#059669"; }
+                  else if (isSel) { bg = "rgba(239,68,68,0.12)"; border = "1px solid rgba(239,68,68,0.3)"; color = "#dc2626"; }
                 }
                 return (
                   <button key={oi} onClick={() => ans === undefined && answerQuiz(i, oi)} style={{

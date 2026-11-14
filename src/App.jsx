@@ -398,9 +398,9 @@ function TasksView({ data, save, isParent }) {
         <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "#f4f2ff", display: "flex", flexDirection: "column", overflow: "hidden" }}>
           <div style={{ background: "#f4f2ff", borderBottom: "1px solid #e5e7eb", padding: "14px 20px", display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
             <button onClick={() => setActiveQuiz(null)} style={{ background: "#e5e7eb", border: "none", color: "#1e1b4b", width: 34, height: 34, borderRadius: "50%", cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>←</button>
-            <p style={{ color: "#fbbf24", fontWeight: 700, fontSize: 15, margin: 0, flex: 1 }}>🎮 משחקון סיכום חודש</p>
+            <p style={{ color: "#b45309", fontWeight: 700, fontSize: 15, margin: 0, flex: 1 }}>🎮 משחקון סיכום חודש</p>
             {!!data.completed?.[`quiz_${activeQuiz.monthId}`] && (
-              <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, background: "rgba(16,185,129,0.2)", color: "#6ee7b7", border: "1px solid rgba(16,185,129,0.3)" }}>✓ הושלם</span>
+              <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, background: "rgba(16,185,129,0.2)", color: "#059669", border: "1px solid rgba(16,185,129,0.3)" }}>✓ הושלם</span>
             )}
             <button onClick={() => {
               const newTaskData = { ...(data.taskData || {}) };
@@ -408,7 +408,7 @@ function TasksView({ data, save, isParent }) {
               const newCompleted = { ...(data.completed || {}) };
               delete newCompleted[`quiz_${activeQuiz.monthId}`];
               save({ ...data, taskData: newTaskData, completed: newCompleted });
-            }} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 12, cursor: "pointer", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", color: "#fca5a5" }}>🔄 אפס</button>
+            }} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 12, cursor: "pointer", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", color: "#dc2626" }}>🔄 אפס</button>
           </div>
           <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px 100px" }}>
             {MONTH_QUIZZES_CH2[activeQuiz.monthId] || MONTH_QUIZZES_CH3[activeQuiz.monthId] || MONTH_QUIZZES_CH4[activeQuiz.monthId]
@@ -543,9 +543,9 @@ function TasksView({ data, save, isParent }) {
                       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                         <div style={{
                           width: 10, height: 10, borderRadius: "50%", flexShrink: 0,
-                          background: mDone ? "#10b981" : mUnlocked ? "#7c3aed" : "rgba(255,255,255,0.2)"
+                          background: mDone ? "#10b981" : mUnlocked ? "#7c3aed" : "#d1d5db"
                         }} />
-                        <p style={{ color: mUnlocked ? "#c4b5fd" : "rgba(255,255,255,0.3)", fontWeight: 600, fontSize: 14, margin: 0 }}>
+                        <p style={{ color: mUnlocked ? "#6d28d9" : "#9ca3af", fontWeight: 600, fontSize: 14, margin: 0 }}>
                           {m.month} – {m.title}
                         </p>
                         {!mUnlocked && <span style={{ color: "#d1d5db", fontSize: 11 }}>🔒 נפתח אחרי החודש הקודם</span>}
@@ -571,7 +571,7 @@ function TasksView({ data, save, isParent }) {
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <span style={{ color: done ? "#9ca3af" : "#1e1b4b", fontSize: 14, fontWeight: done ? 400 : 500, textDecoration: done ? "line-through" : "none", display: "block" }}>{task.text}</span>
                             </div>
-                            {taskUnlocked && !done && <span style={{ color: "#c4b5fd", fontSize: 16 }}>›</span>}
+                            {taskUnlocked && !done && <span style={{ color: "#6d28d9", fontSize: 16 }}>›</span>}
                           </div>
                         );
                       })}
@@ -741,7 +741,7 @@ function JournalView({ data, save, isParent }) {
               <span style={{
                 fontSize: 12, padding: "3px 10px", borderRadius: 20,
                 background: e.author === "ההורים" ? "rgba(16,185,129,0.15)" : "rgba(124,58,237,0.12)",
-                color: e.author === "ההורים" ? "#6ee7b7" : "#c4b5fd"
+                color: e.author === "ההורים" ? "#059669" : "#6d28d9"
               }}>{e.author}</span>
               <span style={{ color: "#9ca3af", fontSize: 12 }}>{e.date}</span>
             </div>
@@ -803,7 +803,7 @@ function ProgressView({ data }) {
         {CHAPTERS.flatMap(ch => ch.months).map(m => {
           const done = m.tasks.filter(t => data.completed[t.id]).length;
           const pct = Math.round((done / m.tasks.length) * 100);
-          const color = done === m.tasks.length ? "#10b981" : done > 0 ? "#7c3aed" : "rgba(255,255,255,0.15)";
+          const color = done === m.tasks.length ? "#10b981" : done > 0 ? "#7c3aed" : "#e5e7eb";
           return (
             <div key={m.id} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
               <span style={{ color: "#9ca3af", fontSize: 12, width: 100, flexShrink: 0, textAlign: "left" }}>
@@ -1067,7 +1067,7 @@ function ValuesView({ data, save }) {
         <button onClick={() => setGamePhase("game")} style={{
           padding: "7px 14px", borderRadius: 10, fontSize: 12, cursor: "pointer", flexShrink: 0,
           background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.3)",
-          color: "#c4b5fd"
+          color: "#6d28d9"
         }}>🏆 חזור למשחק</button>
       </div>
 
@@ -1077,7 +1077,7 @@ function ValuesView({ data, save }) {
           background: selected.length === 5 ? "rgba(234,179,8,0.08)" : "rgba(124,58,237,0.08)",
           border: selected.length === 5 ? "1px solid rgba(234,179,8,0.25)" : "1px solid rgba(124,58,237,0.2)"
         }}>
-          <p style={{ color: selected.length === 5 ? "#fbbf24" : "#c4b5fd", fontWeight: 600, margin: "0 0 10px", fontSize: 13 }}>
+          <p style={{ color: selected.length === 5 ? "#b45309" : "#6d28d9", fontWeight: 600, margin: "0 0 10px", fontSize: 13 }}>
             {selected.length === 5 ? "✨ המצפן שלך לשנה הזו" : `✓ בחרת ${selected.length}/5 ערכים`}
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -1086,7 +1086,7 @@ function ValuesView({ data, save }) {
                 display: "flex", alignItems: "center", gap: 8, padding: "6px 14px",
                 borderRadius: 30, background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.4)"
               }}>
-                <span style={{ color: "#e9d5ff", fontSize: 14, fontWeight: 500 }}>{v}</span>
+                <span style={{ color: "#6d28d9", fontSize: 14, fontWeight: 500 }}>{v}</span>
                 <button onClick={() => toggleValue(v)} style={{
                   background: "none", border: "none", color: "#9ca3af",
                   cursor: "pointer", fontSize: 16, lineHeight: 1, padding: 0
@@ -1121,7 +1121,7 @@ function ValuesView({ data, save }) {
                   padding: "8px 14px", borderRadius: 10, fontSize: 14, cursor: isDisabled ? "not-allowed" : "pointer",
                   background: isSelected ? "rgba(124,58,237,0.15)" : isExpanded ? "#e5e7eb" : "#f9fafb",
                   border: isSelected ? "1px solid rgba(124,58,237,0.6)" : "1px solid #e5e7eb",
-                  color: isSelected ? "#e9d5ff" : isDisabled ? "rgba(255,255,255,0.25)" : "#fff",
+                  color: isSelected ? "#6d28d9" : isDisabled ? "#9ca3af" : "#fff",
                   transition: "all 0.15s"
                 }}
               >
@@ -1136,14 +1136,14 @@ function ValuesView({ data, save }) {
                   background: "#ffffff", border: "1px solid rgba(124,58,237,0.4)",
                   boxShadow: "0 8px 32px rgba(0,0,0,0.6)"
                 }}>
-                  <p style={{ color: "#c4b5fd", fontWeight: 600, margin: "0 0 6px", fontSize: 14 }}>{v.name}</p>
+                  <p style={{ color: "#6d28d9", fontWeight: 600, margin: "0 0 6px", fontSize: 14 }}>{v.name}</p>
                   <p style={{ color: "#4b5563", fontSize: 13, margin: "0 0 12px", lineHeight: 1.6 }}>{v.desc}</p>
                   <div style={{ display: "flex", gap: 8 }}>
                     <button onClick={() => { toggleValue(v.name); setExpandedValue(null); }} style={{
                       flex: 1, padding: "8px", borderRadius: 8, fontSize: 13, cursor: isDisabled && !isSelected ? "not-allowed" : "pointer",
                       background: isSelected ? "rgba(239,68,68,0.15)" : "rgba(124,58,237,0.4)",
                       border: isSelected ? "1px solid rgba(239,68,68,0.3)" : "1px solid rgba(124,58,237,0.5)",
-                      color: isSelected ? "#fca5a5" : "#fff"
+                      color: isSelected ? "#dc2626" : "#fff"
                     }}>
                       {isSelected ? "הסר" : isDisabled ? "כבר 5 ✓" : "בחר ➕"}
                     </button>
@@ -1179,7 +1179,7 @@ function ManifestoView() {
         background: "linear-gradient(135deg, rgba(124,58,237,0.08) 0%, rgba(168,85,247,0.03) 100%)",
         border: "1px solid rgba(124,58,237,0.3)"
       }}>
-        <h2 style={{ color: "#c4b5fd", fontSize: 20, fontWeight: 700, margin: "0 0 8px" }}>טקס פתיחה</h2>
+        <h2 style={{ color: "#6d28d9", fontSize: 20, fontWeight: 700, margin: "0 0 8px" }}>טקס פתיחה</h2>
         <p style={{ color: "#4b5563", fontSize: 14, lineHeight: 1.8, margin: 0 }}>
           היום אנחנו מתחילים במסע משותף. זה לא מסע דתי או מסורתי, אלא מסע של התבגרות. מסע שבו אתה מתחיל להוביל את החיים שלך בצעד ראשון.
         </p>
@@ -1199,7 +1199,7 @@ function ManifestoView() {
             width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
             background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.4)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#c4b5fd", fontSize: 13, fontWeight: 700
+            color: "#6d28d9", fontSize: 13, fontWeight: 700
           }}>{i + 1}</div>
           <p style={{ color: "#374151", fontSize: 15, margin: 0, lineHeight: 1.6 }}>{c}</p>
         </div>
@@ -1209,7 +1209,7 @@ function ManifestoView() {
         marginTop: 24, padding: 20, borderRadius: 14,
         background: "rgba(16,185,129,0.07)", border: "1px solid rgba(16,185,129,0.2)"
       }}>
-        <p style={{ color: "#6ee7b7", fontWeight: 600, margin: "0 0 6px" }}>הבטחה מאיתנו</p>
+        <p style={{ color: "#059669", fontWeight: 600, margin: "0 0 6px" }}>הבטחה מאיתנו</p>
         <p style={{ color: "#4b5563", fontSize: 14, margin: 0, lineHeight: 1.7 }}>
           אנחנו מתחייבות להיות לצידך במסע הזה. לא להוביל במקומך, לא לפתור עבורך, לא להחליט — אלא לצעוד לצידך, לשאול, להקשיב, לאתגר כשצריך ולתמוך תמיד.
         </p>
@@ -1396,13 +1396,13 @@ function HeroCard({ hero, isSelected, isDisabled, onExpand, isExpanded, onToggle
               border: "2px solid rgba(124,58,237,0.4)"
             }} />
           )}
-          <p style={{ color: "#c4b5fd", fontWeight: 700, fontSize: 14, margin: "0 0 6px" }}>{hero.name}</p>
+          <p style={{ color: "#6d28d9", fontWeight: 700, fontSize: 14, margin: "0 0 6px" }}>{hero.name}</p>
           <p style={{ color: "#4b5563", fontSize: 12, margin: "0 0 10px", lineHeight: 1.6, clear: "both" }}>{hero.bio}</p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 12 }}>
             {hero.values.slice(0, 4).map(v => (
               <span key={v} style={{
                 padding: "3px 10px", borderRadius: 20, fontSize: 11,
-                background: "rgba(124,58,237,0.1)", color: "#c4b5fd",
+                background: "rgba(124,58,237,0.1)", color: "#6d28d9",
                 border: "1px solid rgba(124,58,237,0.3)"
               }}>{v}</span>
             ))}
@@ -1413,7 +1413,7 @@ function HeroCard({ hero, isSelected, isDisabled, onExpand, isExpanded, onToggle
                 flex: 1, padding: "8px", borderRadius: 8, fontSize: 12, cursor: "pointer",
                 background: isSelected ? "rgba(239,68,68,0.2)" : "rgba(124,58,237,0.5)",
                 border: isSelected ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(124,58,237,0.6)",
-                color: isSelected ? "#fca5a5" : "#fff", fontWeight: 600
+                color: isSelected ? "#dc2626" : "#fff", fontWeight: 600
               }}>
                 {isSelected ? "הסר מהצוות" : "הוסף לצוות ➕"}
               </button>
@@ -1478,7 +1478,7 @@ function HeroGame({ onFinish }) {
           padding: 20, borderRadius: 16, marginBottom: 20,
           background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.3)"
         }}>
-          <p style={{ color: "#c4b5fd", fontWeight: 600, fontSize: 15, margin: "0 0 14px" }}>
+          <p style={{ color: "#6d28d9", fontWeight: 600, fontSize: 15, margin: "0 0 14px" }}>
             הערכים שמאפיינים את הצוות שלך:
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -1487,7 +1487,7 @@ function HeroGame({ onFinish }) {
                 padding: "8px 16px", borderRadius: 30, fontSize: 14, fontWeight: 500,
                 background: i < 3 ? "rgba(124,58,237,0.2)" : "#f3f4f6",
                 border: i < 3 ? "1px solid rgba(124,58,237,0.6)" : "1px solid #e5e7eb",
-                color: i < 3 ? "#e9d5ff" : "rgba(255,255,255,0.6)"
+                color: i < 3 ? "#6d28d9" : "#6b7280"
               }}>
                 {i < 3 && <span style={{ marginLeft: 6 }}>⭐</span>}
                 {v}
@@ -1500,7 +1500,7 @@ function HeroGame({ onFinish }) {
           padding: 18, borderRadius: 14, marginBottom: 24,
           background: "rgba(16,185,129,0.07)", border: "1px solid rgba(16,185,129,0.2)"
         }}>
-          <p style={{ color: "#6ee7b7", fontSize: 13, margin: 0, lineHeight: 1.7 }}>
+          <p style={{ color: "#059669", fontSize: 13, margin: 0, lineHeight: 1.7 }}>
             💡 הערכים המודגשים בכוכב הם הכי חזקים אצלך לפי הבחירות שלך. השתמש בהם כנקודת מוצא כשתבחר את 5 הערכים שלך.
           </p>
         </div>
@@ -1533,7 +1533,7 @@ function HeroGame({ onFinish }) {
         <p style={{ color: "#6b7280", fontSize: 14, margin: "0 0 4px" }}>
           בחר 3 דמויות שהיית רוצה שיהיו לצידך במסע הזה
         </p>
-        <p style={{ color: selected.length === 3 ? "#a855f7" : "rgba(255,255,255,0.35)", fontSize: 13, fontWeight: 600 }}>
+        <p style={{ color: selected.length === 3 ? "#a855f7" : "#9ca3af", fontSize: 13, fontWeight: 600 }}>
           {selected.length}/3 נבחרו
         </p>
       </div>
@@ -1580,7 +1580,7 @@ function HeroAvatar({ hero, size = 64 }) {
         ? <img src={imgUrl} alt={hero.name} style={{ width: size, height: size, borderRadius: "50%", objectFit: "cover", objectPosition: "top", border: "2px solid #7c3aed" }} />
         : <div style={{ width: size, height: size, borderRadius: "50%", background: "rgba(124,58,237,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, border: "2px solid #7c3aed" }}>{hero.name[0]}</div>
       }
-      <p style={{ color: "#c4b5fd", fontSize: 11, margin: "6px 0 0" }}>{hero.name.split(" ")[0]}</p>
+      <p style={{ color: "#6d28d9", fontSize: 11, margin: "6px 0 0" }}>{hero.name.split(" ")[0]}</p>
     </div>
   );
 }
@@ -1657,7 +1657,7 @@ function ValuesMapView({ data, save }) {
                   padding: "8px 14px", borderRadius: 10, fontSize: 12, cursor: "pointer",
                   background: isSel ? `${color}25` : "#ffffff",
                   border: isSel ? `1.5px solid ${color}` : "1px solid #e5e7eb",
-                  color: isSel ? "#fff" : "rgba(255,255,255,0.5)",
+                  color: isSel ? "#fff" : "#6b7280",
                   display: "flex", alignItems: "center", gap: 8
                 }}>
                   <span style={{ width: 10, height: 10, borderRadius: "50%", background: color, display: "inline-block", flexShrink: 0 }} />
@@ -1682,7 +1682,7 @@ function ValuesMapView({ data, save }) {
           padding: "12px 16px", borderRadius: 12, marginBottom: 20,
           background: "rgba(234,179,8,0.07)", border: "1px solid rgba(234,179,8,0.2)"
         }}>
-          <p style={{ color: "#fbbf24", fontWeight: 600, fontSize: 13, margin: "0 0 8px" }}>⭐ הערכים שבחרת כרגע</p>
+          <p style={{ color: "#b45309", fontWeight: 600, fontSize: 13, margin: "0 0 8px" }}>⭐ הערכים שבחרת כרגע</p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
             {data.values.map(v => (
               <span key={v} style={{
@@ -1727,7 +1727,7 @@ function ValuesMapView({ data, save }) {
                   return (
                     <tr key={value} style={{ background: rowIdx % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent" }}>
                       <td style={{
-                        color: data.values?.includes(value) ? "#fbbf24" : "rgba(255,255,255,0.8)",
+                        color: data.values?.includes(value) ? "#b45309" : "#6b7280",
                         fontSize: 13, padding: "8px", fontWeight: data.values?.includes(value) ? 600 : 400
                       }}>
                         {data.values?.includes(value) ? "⭐ " : ""}{value}
@@ -1735,10 +1735,10 @@ function ValuesMapView({ data, save }) {
                       {visibleSnapshots.map((snap, i) => {
                         const score = getValueScore(snap.id, value);
                         const color = SNAPSHOT_COLORS[snapshots.indexOf(snap) % SNAPSHOT_COLORS.length];
-                        const cell = score === 0 ? { bg: "transparent", text: "—", color: "rgba(255,255,255,0.15)" }
+                        const cell = score === 0 ? { bg: "transparent", text: "—", color: "#9ca3af" }
                           : score === 1 ? { bg: `${color}18`, text: "הוצע", color }
                           : score === 2 ? { bg: `${color}30`, text: "⭐ חזק", color }
-                          : { bg: "rgba(234,179,8,0.2)", text: "💛 נבחר", color: "#fbbf24" };
+                          : { bg: "rgba(234,179,8,0.2)", text: "💛 נבחר", color: "#b45309" };
                         return (
                           <td key={snap.id} style={{ textAlign: "center", padding: "6px 4px" }}>
                             <span style={{
@@ -1775,7 +1775,7 @@ function ValuesMapView({ data, save }) {
             return (
               <div key={value} style={{ marginBottom: 12 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                  <span style={{ color: data.values?.includes(value) ? "#fbbf24" : "rgba(255,255,255,0.7)", fontSize: 13 }}>
+                  <span style={{ color: data.values?.includes(value) ? "#b45309" : "#6b7280", fontSize: 13 }}>
                     {data.values?.includes(value) ? "⭐ " : ""}{value}
                   </span>
                 </div>

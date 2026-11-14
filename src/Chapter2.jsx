@@ -83,7 +83,7 @@ export function T13_EmotionJournal({ state, onChange }) {
                 padding: "6px 12px", borderRadius: 20, fontSize: 12, cursor: "pointer",
                 background: entry.emotion === em ? "rgba(124,58,237,0.2)" : "#f9fafb",
                 border: entry.emotion === em ? "1.5px solid #7c3aed" : "1px solid #e5e7eb",
-                color: entry.emotion === em ? "#e9d5ff" : "rgba(255,255,255,0.6)"
+                color: entry.emotion === em ? "#6d28d9" : "#6b7280"
               }}>{em}</button>
             ))}
           </div>
@@ -164,7 +164,7 @@ export function T14_BraveConversation({ state, onChange }) {
             )}
             <button onClick={() => { onChange({ ...s, step: step + 1 }); setStep(step + 1); }}
               disabled={!s[currentStep.key]}
-              style={{ flex: 1, padding: "11px", borderRadius: 12, background: s[currentStep.key] ? "linear-gradient(135deg, #7c3aed, #a855f7)" : "#f9fafb", border: "none", color: s[currentStep.key] ? "#fff" : "rgba(255,255,255,0.3)", fontSize: 15, fontWeight: 600, cursor: s[currentStep.key] ? "pointer" : "not-allowed" }}>
+              style={{ flex: 1, padding: "11px", borderRadius: 12, background: s[currentStep.key] ? "linear-gradient(135deg, #7c3aed, #a855f7)" : "#f9fafb", border: "none", color: s[currentStep.key] ? "#fff" : "#9ca3af", fontSize: 15, fontWeight: 600, cursor: s[currentStep.key] ? "pointer" : "not-allowed" }}>
               {step < steps.length - 1 ? "הבא →" : "סיום ✓"}
             </button>
           </div>
@@ -210,7 +210,7 @@ export function T15_Volunteer({ state, onChange }) {
               padding: "8px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
               background: s.cause === c ? "rgba(124,58,237,0.15)" : "#f9fafb",
               border: s.cause === c ? "1.5px solid #7c3aed" : "1px solid #e5e7eb",
-              color: s.cause === c ? "#e9d5ff" : "rgba(255,255,255,0.7)"
+              color: s.cause === c ? "#6d28d9" : "#6b7280"
             }}>{c}</button>
           ))}
         </div>
@@ -234,7 +234,7 @@ export function T15_Volunteer({ state, onChange }) {
               flex: 1, padding: "9px 6px", borderRadius: 10, fontSize: 12, cursor: "pointer",
               background: s.freq === f ? "rgba(124,58,237,0.15)" : "#f9fafb",
               border: s.freq === f ? "1.5px solid #7c3aed" : "1px solid #e5e7eb",
-              color: s.freq === f ? "#e9d5ff" : "rgba(255,255,255,0.6)"
+              color: s.freq === f ? "#6d28d9" : "#6b7280"
             }}>{f}</button>
           ))}
         </div>
@@ -417,7 +417,7 @@ export function T18_TrainingPlan({ state, onChange }) {
                 border: week.done ? "none" : "1.5px solid #d1d5db",
                 display: "flex", alignItems: "center", justifyContent: "center", color: "#1e1b4b", fontSize: 13
               }}>{week.done ? "✓" : ""}</button>
-              <p style={{ color: week.done ? "#6ee7b7" : "#fff", fontWeight: 600, fontSize: 14, margin: 0, flex: 1 }}>שבוע {week.week}</p>
+              <p style={{ color: week.done ? "#059669" : "#1e1b4b", fontWeight: 600, fontSize: 14, margin: 0, flex: 1 }}>שבוע {week.week}</p>
             </div>
             <div style={{ padding: "0 16px 14px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
               <div>
@@ -538,7 +538,7 @@ export function T21_TakeTrip({ state, onChange }) {
               flex: 1, padding: "10px 8px", borderRadius: 10, fontSize: 12, cursor: "pointer",
               background: s.success === opt ? "rgba(124,58,237,0.15)" : "#f9fafb",
               border: s.success === opt ? "1.5px solid #7c3aed" : "1px solid #e5e7eb",
-              color: s.success === opt ? "#e9d5ff" : "rgba(255,255,255,0.6)", lineHeight: 1.4
+              color: s.success === opt ? "#6d28d9" : "#6b7280", lineHeight: 1.4
             }}>{opt}</button>
           ))}
         </div>
@@ -720,7 +720,7 @@ export function QuizM5({ state, onChange }) {
                     padding: "8px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
                     background: isSel ? `${cat.color}30` : "#f9fafb",
                     border: isSel ? `1.5px solid ${cat.color}` : "1px solid #e5e7eb",
-                    color: isSel ? "#fff" : "rgba(255,255,255,0.6)", transition: "all 0.15s"
+                    color: isSel ? "#1e1b4b" : "#6b7280", transition: "all 0.15s"
                   }}>{isSel ? "✓ " : ""}{em}</button>
                 );
               })}
@@ -757,10 +757,10 @@ export function QuizM5({ state, onChange }) {
             const isBest = opt.v === sc.best;
             let bg = "#ffffff";
             let border = "1px solid #e5e7eb";
-            let color = "#fff";
+            let color = "#1e1b4b";
             if (answered) {
-              if (isBest) { bg = "rgba(16,185,129,0.15)"; border = "1px solid rgba(16,185,129,0.4)"; color = "#6ee7b7"; }
-              else if (isSel) { bg = "rgba(239,68,68,0.1)"; border = "1px solid rgba(239,68,68,0.3)"; color = "#fca5a5"; }
+              if (isBest) { bg = "rgba(16,185,129,0.15)"; border = "1px solid rgba(16,185,129,0.4)"; color = "#059669"; }
+              else if (isSel) { bg = "rgba(239,68,68,0.1)"; border = "1px solid rgba(239,68,68,0.3)"; color = "#dc2626"; }
             }
             return (
               <button key={opt.v} onClick={() => !answered && onChange({ ...s, scenarioAnswers: { ...(s.scenarioAnswers || {}), [sc.id]: opt.v } })} style={{ padding: "14px 16px", borderRadius: 12, textAlign: "right", background: bg, border, color, fontSize: 14, cursor: answered ? "default" : "pointer", lineHeight: 1.5 }}>
@@ -803,7 +803,7 @@ export function QuizM5({ state, onChange }) {
           <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
             {selected.map(em => {
               const cat = emotionCategories.find(c => c.emotions.includes(em));
-              return <span key={em} style={{ padding: "6px 14px", borderRadius: 20, fontSize: 13, background: `${cat?.color || "#7c3aed"}20`, border: `1px solid ${cat?.color || "#7c3aed"}50`, color: cat?.color || "#c4b5fd" }}>{em}</span>;
+              return <span key={em} style={{ padding: "6px 14px", borderRadius: 20, fontSize: 13, background: `${cat?.color || "#7c3aed"}20`, border: `1px solid ${cat?.color || "#7c3aed"}50`, color: cat?.color || "#6d28d9" }}>{em}</span>;
             })}
           </div>
         </div>
@@ -889,7 +889,7 @@ export function QuizM6({ state, onChange }) {
                 padding: "14px 16px", borderRadius: 12, textAlign: "right",
                 background: isSel ? "rgba(124,58,237,0.25)" : "#ffffff",
                 border: isSel ? "1.5px solid #7c3aed" : "1px solid #e5e7eb",
-                color: isSel ? "#e9d5ff" : "#fff", fontSize: 14, cursor: answered ? "default" : "pointer"
+                color: isSel ? "#6d28d9" : "#1e1b4b", fontSize: 14, cursor: answered ? "default" : "pointer"
               }}>{opt.t}</button>
             );
           })}
@@ -973,7 +973,7 @@ export function QuizM7({ state, onChange }) {
               transition: "all 0.3s"
             }}>
               <p style={{ fontSize: 20, margin: "0 0 8px" }}>{flipped[block.id] ? "✅" : "🚧"}</p>
-              <p style={{ color: flipped[block.id] ? "#6ee7b7" : "#fca5a5", fontSize: 13, margin: 0, lineHeight: 1.5, fontWeight: flipped[block.id] ? 600 : 400 }}>
+              <p style={{ color: flipped[block.id] ? "#059669" : "#dc2626", fontSize: 13, margin: 0, lineHeight: 1.5, fontWeight: flipped[block.id] ? 600 : 400 }}>
                 {flipped[block.id] ? block.reframe : block.block}
               </p>
             </div>
@@ -1015,7 +1015,7 @@ export function QuizM7({ state, onChange }) {
         <p style={{ color: "#6b7280", fontSize: 14, margin: 0 }}>הגוף שלך הוכיח שהראש יכול להוביל</p>
       </div>
       <Card style={{ border: "1px solid rgba(234,179,8,0.3)", background: "rgba(234,179,8,0.07)", marginBottom: 16 }}>
-        <p style={{ color: "#fbbf24", fontWeight: 600, fontSize: 14, margin: "0 0 10px" }}>לפני ← אחרי</p>
+        <p style={{ color: "#b45309", fontWeight: 600, fontSize: 14, margin: "0 0 10px" }}>לפני ← אחרי</p>
         <p style={{ color: "#6b7280", fontSize: 13, margin: "0 0 6px" }}>{s.before}</p>
         <p style={{ color: "#059669", fontSize: 14, fontWeight: 600, margin: 0 }}>↓ {s.after}</p>
       </Card>
